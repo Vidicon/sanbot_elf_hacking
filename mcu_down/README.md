@@ -65,6 +65,7 @@
  - CLK of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - Data of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - CLK and Data have 2K2 pullups to 3.3v
+ - Clk @ 121 Khz 
 
 ---
 
