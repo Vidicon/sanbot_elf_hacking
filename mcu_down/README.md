@@ -26,9 +26,13 @@
 
 ### RGB LED (J51 J52 J53)
 
-| Pin 1 | Pin 2 | Pin 3 | Pin 4 |
-|----------|----------|----------|----------|
-|   GND  |   Red  |   Green  |   Blue  |
+|    | Pin 1 | Pin 2 | Pin 3 | Pin 4 |
+|----------|----------|----------|----------|----------|
+|          |   GND  |   Red  |   Green  |   Blue  |
+|  |  |  |  |  |
+| Wing Left  |     |   PH13  |   PH14  |   PH15  |
+| Wing Right |     |   PD10  |   PD14  |   PD15  |
+| Bottom     |     |   PG12  |   PG13  |   PG15  |
 
 ---
 
@@ -37,6 +41,11 @@
 | Pin 1 | Pin 2 |
 |----------|----------|
 |   GND  |   Sense  |
+
+STM32F2 connections:
+| Touch0 | Touch1 | Touch2 | Touch3 | Touch4 | Touch5 | Touch6 | Touch7 |
+|----------|----------|----------|----------|----------|----------|----------|----------|
+|   PE7  |   PE8  |   PE9  |   PE10  |   PE12  |   PE13  |   PE14  |   PE15  |
 
 ---
 
