@@ -78,7 +78,7 @@
 
 ---
 
-### Gyroboard 1x (J45)
+### IMU Board 1x (J45)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|
@@ -90,9 +90,26 @@ The external board contains:
 
 ---
 
+### Battery + Charger (J46)
+
+| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
+|----------|----------|----------|----------|----------|
+|   SCL  |   SDA  |   GND?  |    Charging   |   charging_complete?   |
+
+The external board contains:
+ - 5 wires down to Charger board
+ - 3 wires to Battery BMS (SCL, SDA, GND)
+ - Battery has the TI BQ3055 battery manager IC
+
+---
+
 ### IR Docking sensor 1x (J47 J49)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
 |----------|----------|----------|----------|----------|
 |   IN_R  |   IN_M  |    IN_L   |   GND  |   3.3  |
+
+ - Read 3 IR Receivers for docking,
+ - Dock transmits IR Light, based on what receiver sees the light a heading can be determinant.
+ - Middle receiver can only see in a small slit
 
