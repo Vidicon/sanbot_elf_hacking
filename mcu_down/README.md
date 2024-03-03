@@ -78,9 +78,21 @@
 
 ---
 
+### Gyroboard 1x (J45)
+
+| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
+|----------|----------|----------|----------|----------|----------|
+|   3.3v  |   GND  |    SDA   |   SCL  |   INT_GYRO  | INT_MAG |
+
+The external board contains:
+ - STMicroelectronics LSM6DSL Gyroscope + accelerometer
+ - STMicroelectronics LSM303AH Magnetometer + accelerometer
+
+---
+
 ### IR Docking sensor 1x (J47 J49)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
 |----------|----------|----------|----------|----------|
-|   ??1  |   ??2  |    ??3   |   GND  |   3.3  |
+|   IN_R  |   IN_M  |    IN_L   |   GND  |   3.3  |
 
