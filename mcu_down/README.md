@@ -56,6 +56,15 @@
 
 ---
 
+### Distence sensor 4x (7x) (J19)
+
+| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+|   3.3v  |   SCL  |   GND  |   SDA  |   GND  |   CS1  |   CS2  |   CS3  |   CS4  |   CS5  |   CS6  |   CS7  |
+|     |   PD7  |     |   PD6  |     |   PD5  |   PD4  |   PD3  |   PD2  |   PD1  |   PD0  |   PC12  |
+
+---
+
 ### Distence sensor 1x (J21 J24 J28)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
