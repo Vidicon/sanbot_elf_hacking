@@ -14,9 +14,12 @@
 
 ### Motors (J8 J9 J10 J14 J15)
 
-| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 |
-|----------|----------|----------|----------|----------|----------|----------|
-|   encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
+|      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 |
+|----------|----------|----------|----------|----------|----------|----------|----------|
+|                |   encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
+|  Motor Left    |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
+|  Motor Center  |  -  |   PF0  |   PF6   |  -  |  PF1   |  -   |  -   |
+|  Motor Right   |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
 
  - PWM is at 10Khz 3.3v
  - Enable is active low 3.3v
