@@ -111,12 +111,14 @@ The external board contains:
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
 |----------|----------|----------|----------|----------|
-|   SCL  |   SDA  |   GND?  |    Charging   |   charging_complete?   |
+|   SCL  |   SDA  |   GND?  |   charging_complete? |   Charging  |
 
 The external board contains:
  - 5 wires down to Charger board
  - 3 wires to Battery BMS (SCL, SDA, GND)
  - Battery has the TI BQ3055 battery manager IC
+ - Charging line is pulled to GND during charging, when not charging its at 3.3v
+ - charging_complete is pulled to GND when the battery is full
 
 ---
 
