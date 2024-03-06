@@ -21,8 +21,8 @@
 |  Motor Center  |  -  |   PF0  |   PF6   |  -  |  PF1   |  -   |  -   |
 |  Motor Right   |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
 
- - PWM is at 10Khz 3.3v
- - Enable is active low 3.3v
+ - PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, 
+ - Enable is active high 3.3v
  - DIR pull down to reverse motor direction 3.3v
 
 ---
