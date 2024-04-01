@@ -18,7 +18,7 @@
 |----------|----------|----------|----------|----------|----------|----------|----------|
 |                |   encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
 |  Motor Left    |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
-|  Motor Center  |  -  |   PF0  |   PF6   |  -  |  PF1   |  -   |  -   |
+|  Motor Center  |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
 |  Motor Right   |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
 
  - PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, 
