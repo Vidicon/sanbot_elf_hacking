@@ -107,6 +107,47 @@ The external board contains:
 
 Most EAST pin is 1 (+3.3V)
 
+| IC | Sensor | Write addr | Read addr | Used signals|
+|----------|----------|----------|----------|----------|
+|LSM6DSL	|3D accelerometer and 3D gyroscope	|0xd4	|0xd5	|Linear accel & Rotational accel|                
+|LSM303AH	|Magnetic field sensor	|0x3c	|0x3d	|Compass X Y Z|                
+|LSM303AH	|Linear acceleration sensor	|0x3a	|0x3b	|Not used?|
+
+
+#### LSM6DSL (0xd4/0xd5)
+|Registers| Name | Meaning| 
+|-----   |----| ----  |
+|  0x1e  |STATUS_REG  | Status|
+|  0x22  | OUTX_L_G   |Angular acceleration Pitch Low Byte|
+|  0x23  | OUTX_H_G   |Angular acceleration Pitch High Byte|
+|  0x24  | OUTY_L_G   |Angular acceleration Roll Low Byte|
+|  0x25  | OUTY_H_G   |Angular acceleration Roll High Byte|
+|  0x26  | OUTZ_L_G   |Angular acceleration Yaw Low Byte|
+|  0x27  | OUTZ_H_G   |Angular acceleration Yaw High Byte|
+|  0x28  | OUTX_L_XL  |Linear acceleration X Low Byte|
+|  0x29  | OUTX_H_XL  |Linear acceleration X High Byte|
+|  0x2a  | OUTY_L_XL  |Linear acceleration Y Low Byte|
+|  0x2b  | OUTY_H_XL  |Linear acceleration Y High Byte|
+|  0x2c  | OUTZ_L_XL  |Linear acceleration Z Low Byte|
+|  0x2d  | OUTZ_H_XL  |Linear acceleration Z High Byte|
+
+#### LSM303AH (0x3c/0x3d)
+|Registers| Name | Meaning|
+|-----|----|----|
+|  0x68  | OUTX_L_REG_M  |X magnetic data Low Byte |
+|  0x69  | OUTX_H_REG_M  |X magnetic data High Byte |
+|  0x6a  | OUTY_L_REG_M  |Y magnetic data Low Byte |
+|  0x6b  | OUTY_H_REG_M  |Y magnetic data High Byte |
+|  0x6c  | OUTZ_L_REG_M  |Z magnetic data Low Byte |
+|  0x6d  | OUTZ_H_REG_M  |Z magnetic data High Byte |
+
+#### Interrupts
+
+Interrupts are triggered when a certain threshold is exceeded.
+Most likely configured during startup. 
+* Maybe not need when using polling?
+* Maybe default values are good enough?
+
 ---
 
 ### Battery + Charger (J46)
