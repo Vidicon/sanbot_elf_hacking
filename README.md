@@ -134,12 +134,19 @@ Most EAST pin is 1 (+3.3V)
 #### LSM303AH (0x3c/0x3d)
 |Registers| Name | Meaning|
 |-----|----|----|
-|  0x68  | OUTX_L_REG_M  |
-|  0x69  | OUTX_H_REG_M  |
-|  0x6a  | OUTY_L_REG_M  |
-|  0x6b  | OUTY_H_REG_M  |
-|  0x6c  | OUTZ_L_REG_M  |
-|  0x6d  | OUTZ_H_REG_M  |
+|  0x68  | OUTX_L_REG_M  |X magnetic data Low Byte |
+|  0x69  | OUTX_H_REG_M  |X magnetic data High Byte |
+|  0x6a  | OUTY_L_REG_M  |Y magnetic data Low Byte |
+|  0x6b  | OUTY_H_REG_M  |Y magnetic data High Byte |
+|  0x6c  | OUTZ_L_REG_M  |Z magnetic data Low Byte |
+|  0x6d  | OUTZ_H_REG_M  |Z magnetic data High Byte |
+
+#### Interrupts
+
+Interrupts are triggered when a certain threshold is exceeded.
+Most likely configured during startup. 
+* Maybe not need when using polling?
+* Maybe default values are good enough?
 
 ---
 
