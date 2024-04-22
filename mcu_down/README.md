@@ -105,6 +105,8 @@ The external board contains:
  - STMicroelectronics LSM6DSL Gyroscope + accelerometer
  - STMicroelectronics LSM303AH Magnetometer + accelerometer
 
+Most EAST pin is 1 (+3.3V)
+
 ---
 
 ### Battery + Charger (J46)
