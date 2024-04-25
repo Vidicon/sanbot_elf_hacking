@@ -37,6 +37,9 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+int Update_10Hz;
+int Update_5Hz;
+int Update_2Hz;
 
 /* USER CODE END ET */
 
@@ -58,6 +61,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define WingRightRed_Pin GPIO_PIN_10
+#define WingRightRed_GPIO_Port GPIOD
+#define WingRightGreen_Pin GPIO_PIN_14
+#define WingRightGreen_GPIO_Port GPIOD
+#define WingRightBlue_Pin GPIO_PIN_15
+#define WingRightBlue_GPIO_Port GPIOD
+#define WingLeftRed_Pin GPIO_PIN_13
+#define WingLeftRed_GPIO_Port GPIOH
+#define WingLeftGreen_Pin GPIO_PIN_14
+#define WingLeftGreen_GPIO_Port GPIOH
+#define WingLeftBlue_Pin GPIO_PIN_15
+#define WingLeftBlue_GPIO_Port GPIOH
+#define BottomRed_Pin GPIO_PIN_12
+#define BottomRed_GPIO_Port GPIOG
+#define BottomGreen_Pin GPIO_PIN_13
+#define BottomGreen_GPIO_Port GPIOG
+#define BottomBlue_Pin GPIO_PIN_15
+#define BottomBlue_GPIO_Port GPIOG
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
