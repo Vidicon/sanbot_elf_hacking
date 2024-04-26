@@ -1,5 +1,8 @@
-main.c:69:5:main	8	static
-main.c:159:6:SystemClock_Config	80	static
-main.c:201:13:MX_TIM14_Init	8	static
-main.c:232:13:MX_GPIO_Init	48	static
-main.c:282:6:Error_Handler	4	static,ignoring_inline_asm
+main.c:65:6:System_Initialize	8	static
+main.c:72:6:System_SelfTest	8	static
+main.c:77:6:Check_USB_Communication	8	static
+main.c:93:5:main	8	static
+main.c:158:6:SystemClock_Config	80	static
+main.c:200:13:MX_TIM14_Init	8	static
+main.c:231:13:MX_GPIO_Init	48	static
+main.c:281:6:Error_Handler	4	static,ignoring_inline_asm

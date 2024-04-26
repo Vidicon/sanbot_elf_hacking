@@ -16,6 +16,7 @@ RM := rm -rf
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include Communication/Protocol_0x55/Src/subdir.mk
+-include Actuators/RGBLeds/Src/subdir.mk
 -include subdir.mk
 -include objects.mk
 

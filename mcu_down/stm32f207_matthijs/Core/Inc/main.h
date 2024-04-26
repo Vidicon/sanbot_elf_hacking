@@ -61,24 +61,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define WingRightRed_Pin GPIO_PIN_10
-#define WingRightRed_GPIO_Port GPIOD
-#define WingRightGreen_Pin GPIO_PIN_14
-#define WingRightGreen_GPIO_Port GPIOD
-#define WingRightBlue_Pin GPIO_PIN_15
-#define WingRightBlue_GPIO_Port GPIOD
-#define WingLeftRed_Pin GPIO_PIN_13
-#define WingLeftRed_GPIO_Port GPIOH
-#define WingLeftGreen_Pin GPIO_PIN_14
-#define WingLeftGreen_GPIO_Port GPIOH
-#define WingLeftBlue_Pin GPIO_PIN_15
-#define WingLeftBlue_GPIO_Port GPIOH
-#define BottomRed_Pin GPIO_PIN_12
-#define BottomRed_GPIO_Port GPIOG
-#define BottomGreen_Pin GPIO_PIN_13
-#define BottomGreen_GPIO_Port GPIOG
-#define BottomBlue_Pin GPIO_PIN_15
-#define BottomBlue_GPIO_Port GPIOG
+#define RightArmRed_Pin GPIO_PIN_10
+#define RightArmRed_GPIO_Port GPIOD
+#define RightArmGreen_Pin GPIO_PIN_14
+#define RightArmGreen_GPIO_Port GPIOD
+#define RightArmBlue_Pin GPIO_PIN_15
+#define RightArmBlue_GPIO_Port GPIOD
+#define LeftArmRed_Pin GPIO_PIN_13
+#define LeftArmRed_GPIO_Port GPIOH
+#define LeftArmGreen_Pin GPIO_PIN_14
+#define LeftArmGreen_GPIO_Port GPIOH
+#define LeftArmBlue_Pin GPIO_PIN_15
+#define LeftArmBlue_GPIO_Port GPIOH
+#define BaseRed_Pin GPIO_PIN_12
+#define BaseRed_GPIO_Port GPIOG
+#define BaseGreen_Pin GPIO_PIN_13
+#define BaseGreen_GPIO_Port GPIOG
+#define BaseBlue_Pin GPIO_PIN_15
+#define BaseBlue_GPIO_Port GPIOG
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

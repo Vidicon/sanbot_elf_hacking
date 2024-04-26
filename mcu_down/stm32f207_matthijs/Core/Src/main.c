@@ -25,6 +25,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "protocol_0x55.h"
+#include "RGBLeds.h"
+#include "RobotGlobals.h"
 
 /* USER CODE END Includes */
 
@@ -60,6 +62,28 @@ static void MX_TIM14_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void System_Initialize()
+{
+	HAL_TIM_Base_Start_IT(&htim14);
+
+	RGBLeds_Init();
+}
+
+void System_SelfTest()
+{
+	RGBLeds_SelfTest(True);
+}
+
+void Check_USB_Communication()
+{
+	if (Protocol_0x55_CheckFifo() > 0)
+	{
+		Protocol_0x55_ProcessRxCommand();
+
+		// if (valid) --> find module to handle command
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -94,20 +118,9 @@ int main(void)
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_GPIO_WritePin(WingRightRed_GPIO_Port, 	WingRightRed_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(WingRightGreen_GPIO_Port, 	WingRightGreen_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(WingRightBlue_GPIO_Port, 	WingRightBlue_Pin, GPIO_PIN_SET);
+  System_Initialize();
+  System_SelfTest();
 
-  HAL_GPIO_WritePin(WingLeftRed_GPIO_Port, 		WingLeftRed_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(WingLeftGreen_GPIO_Port, 	WingLeftGreen_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(WingLeftBlue_GPIO_Port, 	WingLeftBlue_Pin, GPIO_PIN_RESET);
-
-
-  HAL_GPIO_WritePin(BottomRed_GPIO_Port, 	BottomRed_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(BottomGreen_GPIO_Port, 	BottomGreen_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(BottomBlue_GPIO_Port, 	BottomBlue_Pin, GPIO_PIN_RESET);
-
-  HAL_TIM_Base_Start_IT(&htim14);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,34 +130,20 @@ int main(void)
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
+		  RGBLeds_Update10Hz();
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
-//		  HAL_GPIO_TogglePin(WingRightRed_GPIO_Port, WingRightRed_Pin);
-//		  HAL_GPIO_TogglePin(BottomRed_GPIO_Port, 	BottomRed_Pin);
 	  }
 
 	  if (Update_2Hz)
 	  {
 		  Update_2Hz = 0;
-//		  HAL_GPIO_TogglePin(WingLeftGreen_GPIO_Port, 	WingLeftGreen_Pin);
-//		  HAL_GPIO_TogglePin(BottomGreen_GPIO_Port, 	BottomGreen_Pin);
 	  }
 
-	  if (Protocol_0x55_CheckFifo() > 0)
-	  {
-		  Protocol_0x55_ProcessRxCommand();
-
-		  HAL_GPIO_WritePin(WingLeftBlue_GPIO_Port, WingLeftBlue_Pin, GPIO_PIN_RESET);
-//		  HAL_GPIO_WritePin(WingRightBlue_GPIO_Port, WingRightBlue_Pin, GPIO_PIN_RESET);
-
-		  HAL_GPIO_WritePin(WingRightRed_GPIO_Port, WingRightRed_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(WingLeftGreen_GPIO_Port, 	WingLeftGreen_Pin, GPIO_PIN_RESET);
-	  }
-
-
+	  Check_USB_Communication();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -240,30 +239,30 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, WingRightRed_Pin|WingRightGreen_Pin|WingRightBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOH, WingLeftRed_Pin|WingLeftGreen_Pin|WingLeftBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOH, LeftArmRed_Pin|LeftArmGreen_Pin|LeftArmBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, BottomRed_Pin|BottomGreen_Pin|BottomBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : WingRightRed_Pin WingRightGreen_Pin WingRightBlue_Pin */
-  GPIO_InitStruct.Pin = WingRightRed_Pin|WingRightGreen_Pin|WingRightBlue_Pin;
+  GPIO_InitStruct.Pin = RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : WingLeftRed_Pin WingLeftGreen_Pin WingLeftBlue_Pin */
-  GPIO_InitStruct.Pin = WingLeftRed_Pin|WingLeftGreen_Pin|WingLeftBlue_Pin;
+  GPIO_InitStruct.Pin = LeftArmRed_Pin|LeftArmGreen_Pin|LeftArmBlue_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BottomRed_Pin BottomGreen_Pin BottomBlue_Pin */
-  GPIO_InitStruct.Pin = BottomRed_Pin|BottomGreen_Pin|BottomBlue_Pin;
+  /*Configure GPIO pins : BaseRed_Pin BaseGreen_Pin BaseBlue_Pin */
+  GPIO_InitStruct.Pin = BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
