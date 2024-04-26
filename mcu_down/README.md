@@ -37,6 +37,10 @@
 | Wing Right |     |   PD10  |   PD14  |   PD15  |
 | Bottom     |     |   PG12  |   PG13  |   PG15  |
 
+Notes Matthijs:
+* IO pins are correct.
+* Pull pins **DOWN** to turn LED **ON**
+
 ---
 
 ### Touch Sensors (J33 J34 J36 J37 J39 J42)
