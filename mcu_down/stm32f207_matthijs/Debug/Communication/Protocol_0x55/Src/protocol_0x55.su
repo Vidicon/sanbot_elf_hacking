@@ -1,0 +1,11 @@
+protocol_0x55.c:11:33:Protocol_0x55_GetRxPointer	4	static
+protocol_0x55.c:17:33:Protocol_0x55_GetTxPointer	4	static
+protocol_0x55.c:22:6:Protocol_0x55_Init	4	static
+protocol_0x55.c:28:9:Protocol_0x55_CheckFifo	4	static
+protocol_0x55.c:33:6:Protocol_0x55_ProcessRxCommand	8	static
+protocol_0x55.c:40:6:Protocol_0x55_SendVersion	32	static
+protocol_0x55.c:56:6:Protocol_0x55_PrepareNewMessage	16	static
+protocol_0x55.c:66:6:Protocol_0x55_SetLength	16	static
+protocol_0x55.c:71:6:Protocol_0x55_AddCRC	24	static
+protocol_0x55.c:84:10:Protocol_0x55_CalculateCRC16	24	static
+protocol_0x55.c:105:6:Protocol_0x55_Send	16	static
