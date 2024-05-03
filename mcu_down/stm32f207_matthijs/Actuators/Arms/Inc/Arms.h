@@ -9,7 +9,7 @@
 #define ARMS_INC_ARMS_H_
 
 #include "RobotGlobals.h"
-
+#include "stm32f2xx_hal.h"
 
 enum ENUM_HomeState {
 	NotHomed,
@@ -23,20 +23,25 @@ enum ENUM_ArmDirection {
 
 enum ENUM_MotionState {
 	Motion_Disabled,
-	Motion_Moving,
 	Motion_AtTarget,
-	Motion_Error
+	Motion_Error,
+	Motion_MovingUp,
+	Motion_MovingDown
 };
 
 struct Arm_State_Type {
 	enum ENUM_HomeState Homed;
 	enum ENUM_MotionState MotionState;
-	int Angle;
 	enum ENUM_ArmDirection Direction;
+	int Angle;
+	int Timer;
+	int SelTestRunning;
+	int Speed;
+	TIM_HandleTypeDef *TIM;
 	};
 
 //------------------------------------------------
-void LeftArm_Init();
+void LeftArm_Init(TIM_HandleTypeDef *htim);
 
 void LeftArm_SelfTest();
 
@@ -44,14 +49,19 @@ void LeftArm_MoveToAngle(int TargetAngle);
 
 void LeftArm_Update10Hz();
 
+void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
+
 //------------------------------------------------
-void RightArm_Init();
+void RightArm_Init(TIM_HandleTypeDef *htim);
 
 void RightArm_SelfTest();
 
 void RightArm_MoveToAngle(int TargetAngle);
 
 void RightArm_Update10Hz();
+
+void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
+
 
 //------------------------------------------------
 void GenericArm_Init(struct Arm_State_Type LeftArm_State);

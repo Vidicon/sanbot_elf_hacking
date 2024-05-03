@@ -53,6 +53,8 @@ int Update_2Hz;
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -61,6 +63,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LeftArmBrake_Pin GPIO_PIN_2
+#define LeftArmBrake_GPIO_Port GPIOE
+#define RightArmBrake_Pin GPIO_PIN_4
+#define RightArmBrake_GPIO_Port GPIOE
 #define RightArmRed_Pin GPIO_PIN_10
 #define RightArmRed_GPIO_Port GPIOD
 #define RightArmGreen_Pin GPIO_PIN_14
@@ -79,6 +85,8 @@ void Error_Handler(void);
 #define BaseGreen_GPIO_Port GPIOG
 #define BaseBlue_Pin GPIO_PIN_15
 #define BaseBlue_GPIO_Port GPIOG
+#define LeftArmUp_Pin GPIO_PIN_1
+#define LeftArmUp_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

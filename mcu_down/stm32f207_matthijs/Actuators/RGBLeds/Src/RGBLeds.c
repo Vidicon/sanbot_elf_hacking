@@ -149,11 +149,11 @@ void RGBLeds_SelfTest(enum ENUM_Booleans Enabled)
 	}
 	else
 	{
-		RGBLeds_BlinkColor(LeftArm, Red, Blink_Off);
-		RGBLeds_SetColorOff(LeftArm);
+		RGBLeds_BlinkColor(LeftArm, White, Blink_Off);
+		RGBLeds_SetColorOn(LeftArm, White);
 
-		RGBLeds_BlinkColor(RightArm, Green, Blink_Off);
-		RGBLeds_SetColorOff(RightArm);
+		RGBLeds_BlinkColor(RightArm, White, Blink_Off);
+		RGBLeds_SetColorOn(RightArm, White);
 
 		RGBLeds_BlinkColor(Base, White, Blink_Off);
 		RGBLeds_SetColorOff(Base);
