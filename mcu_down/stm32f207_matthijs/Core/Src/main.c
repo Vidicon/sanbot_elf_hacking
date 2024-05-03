@@ -27,6 +27,7 @@
 #include "protocol_0x55.h"
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
+#include "Arms.h"
 
 /* USER CODE END Includes */
 
@@ -67,11 +68,15 @@ void System_Initialize()
 	HAL_TIM_Base_Start_IT(&htim14);
 
 	RGBLeds_Init();
+	LeftArm_Init();
+	RightArm_Init();
 }
 
 void System_SelfTest()
 {
 	RGBLeds_SelfTest(True);
+	LeftArm_SelfTest(True);
+	RightArm_SelfTest(True);
 }
 
 void Check_USB_Communication()

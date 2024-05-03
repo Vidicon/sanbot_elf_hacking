@@ -1,3 +1,4 @@
+"Actuators/Arms/Src/Arms.o"
 "Actuators/RGBLeds/Src/RGBLeds.o"
 "Communication/Protocol_0x55/Src/protocol_0x55.o"
 "Core/Src/main.o"

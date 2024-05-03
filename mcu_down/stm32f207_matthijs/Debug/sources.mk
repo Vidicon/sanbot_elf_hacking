@@ -19,6 +19,7 @@ OBJCOPY_BIN :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+Actuators/Arms/Src \
 Actuators/RGBLeds/Src \
 Communication/Protocol_0x55/Src \
 Core/Src \
