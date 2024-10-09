@@ -266,7 +266,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 	struct PROTOCOL_0X55_Data_Type *TmpPointer;
 	TmpPointer = Protocol_0x55_GetRxPointer();
 
-	strncat((char*)TmpPointer->FIFO_Data, (char*) Buf, *Len);
+	memcpy((char*)TmpPointer->FIFO_Data, (char*) Buf, *Len);
 
 	// Set new data flag
 	TmpPointer->NewData = 1;

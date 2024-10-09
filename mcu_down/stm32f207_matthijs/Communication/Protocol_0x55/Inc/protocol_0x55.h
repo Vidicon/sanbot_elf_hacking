@@ -6,9 +6,14 @@
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
 
-#define FIFO_RXSIZE			1024
+#define FIFO_RXSIZE			128
 
-#define CMD_VERSION 		1
+#define CMD_VERSION     0x01
+#define CMD_LA_COLOR    0x10
+#define CMD_RA_COLOR    0x11
+#define CMD_BASE_COLOR  0x12
+
+#define RESP_BIT 		0x80
 
 
 struct PROTOCOL_0X55_Data_Type {
@@ -24,7 +29,11 @@ void Protocol_0x55_Init();
 
 uint8_t Protocol_0x55_CheckFifo();
 
-void Protocol_0x55_ProcessRxCommand();
+void Protocol_0x55_MarkProcessed();
+
+int Protocol_0x55_GetCommand();
+
+void SendVersion(void);
 
 void Protocol_0x55_SendVersion(char *Buffer);
 
@@ -38,7 +47,9 @@ void Protocol_0x55_Send(char *data, uint8_t datalen);
 
 uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize);
 
+char Protocol_0x55_GetData(int Index);
 
+void Protocol_0x55_ClearRxBuffer();
 
 //void MSG_PrepareNewMessage(char* Buffer, char Command, char Response);
 //

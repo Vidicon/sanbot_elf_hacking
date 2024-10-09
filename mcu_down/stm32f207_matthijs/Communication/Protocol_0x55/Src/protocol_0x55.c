@@ -27,13 +27,53 @@ void Protocol_0x55_Init()
 
 uint8_t Protocol_0x55_CheckFifo()
 {
-	return PROTOCOL_0X55_RxData.NewData;
+	if (PROTOCOL_0X55_RxData.NewData == 0)
+	{
+		return 0;
+	}
+
+	// Check command > 0
+	if (PROTOCOL_0X55_RxData.FIFO_Data[1] == 0)
+	{
+		Protocol_0x55_ClearRxBuffer();
+		return 0;
+	}
+
+	// Check length and calculate the CRC
+	// Maybe not all data is received yet.
+	// Do not clear the buffer
+	uint8_t datalen = PROTOCOL_0X55_RxData.FIFO_Data[2];
+	uint16_t Result = Protocol_0x55_CalculateCRC16((char*)&PROTOCOL_0X55_RxData.FIFO_Data[0], 3+datalen+2);
+
+	if ((Result & 0xff) == PROTOCOL_0X55_RxData.FIFO_Data[datalen+3])
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
-void Protocol_0x55_ProcessRxCommand()
+void Protocol_0x55_MarkProcessed()
 {
 	PROTOCOL_0X55_RxData.NewData = 0;
+	Protocol_0x55_ClearRxBuffer();
+}
 
+int Protocol_0x55_GetCommand()
+{
+	PROTOCOL_0X55_RxData.NewData = 0;
+	return PROTOCOL_0X55_RxData.FIFO_Data[1];
+}
+
+void Protocol_0x55_ClearRxBuffer()
+{
+	memset((uint8_t*)PROTOCOL_0X55_RxData.FIFO_Data, 0, sizeof(PROTOCOL_0X55_RxData.FIFO_Data));
+}
+
+void SendVersion(void)
+{
 	Protocol_0x55_SendVersion((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0]);
 }
 
@@ -46,11 +86,11 @@ void Protocol_0x55_SendVersion(char *Buffer)
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
 
-	int datalen = strlen(&Buffer[3]);
+	int payloadLen = strlen(&Buffer[3]);
 
-	Protocol_0x55_SetLength(Buffer, datalen);
-	Protocol_0x55_AddCRC(Buffer, datalen);
-	Protocol_0x55_Send(Buffer, datalen);
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
 }
 
 void Protocol_0x55_PrepareNewMessage(char *Buffer, char Command, char Response)
@@ -68,13 +108,13 @@ void Protocol_0x55_SetLength(char *Buffer, uint8_t datalen)
 	Buffer[2] = datalen;
 }
 
-void Protocol_0x55_AddCRC(char *Buffer, uint8_t datalen)
+void Protocol_0x55_AddCRC(char *Buffer, uint8_t payloadLen)
 {
-	// 0x55 CMD LEN + datalen
-	uint16_t Result = Protocol_0x55_CalculateCRC16(Buffer, datalen);
+	// 0x55 CMD LEN + payload + CRC1 + CRC2
+	uint16_t Result = Protocol_0x55_CalculateCRC16(Buffer, 3 + payloadLen + 2);
 
-	Buffer[datalen+3] 	= (Result & 0xff);
-	Buffer[datalen+4]	= ((Result >> 8) & 0xff);
+	Buffer[3 + payloadLen + 0] 	= (Result & 0xff);
+	Buffer[3 + payloadLen + 1]	= ((Result >> 8) & 0xff);
 }
 
 //------------------------------------------------------------------------
@@ -102,9 +142,14 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 	return crc;
 }
 
-void Protocol_0x55_Send(char *data, uint8_t datalen)
+void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	CDC_Transmit_FS((uint8_t*)data, 3 + datalen + 2);
+	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+}
+
+char Protocol_0x55_GetData(int Index)
+{
+	return PROTOCOL_0X55_RxData.FIFO_Data[Index];
 }
 
 //void MSG_Response_OK(char* Buffer, UART_HandleTypeDef Uart, int Command)

@@ -79,7 +79,7 @@ void System_SelfTest()
 {
 	RGBLeds_SelfTest(False);
 
-	LeftArm_SelfTest(True);
+//	LeftArm_SelfTest(True);
 //	RightArm_SelfTest(True);
 
 //	LeftArm_EnableBrake(False);
@@ -90,9 +90,15 @@ void Check_USB_Communication()
 {
 	if (Protocol_0x55_CheckFifo() > 0)
 	{
-		Protocol_0x55_ProcessRxCommand();
+		int command = Protocol_0x55_GetCommand();
 
-		// if (valid) --> find module to handle command
+		if (command == CMD_VERSION) 	{ SendVersion();}
+		if (command == CMD_LA_COLOR) 	{ RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+
+
+		Protocol_0x55_MarkProcessed();
 	}
 }
 

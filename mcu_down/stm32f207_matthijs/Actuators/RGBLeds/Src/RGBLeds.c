@@ -18,6 +18,23 @@ void RGBLeds_Init()
 	RGBLeds_SetColorOff(Base);
 }
 
+
+void RGBLeds_SetAllColors(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Color, enum ENUM_RGBLeds_Command Command)
+{
+	if (Command == LED_On) 	{ RGBLeds_SetColorOn(BodyPart, Color);}
+	if (Command == LED_Off)
+	{
+		RGBLeds_SetColorOff(BodyPart);
+		RGBLeds_BlinkColor(BodyPart, Color, LED_Blink_Off);
+	}
+
+
+	if ((Command >= LED_Blink_Off) && (Command <= LED_Blink_VeryFast))
+	{
+		RGBLeds_BlinkColor(BodyPart, Color, Command);
+	}
+}
+
 void RGBLeds_SetColorOn(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Color)
 {
 	if (BodyPart == LeftArm)
@@ -84,7 +101,7 @@ void RGBLeds_SetColorOff(enum ENUM_BodyParts BodyPart)
 	}
 }
 
-void RGBLeds_BlinkColor(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Color, enum ENUM_RGBLeds_Blink Blink)
+void RGBLeds_BlinkColor(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Color, enum ENUM_RGBLeds_Command Blink)
 {
 	RGBLeds_State[BodyPart].Color = Color;
 	RGBLeds_State[BodyPart].Blink = Blink;
@@ -95,7 +112,7 @@ void RGBLeds_Update10Hz()
 {
 	for (int i = 0; i < 3; i++)
 	{
-		if (RGBLeds_State[i].Blink == Blink_Slow)
+		if (RGBLeds_State[i].Blink == LED_Blink_Slow)
 		{
 			if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), RGBLeds_State[i].Color);}
 			if (RGBLeds_State[i].Counter == 5) { RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));}
@@ -104,7 +121,7 @@ void RGBLeds_Update10Hz()
 			if (RGBLeds_State[i].Counter >= 10) {RGBLeds_State[i].Counter = 0;}
 		}
 
-		if (RGBLeds_State[i].Blink == Blink_Fast)
+		if (RGBLeds_State[i].Blink == LED_Blink_Fast)
 		{
 			if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), RGBLeds_State[i].Color);}
 			if (RGBLeds_State[i].Counter == 3) { RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));}
@@ -113,7 +130,7 @@ void RGBLeds_Update10Hz()
 			if (RGBLeds_State[i].Counter >= 6) {RGBLeds_State[i].Counter = 0;}
 		}
 
-		if (RGBLeds_State[i].Blink == Blink_VeryFast)
+		if (RGBLeds_State[i].Blink == LED_Blink_VeryFast)
 		{
 			if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), RGBLeds_State[i].Color);}
 			if (RGBLeds_State[i].Counter == 2) { RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));}
@@ -126,36 +143,30 @@ void RGBLeds_Update10Hz()
 	//---------------------------------------------------------
 	// Selftest update
 	//---------------------------------------------------------
-	SelfTestCounterTmo += 1;
 
-	if (SelfTestCounterTmo >= 5 * UPDATE_10HZ)
+	if (SelfTestCounterTmo > 0)
 	{
-		RGBLeds_SelfTest(False);
+		if (SelfTestCounterTmo == 1) { RGBLeds_SelfTest(False);}
 
-		RGBLeds_SetColorOn(LeftArm, White);
-		RGBLeds_SetColorOn(RightArm, White);
+		SelfTestCounterTmo -= 1;
 	}
+
 }
 
 void RGBLeds_SelfTest(enum ENUM_Booleans Enabled)
 {
 	if (Enabled == True)
 	{
-		SelfTestCounterTmo = 0;
+		SelfTestCounterTmo = 5 * UPDATE_10HZ;
 
-		RGBLeds_BlinkColor(LeftArm, Red, Blink_Slow);
-		RGBLeds_BlinkColor(RightArm, Green, Blink_Fast);
-		RGBLeds_BlinkColor(Base, White, Blink_VeryFast);
+		RGBLeds_BlinkColor(LeftArm, Red, LED_Blink_Slow);
+		RGBLeds_BlinkColor(RightArm, Green, LED_Blink_Fast);
+		RGBLeds_BlinkColor(Base, White, LED_Blink_VeryFast);
 	}
 	else
 	{
-		RGBLeds_BlinkColor(LeftArm, White, Blink_Off);
-		RGBLeds_SetColorOn(LeftArm, White);
-
-		RGBLeds_BlinkColor(RightArm, White, Blink_Off);
-		RGBLeds_SetColorOn(RightArm, White);
-
-		RGBLeds_BlinkColor(Base, White, Blink_Off);
+		RGBLeds_SetColorOff(LeftArm);
+		RGBLeds_SetColorOff(RightArm);
 		RGBLeds_SetColorOff(Base);
 	}
 }
