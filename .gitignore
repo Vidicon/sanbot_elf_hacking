@@ -2,3 +2,4 @@
 **/[Dd]ebug/*
 **/[Rr]elease/*
 /mcu_down/stm32f207_matthijs/Debug/
+/python_gui/__pycache__/
