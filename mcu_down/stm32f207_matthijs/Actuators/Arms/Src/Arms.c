@@ -19,11 +19,6 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 	LeftArm_State.TIM = htim;
 	LeftArm_State.Speed = 0;
 
-//	HAL_TIM_Base_Start_IT(&htim3);
-//
-//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
 	HAL_TIM_Base_Start(htim);
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
@@ -32,11 +27,11 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 void LeftArm_SelfTest()
 {
 	// Force a home sequence
+	LeftArm_EnableBrake(False);
+
 	LeftArm_State.SelTestRunning = 1;
 	LeftArm_State.MotionState = Motion_MovingUp;
 	LeftArm_State.Speed = 10;
-
-	LeftArm_EnableBrake(False);
 }
 
 void LeftArm_MoveToAngle(int TargetAngle)
@@ -107,14 +102,23 @@ void RightArm_Init(TIM_HandleTypeDef *htim)
 	RightArm_State.Direction = Arm_Up;
 	RightArm_State.Homed = NotHomed;
 	RightArm_State.MotionState = Motion_Disabled;
+	RightArm_State.Timer = 0;
+	RightArm_State.SelTestRunning = 0;
+	RightArm_State.TIM = htim;
+	RightArm_State.Speed = 0;
 
-//	HAL_TIM_Base_Start(htim);
-//	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
+	HAL_TIM_Base_Start(htim);
+	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
 }
 
 void RightArm_SelfTest()
 {
+	// Force a home sequence
+	RightArm_EnableBrake(False);
 
+	RightArm_State.SelTestRunning = 1;
+	RightArm_State.MotionState = Motion_MovingUp;
+	RightArm_State.Speed = 10;
 }
 
 void RightArm_MoveToAngle(int TargetAngle)
@@ -124,7 +128,50 @@ void RightArm_MoveToAngle(int TargetAngle)
 
 void RightArm_Update10Hz()
 {
+	//  Check if selftest is running
+	if (RightArm_State.SelTestRunning == 1)
+	{
+		RightArm_State.Timer += 1;
 
+		if (RightArm_State.Timer <= 1 * UPDATE_10HZ)
+		{
+			RightArm_State.MotionState = Motion_MovingUp;
+		}
+		else if (RightArm_State.Timer <= 2 * UPDATE_10HZ)
+		{
+			RightArm_State.MotionState = Motion_MovingDown;
+		}
+		else
+		{
+			RightArm_State.MotionState = Motion_AtTarget;
+		}
+	}
+	else
+	{
+
+	}
+
+	// Write correct outputs
+	if (RightArm_State.MotionState == Motion_MovingUp)
+	{
+		__HAL_TIM_SET_COMPARE(RightArm_State.TIM, TIM_CHANNEL_2, RightArm_State.Speed);
+
+		HAL_GPIO_WritePin(RightArmUp_GPIO_Port, RightArmUp_Pin, GPIO_PIN_SET);
+
+		RightArm_EnableBrake(False);
+	}
+	else if (RightArm_State.MotionState == Motion_MovingDown)
+	{
+		__HAL_TIM_SET_COMPARE(RightArm_State.TIM, TIM_CHANNEL_2, RightArm_State.Speed);
+
+		HAL_GPIO_WritePin(RightArmUp_GPIO_Port, RightArmUp_Pin, GPIO_PIN_RESET);
+
+		RightArm_EnableBrake(False);
+	}
+	else
+	{
+		__HAL_TIM_SET_COMPARE(RightArm_State.TIM, TIM_CHANNEL_2, 0);
+	}
 }
 
 void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable)

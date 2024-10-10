@@ -16,14 +16,16 @@
 
 |      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 |
 |----------|----------|----------|----------|----------|----------|----------|----------|
-|                |   encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
-|  Motor Left    |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
-|  Motor Center  |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
-|  Motor Right   |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
+|             |         encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
+|  Motor Left       |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
+|  Motor Center     |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
+|  Motor Right      |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
+|  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |
+|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  ?   |  -   |  -   |
 
- - PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, 
- - Enable is active high 3.3v
- - DIR pull down to reverse motor direction 3.3v
+ - Enable is active high 3.3v (= Brake disable)
+ - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 
+ 
 
 ---
 

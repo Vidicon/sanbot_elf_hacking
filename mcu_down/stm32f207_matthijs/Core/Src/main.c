@@ -50,7 +50,7 @@ TIM_HandleTypeDef htim9;
 TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
-
+int Time10Hz = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +65,7 @@ static void MX_TIM9_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
 void System_Initialize()
 {
 	HAL_TIM_Base_Start_IT(&htim14);
@@ -75,15 +76,12 @@ void System_Initialize()
 	RightArm_Init(&htim9);
 }
 
-void System_SelfTest()
+void System_SelfTest(enum ENUM_Booleans Enabled )
 {
-	RGBLeds_SelfTest(False);
+	RGBLeds_SelfTest(Enabled);
 
-//	LeftArm_SelfTest(True);
-//	RightArm_SelfTest(True);
-
-//	LeftArm_EnableBrake(False);
-//	RightArm_EnableBrake(False);
+//	LeftArm_SelfTest(Enabled);
+//	RightArm_SelfTest(Enabled);
 }
 
 void Check_USB_Communication()
@@ -138,7 +136,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-  System_SelfTest();
+  System_SelfTest(True);
 
   Protocol_0x55_Init();
 
@@ -155,6 +153,10 @@ int main(void)
 
 		  LeftArm_Update10Hz();
 		  RightArm_Update10Hz();
+
+		  Time10Hz += 1;
+
+		  if (Time10Hz == 100) { System_SelfTest(False);}
 	  }
 
 	  if (Update_5Hz)
@@ -310,7 +312,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmBrake_Pin|RightArmUp_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
@@ -321,8 +323,8 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LeftArmBrake_Pin LeftArmUp_Pin */
-  GPIO_InitStruct.Pin = LeftArmBrake_Pin|LeftArmUp_Pin;
+  /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin LeftArmUp_Pin */
+  GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|LeftArmUp_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
