@@ -140,6 +140,8 @@ int main(void)
   System_Initialize();
   System_SelfTest();
 
+  Protocol_0x55_Init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

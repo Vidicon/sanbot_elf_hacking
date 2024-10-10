@@ -6,7 +6,7 @@
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
 
-#define FIFO_RXSIZE			128
+#define FIFO_RXSIZE			256
 
 #define CMD_VERSION     0x01
 #define CMD_LA_COLOR    0x10
@@ -18,7 +18,8 @@
 
 struct PROTOCOL_0X55_Data_Type {
 			uint8_t FIFO_Data[FIFO_RXSIZE+1];
-			uint8_t NewData;
+//			int NewData;
+			int BytesInBuffer;
 		};
 
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer();

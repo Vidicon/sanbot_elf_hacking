@@ -285,8 +285,8 @@ def main():
    
     if ("LINUX" in platform.system().upper()):
         print ("Linux detected!")
-        mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
-        # mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
+        # mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
+        mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
     else:
         mod_manager = ModManager(port='COM9', baudrate=115200)
         
