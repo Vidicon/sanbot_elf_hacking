@@ -21,7 +21,7 @@
 |  Motor Center     |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
 |  Motor Right      |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
 |  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |
-|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  ?   |  -   |  -   |
+|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |
 
  - Enable is active high 3.3v (= Brake disable)
  - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 

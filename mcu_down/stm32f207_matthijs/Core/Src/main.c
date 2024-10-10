@@ -80,8 +80,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled )
 {
 	RGBLeds_SelfTest(Enabled);
 
-//	LeftArm_SelfTest(Enabled);
-//	RightArm_SelfTest(Enabled);
+	LeftArm_SelfTest(Enabled);
+	RightArm_SelfTest(Enabled);
 }
 
 void Check_USB_Communication()
@@ -312,7 +312,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmBrake_Pin|RightArmUp_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
@@ -328,12 +328,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PE3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pin : RightArmBrake_Pin */

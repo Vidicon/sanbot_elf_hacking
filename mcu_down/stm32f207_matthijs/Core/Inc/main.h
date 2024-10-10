@@ -65,6 +65,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LeftArmBrake_Pin GPIO_PIN_2
 #define LeftArmBrake_GPIO_Port GPIOE
+#define RightArmUp_Pin GPIO_PIN_3
+#define RightArmUp_GPIO_Port GPIOE
 #define RightArmBrake_Pin GPIO_PIN_4
 #define RightArmBrake_GPIO_Port GPIOE
 #define RightArmRed_Pin GPIO_PIN_10
@@ -85,8 +87,6 @@ void Error_Handler(void);
 #define BaseGreen_GPIO_Port GPIOG
 #define BaseBlue_Pin GPIO_PIN_15
 #define BaseBlue_GPIO_Port GPIOG
-#define RightArmUp_Pin GPIO_PIN_0
-#define RightArmUp_GPIO_Port GPIOE
 #define LeftArmUp_Pin GPIO_PIN_1
 #define LeftArmUp_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */

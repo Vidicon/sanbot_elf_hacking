@@ -117,7 +117,7 @@ void RightArm_SelfTest()
 	RightArm_EnableBrake(False);
 
 	RightArm_State.SelTestRunning = 1;
-	RightArm_State.MotionState = Motion_MovingUp;
+	RightArm_State.MotionState = Motion_MovingDown;
 	RightArm_State.Speed = 10;
 }
 
@@ -135,11 +135,11 @@ void RightArm_Update10Hz()
 
 		if (RightArm_State.Timer <= 1 * UPDATE_10HZ)
 		{
-			RightArm_State.MotionState = Motion_MovingUp;
+			RightArm_State.MotionState = Motion_MovingDown;
 		}
 		else if (RightArm_State.Timer <= 2 * UPDATE_10HZ)
 		{
-			RightArm_State.MotionState = Motion_MovingDown;
+			RightArm_State.MotionState = Motion_MovingUp;
 		}
 		else
 		{
