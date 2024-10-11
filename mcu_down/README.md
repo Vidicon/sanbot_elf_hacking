@@ -27,6 +27,7 @@ Notes Matthijs:
  - IO pins are correct.
  - Enable is active high 3.3v (= Brake disable)
  - In the new firmware **Enable** is called **Brake** as the motor feels locked when this IO pin is **LOW**
+ - Left arm motor runs opposite direction of Right arm
  
  Notes to be checked:
  - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 
