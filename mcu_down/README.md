@@ -23,8 +23,12 @@
 |  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |
 |  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |
 
+Notes Matthijs:
+* IO pins are correct.
  - Enable is active high 3.3v (= Brake disable)
  - In the new firmware **Enable** is called **Brake** as the motor feels locked when this IO pin is **LOW**
+ 
+ Notes to be checked:
  - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 
  
 
