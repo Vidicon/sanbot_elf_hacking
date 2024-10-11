@@ -24,7 +24,7 @@
 |  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |
 
 Notes Matthijs:
-* IO pins are correct.
+ - IO pins are correct.
  - Enable is active high 3.3v (= Brake disable)
  - In the new firmware **Enable** is called **Brake** as the motor feels locked when this IO pin is **LOW**
  
