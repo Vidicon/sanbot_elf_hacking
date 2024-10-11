@@ -33,6 +33,14 @@ Notes Matthijs:
  - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 
  
 
+### Limit switches arms (J29 J32)
+
+|          | Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
+|----------|----------|----------|----------|----------|----------|
+
+Notes Matthijs:
+- To do
+- 
 ---
 
 ### RGB LED (J51 J52 J53)
