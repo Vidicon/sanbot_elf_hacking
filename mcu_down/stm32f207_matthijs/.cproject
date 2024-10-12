@@ -74,6 +74,7 @@
 									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/Arms/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/Base/Inc"/>
+									<listOptionValue builtIn="false" value="../Actuators/Encoders/Inc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.954384614" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -185,6 +186,7 @@
 									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/Arms/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/Base/Inc"/>
+									<listOptionValue builtIn="false" value="../Actuators/Encoders/Inc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.96170591" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

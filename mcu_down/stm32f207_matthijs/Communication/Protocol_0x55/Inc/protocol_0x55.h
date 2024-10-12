@@ -18,7 +18,6 @@
 
 struct PROTOCOL_0X55_Data_Type {
 			uint8_t FIFO_Data[FIFO_RXSIZE+1];
-//			int NewData;
 			int BytesInBuffer;
 		};
 
