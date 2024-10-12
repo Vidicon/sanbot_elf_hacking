@@ -29,7 +29,6 @@
 #include "RobotGlobals.h"
 #include "Arms.h"
 #include "Base.h"
-#include "Encoders.h"
 
 /* USER CODE END Includes */
 
@@ -81,20 +80,17 @@ void System_Initialize()
 
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
-	Base_Init(&htim9);
-
-	LeftArm_EnableBrake(False);
-	RightArm_EnableBrake(False);
-
-	Encoders_Init(&huart6);
+	Base_Init(&htim9)
 }
 
-void System_SelfTest(enum ENUM_Booleans Enabled)
+void System_SelfTest(enum ENUM_Booleans Enabled )
 {
 	RGBLeds_SelfTest(Enabled);
 
 	LeftArm_SelfTest(Enabled);
 	RightArm_SelfTest(Enabled);
+
+	Base_SelfTest(Enabled);
 }
 
 void Check_USB_Communication()
@@ -150,16 +146,10 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
-	System_Initialize();
-
-	System_SelfTest(True);
-	LeftArm_EnableBrake(False);
-	RightArm_EnableBrake(False);
-
+  System_Initialize();
+  System_SelfTest(True);
 
   Protocol_0x55_Init();
-
-
 
   /* USER CODE END 2 */
 
@@ -177,7 +167,7 @@ int main(void)
 
 		  Time10Hz += 1;
 
-//		  if (Time10Hz == 100) { System_SelfTest(False);}
+		  if (Time10Hz == 100) { System_SelfTest(False);}
 	  }
 
 	  if (Update_5Hz)
@@ -188,8 +178,6 @@ int main(void)
 	  if (Update_2Hz)
 	  {
 		  Update_2Hz = 0;
-
-
 	  }
 
 	  Check_USB_Communication();
