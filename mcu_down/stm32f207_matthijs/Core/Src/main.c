@@ -170,9 +170,10 @@ int main(void)
 		  Time10Hz += 1;
 
 		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
-		  if (Time10Hz == 8 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-		  if (Time10Hz == 14 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
-		  if (Time10Hz == 20 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
+		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
+		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
 
 	  }
 

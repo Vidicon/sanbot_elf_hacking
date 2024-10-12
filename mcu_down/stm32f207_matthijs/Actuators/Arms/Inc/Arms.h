@@ -40,13 +40,14 @@ struct Arm_State_Type {
 	int Speed;
 	TIM_HandleTypeDef *TIM;
 	int PrevError;
-	int SetpointState;
 	int AmplifierSetpoint;
 
+	int SetpointState;
 	int ActualPosition;
 	int ActualPositionPrev;
 	int TargetPosition;
 	int SetpointPosition;
+	int SetpointDirection;
 
 	int ErrorPrev;
 	int Integral;

@@ -76,67 +76,74 @@ void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
 	//----------------------------------------------------------------------------
 	LeftArm_State.ActualPosition = EncoderData.Encoder[3];
 
-	int FF = 0;
-	int SetpointVelocity = 0;
-	int Direction = 0;
-
 	LeftArm_State.SetpointPosition = LeftArm_State.TargetPosition;
-
-	if (LeftArm_State.ActualPosition < LeftArm_State.TargetPosition)
-	{
-		Direction = 1;
-	}
-	else if (LeftArm_State.ActualPosition > LeftArm_State.TargetPosition)
-	{
-		Direction = -1;
-	}
-	else
-	{
-		Direction = 0;
-	}
-
 	int error = LeftArm_State.SetpointPosition - LeftArm_State.ActualPosition;
 
-	int velocity = LeftArm_State.ActualPosition - LeftArm_State.ActualPositionPrev;
-	LeftArm_State.ActualPositionPrev = LeftArm_State.ActualPosition;
+	// Check end-condition
+	if ((LeftArm_State.SetpointState == +1) && (error <= 30)) { LeftArm_State.SetpointState = 0;}
+	if ((LeftArm_State.SetpointState == -1) && (error >= -30)) { LeftArm_State.SetpointState = 0;}
 
-	LeftArm_State.Differential = error - LeftArm_State.ErrorPrev;
-	LeftArm_State.ErrorPrev = error;
-
-	LeftArm_State.Integral += error;
-
-	int kp = 20 * error;
-	int Max_Kp = 1000;
-
-	if (kp > Max_Kp) {kp = Max_Kp;}
-	if (kp < -Max_Kp) {kp = -Max_Kp;}
-
-	int kd = 20 * LeftArm_State.Differential;
-	int Max_Kd = 1000;
-
-	if (kd > Max_Kd) {kd = Max_Kd;}
-	if (kd < -Max_Kd) {kd = -Max_Kd;}
-
-	int controller = kp +  kd + Direction * 600;
-
-
-
-
-	// Feedback controller
-	if (controller > 0)
+	if (LeftArm_State.SetpointState == 1)
 	{
-		LeftArm_State.AmplifierSetpoint = controller/100;
-		LeftArm_State.MotionState = Arm_Motion_MovingDown;
+		RGBLeds_SetColorOff(LeftArm);
+		RGBLeds_SetColorOn(LeftArm, Blue);
 	}
-	else if (controller < 0)
+
+	if (LeftArm_State.SetpointState == -1)
 	{
-		LeftArm_State.AmplifierSetpoint = -1 * controller/100;
-		LeftArm_State.MotionState = Arm_Motion_MovingUp;
+		RGBLeds_SetColorOff(LeftArm);
+		RGBLeds_SetColorOn(LeftArm, Red);
+	}
+
+	if (LeftArm_State.SetpointState == 0)
+	{
+		RGBLeds_SetColorOff(LeftArm);
+		RGBLeds_SetColorOn(LeftArm, Green);
+	}
+
+
+	int controller = 0;
+
+	if (LeftArm_State.SetpointState != 0)
+	{
+		LeftArm_State.ActualPositionPrev = LeftArm_State.ActualPosition;
+
+		LeftArm_State.Differential = error - LeftArm_State.ErrorPrev;
+		LeftArm_State.ErrorPrev = error;
+		LeftArm_State.Integral += error;
+
+		int kp = 20 * error;
+		int Max_Kp = 500;
+
+		if (kp > Max_Kp) {kp = Max_Kp;}
+		if (kp < -Max_Kp) {kp = -Max_Kp;}
+
+		int kd = 50 * LeftArm_State.Differential;
+		int Max_Kd = 500;
+
+		if (kd > Max_Kd) {kd = Max_Kd;}
+		if (kd < -Max_Kd) {kd = -Max_Kd;}
+
+		controller = kp + kd + LeftArm_State.SetpointState * 1000;
+
+		// Feedback controller
+		if (controller >= 0)
+		{
+			LeftArm_State.AmplifierSetpoint = controller/100;
+			LeftArm_State.MotionState = Arm_Motion_MovingDown;
+		}
+		else
+		{
+			LeftArm_State.AmplifierSetpoint = -1 * controller/100;
+			LeftArm_State.MotionState = Arm_Motion_MovingUp;
+		}
 	}
 	else
 	{
-		LeftArm_State.AmplifierSetpoint = 0;
-		LeftArm_State.MotionState = Arm_Motion_Disabled;
+		controller = 0;
+		LeftArm_State.Integral = 0;
+
+		LeftArm_State.MotionState = Arm_Motion_AtTarget;
 	}
 
 
@@ -150,29 +157,32 @@ void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
 	//----------------------------------------------------------------------------
 	if (LeftArm_State.MotionState == Arm_Motion_MovingUp)
 	{
-//		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.Speed);
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.AmplifierSetpoint);
 
 		HAL_GPIO_WritePin(LeftArmUp_GPIO_Port, LeftArmUp_Pin, GPIO_PIN_SET);
 
-		RGBLeds_SetColorOff(LeftArm);
-		RGBLeds_SetColorOn(LeftArm, Blue);
-
+//		RGBLeds_SetColorOff(LeftArm);
+//		RGBLeds_SetColorOn(LeftArm, Blue);
 
 		LeftArm_EnableBrake(False);
 	}
 	else if (LeftArm_State.MotionState == Arm_Motion_MovingDown)
 	{
-//		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.Speed);
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.AmplifierSetpoint);
 
 		HAL_GPIO_WritePin(LeftArmUp_GPIO_Port, LeftArmUp_Pin, GPIO_PIN_RESET);
 
 
-		RGBLeds_SetColorOff(LeftArm);
-		RGBLeds_SetColorOn(LeftArm, Red);
-
+//		RGBLeds_SetColorOff(LeftArm);
+//		RGBLeds_SetColorOn(LeftArm, Red);
+//
 		LeftArm_EnableBrake(False);
+	}
+	else if (LeftArm_State.MotionState == Arm_Motion_AtTarget)
+	{
+		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, 0);
+
+		LeftArm_EnableBrake(True);
 	}
 	else
 	{
@@ -192,8 +202,18 @@ void LeftArm_NewSetpoint(int NewSetpoint)
 {
 	// Check if new setpoint is different from current position
 	LeftArm_State.TargetPosition = NewSetpoint;
-	LeftArm_State.Speed = 10;
-	LeftArm_State.SetpointState = 1;
+
+	LeftArm_State.SetpointState = 0;
+
+	if (NewSetpoint > LeftArm_State.ActualPosition)
+	{
+		LeftArm_State.SetpointState = 1;
+	}
+
+	if (NewSetpoint < LeftArm_State.ActualPosition)
+	{
+		LeftArm_State.SetpointState = -1;
+	}
 }
 
 //----------------------------------------------------------------
