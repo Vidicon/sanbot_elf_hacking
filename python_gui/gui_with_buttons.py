@@ -23,6 +23,9 @@ CMD_LA_COLOR    = 0x10
 CMD_RA_COLOR    = 0x11
 CMD_BASE_COLOR  = 0x12
 
+CMD_GET_ENCODERS  = 0x20
+
+
 CMD_RED     = 1
 CMD_GREEN   = 2
 CMD_BLUE    = 3
@@ -53,6 +56,15 @@ def my_receive_callback(data, stream_area):
         
         text_area.insert(tk.END, "< " + string_from_bytearray + "\n")
         text_area.yview_moveto(1)  # Scrolling to the bottom        
+    
+    
+    if (response == (CMD_GET_ENCODERS | RESP_BIT)):
+        new_byte_array = data[3:-2]
+        int16_array_5 = np.frombuffer(new_byte_array, dtype='>i2')
+        
+        stream_area.insert(tk.END, "< Encoders : " + str(int16_array_5) + "\n")
+        stream_area.yview_moveto(1)  # Scrolling to the bottom        
+    
     
 def createCommand(mod_manager, InputCommmand, Parameters):
     
@@ -263,13 +275,13 @@ def show_gui(mod_manager):
     #--------------------------------------------------------------------------------------
     # event data area
     #--------------------------------------------------------------------------------------
-    text_area = scrolledtext.ScrolledText(frame, width = 100, height=20, wrap="word")
+    text_area = scrolledtext.ScrolledText(frame, width = 200, height=20, wrap="word")
     text_area.grid(row=9, column=0, columnspan=10, sticky="w")
 
     #--------------------------------------------------------------------------------------
     # streaming data area
     #--------------------------------------------------------------------------------------
-    stream_area = scrolledtext.ScrolledText(frame, width = 100, height=10, wrap="word")
+    stream_area = scrolledtext.ScrolledText(frame, width = 200, height=20, wrap="word")
     stream_area.grid(row=10, column=0, columnspan=10, sticky="w")
 
     return root, text_area, stream_area
@@ -285,8 +297,8 @@ def main():
    
     if ("LINUX" in platform.system().upper()):
         print ("Linux detected!")
-        # mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
-        mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
+        mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
+        # mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
     else:
         mod_manager = ModManager(port='COM9', baudrate=115200)
         

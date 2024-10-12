@@ -68,7 +68,7 @@ class ModManager:
         polynomial = 0xA001  # Modbus CRC-16 polynomial
     
         for byte in data:
-            crc ^= byte
+            crc ^= int(byte)
             for _ in range(8):
                 if crc & 0x0001:
                     crc >>= 1
