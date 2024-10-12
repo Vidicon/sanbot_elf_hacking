@@ -28,17 +28,17 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 {
 	if (Enabled)
 	{
-		LeftArm_EnableBrake(True);
+		LeftArm_EnableBrake(False);
 		LeftArm_State.SelTestRunning = 1;
 		LeftArm_State.MotionState = Arm_Motion_MovingUp;
 		LeftArm_State.Speed = 10;
 	}
 	else
 	{
-		LeftArm_EnableBrake(False);
+		LeftArm_EnableBrake(True);
 		LeftArm_State.SelTestRunning = 0;
-		LeftArm_State.MotionState = Arm_Motion_MovingUp;
-		LeftArm_State.Speed = 10;
+		LeftArm_State.MotionState = Arm_Motion_Disabled;
+		LeftArm_State.Speed = 0;
 	}
 }
 
@@ -123,17 +123,17 @@ void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 {
 	if (Enabled)
 	{
-		RightArm_EnableBrake(True);
+		RightArm_EnableBrake(False);
 		RightArm_State.SelTestRunning = 1;
 		RightArm_State.MotionState = Arm_Motion_MovingUp;
 		RightArm_State.Speed = 10;
 	}
 	else
 	{
-		RightArm_EnableBrake(False);
+		RightArm_EnableBrake(True);
 		RightArm_State.SelTestRunning = 0;
-		RightArm_State.MotionState = Arm_Motion_MovingUp;
-		RightArm_State.Speed = 10;
+		RightArm_State.MotionState = Arm_Motion_Disabled;
+		RightArm_State.Speed = 0;
 	}
 }
 
