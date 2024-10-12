@@ -9,7 +9,6 @@ uint8_t Encoder_Raw_Buffer[ENCODER_RX_BUFFER_SIZE];
 
 struct Encoders_Data_Type EncoderData;
 
-
 struct Encoders_Data_Type Encoders_GetPointer()
 {
 	return EncoderData;
@@ -36,6 +35,12 @@ void Encoders_Init(UART_HandleTypeDef *huart)
 
 //	HAL_TIM_Base_Start(htim);
 //	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+
+	  EncoderData.Encoder[0] = 0;
+  	  EncoderData.Encoder[1] = 0;
+  	  EncoderData.Encoder[2] = 0;
+  	  EncoderData.Encoder[3] = 0;
+  	  EncoderData.Encoder[4] = 0;
 }
 
 void Encoders_SelfTest()

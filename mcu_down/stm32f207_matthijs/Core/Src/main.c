@@ -77,10 +77,10 @@ void System_Initialize()
 
 	RGBLeds_Init();
 
+	Encoders_Init(&huart6);
+
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
-
-	Encoders_Init(&huart6);
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled )
@@ -90,8 +90,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled )
 	LeftArm_SelfTest(Enabled);
 	RightArm_SelfTest(Enabled);
 
-	LeftArm_EnableBrake(False);
-	RightArm_EnableBrake(False);
+	LeftArm_EnableBrake(Enabled);
+	RightArm_EnableBrake(Enabled);
 }
 
 void Check_USB_Communication()
@@ -158,17 +158,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
 		  RGBLeds_Update10Hz();
 
-		  LeftArm_Update10Hz();
+		  LeftArm_Update10Hz(Encoders_GetPointer());
 		  RightArm_Update10Hz();
 
 		  Time10Hz += 1;
 
-		  if (Time10Hz == 100) { System_SelfTest(False);}
+		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
+		  if (Time10Hz == 8 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+		  if (Time10Hz == 14 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
+		  if (Time10Hz == 20 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+
 	  }
 
 	  if (Update_5Hz)

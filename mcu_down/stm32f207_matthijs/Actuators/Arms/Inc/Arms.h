@@ -10,6 +10,7 @@
 
 #include "RobotGlobals.h"
 #include "stm32f2xx_hal.h"
+#include "Encoders.h"
 
 enum ENUM_ArmHomeState {
 	Arm_NotHomed,
@@ -38,6 +39,20 @@ struct Arm_State_Type {
 	int SelTestRunning;
 	int Speed;
 	TIM_HandleTypeDef *TIM;
+	int PrevError;
+	int SetpointState;
+	int AmplifierSetpoint;
+
+	int ActualPosition;
+	int ActualPositionPrev;
+	int TargetPosition;
+	int SetpointPosition;
+
+	int ErrorPrev;
+	int Integral;
+	int Differential;
+
+	struct Encoders_Data_Type *EncoderPtr;
 	};
 
 //------------------------------------------------
@@ -47,9 +62,11 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void LeftArm_MoveToAngle(int TargetAngle);
 
-void LeftArm_Update10Hz();
+void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData);
 
 void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
+
+void LeftArm_NewSetpoint(int NewSetpoint);
 
 //------------------------------------------------
 void RightArm_Init(TIM_HandleTypeDef *htim);
