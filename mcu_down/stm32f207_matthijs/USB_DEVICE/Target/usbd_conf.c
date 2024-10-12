@@ -92,6 +92,15 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     /* Peripheral interrupt init */
     HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
+    if(pcdHandle->Init.low_power_enable == 1)
+    {
+      /* Enable EXTI Line 18 for USB wakeup */
+      __HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
+      __HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_RISING_EDGE();
+      __HAL_USB_OTG_FS_WAKEUP_EXTI_ENABLE_IT();
+      HAL_NVIC_SetPriority(OTG_FS_WKUP_IRQn, 0, 0);
+      HAL_NVIC_EnableIRQ(OTG_FS_WKUP_IRQn);
+    }
   /* USER CODE BEGIN USB_OTG_FS_MspInit 1 */
 
   /* USER CODE END USB_OTG_FS_MspInit 1 */
@@ -115,6 +124,8 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
 
     /* Peripheral interrupt Deinit*/
+    HAL_NVIC_DisableIRQ(OTG_FS_WKUP_IRQn);
+
     HAL_NVIC_DisableIRQ(OTG_FS_IRQn);
 
   /* USER CODE BEGIN USB_OTG_FS_MspDeInit 1 */
@@ -337,7 +348,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   hpcd_USB_OTG_FS.Init.dma_enable = DISABLE;
   hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
   hpcd_USB_OTG_FS.Init.Sof_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.low_power_enable = ENABLE;
   hpcd_USB_OTG_FS.Init.vbus_sensing_enable = DISABLE;
   hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
   if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
