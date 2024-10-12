@@ -9,6 +9,12 @@ uint8_t Encoder_Raw_Buffer[ENCODER_RX_BUFFER_SIZE];
 
 struct Encoders_Data_Type EncoderData;
 
+
+struct Encoders_Data_Type Encoders_GetPointer()
+{
+	return EncoderData;
+}
+
 //----------------------------------------------------------------
 //
 //----------------------------------------------------------------

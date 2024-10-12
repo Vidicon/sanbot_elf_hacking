@@ -2,6 +2,7 @@
 #define _MYLIB_0x55_MESSAGES
 
 #include "stm32f2xx.h"
+#include "Encoders.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -12,6 +13,8 @@
 #define CMD_LA_COLOR    0x10
 #define CMD_RA_COLOR    0x11
 #define CMD_BASE_COLOR  0x12
+
+#define CMD_GET_ENCODERS 0x20
 
 #define RESP_BIT 		0x80
 
@@ -51,26 +54,8 @@ char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
-//void MSG_PrepareNewMessage(char* Buffer, char Command, char Response);
-//
-//void MSG_SetLength(char* Buffer, uint8_t datalen);
-//
-//void MSG_AddCRC(char* Buffer, uint8_t datalen);
-//
-//uint16_t MSG_CalculateCRC16(uint8_t *data, uint8_t datalen);
-//
-//void MSG_Send(char* Buffer, UART_HandleTypeDef Uart, uint8_t datalen);
-//
-//void MSG_AddHello(char* Buffer);
-//
-//void MSG_SendParam(char* Buffer, UART_HandleTypeDef Uart, uint8_t *ParamBuffer, uint8_t datalen);
-//
-//void MSG_SendVariables(char* Buffer, UART_HandleTypeDef Uart, uint8_t *VariablesBuffer, uint8_t datalen);
-//
-//void MSG_Response_OK(char* Buffer, UART_HandleTypeDef Uart, int Command);
-//
-//void MSG_Response_NOK(char* Buffer, UART_HandleTypeDef Uart, int Command);
-//
-//void MSG_SendVersion(char* Buffer, UART_HandleTypeDef Uart);
+void SendEncoders(struct Encoders_Data_Type EncoderData);
+
+void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type EncoderData);
 
 #endif

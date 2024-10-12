@@ -172,26 +172,37 @@ char Protocol_0x55_GetData(int Index)
 	return PROTOCOL_0X55_RxData.FIFO_Data[Index];
 }
 
-//void MSG_Response_OK(char* Buffer, UART_HandleTypeDef Uart, int Command)
-//{
-//	MSG_PrepareNewMessage(Buffer, Command, RESPONSE_TRUE);
-//	sprintf(&Buffer[3], "OK");
-//	int datalen = strlen(&Buffer[3]);
-//
-//	MSG_SetLength(Buffer, datalen);
-//	MSG_AddCRC(Buffer, datalen);
-//	MSG_Send(Buffer, Uart, datalen);
-//}
-//
-//void MSG_Response_NOK(char* Buffer, UART_HandleTypeDef Uart, int Command)
-//{
-//	MSG_PrepareNewMessage(Buffer, Command, RESPONSE_TRUE);
-//	sprintf(&Buffer[3], "NOK");
-//	int datalen = strlen(&Buffer[3]);
-//
-//	MSG_SetLength(Buffer, datalen);
-//	MSG_AddCRC(Buffer, datalen);
-//	MSG_Send(Buffer, Uart, datalen);
-//}
+
+void SendEncoders(struct Encoders_Data_Type EncoderData)
+{
+	Protocol_0x55_SendEncoders((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], EncoderData);
+}
 
 
+void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type EncoderData)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_ENCODERS, RESPONSE_TRUE);
+
+	Buffer[3] = (EncoderData.Encoder[0] >> 8) & 0xff;
+	Buffer[4] = (EncoderData.Encoder[0]) & 0xff;
+
+	Buffer[5] = (EncoderData.Encoder[1] >> 8) & 0xff;
+	Buffer[6] = (EncoderData.Encoder[1]) & 0xff;
+
+	Buffer[7] = (EncoderData.Encoder[2] >> 8) & 0xff;
+	Buffer[8] = (EncoderData.Encoder[2]) & 0xff;
+
+	Buffer[9] = (EncoderData.Encoder[3] >> 8) & 0xff;
+	Buffer[10] = (EncoderData.Encoder[3]) & 0xff;
+
+	Buffer[11] = (EncoderData.Encoder[4] >> 8) & 0xff;
+	Buffer[12] = (EncoderData.Encoder[4]) & 0xff;
+
+	int payloadLen = 10;
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+
+	return;
+}
