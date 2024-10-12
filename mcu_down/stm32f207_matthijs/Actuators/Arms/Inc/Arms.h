@@ -43,7 +43,7 @@ struct Arm_State_Type {
 //------------------------------------------------
 void LeftArm_Init(TIM_HandleTypeDef *htim);
 
-void LeftArm_SelfTest();
+void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void LeftArm_MoveToAngle(int TargetAngle);
 
@@ -54,7 +54,7 @@ void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
 //------------------------------------------------
 void RightArm_Init(TIM_HandleTypeDef *htim);
 
-void RightArm_SelfTest();
+void RightArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void RightArm_MoveToAngle(int TargetAngle);
 

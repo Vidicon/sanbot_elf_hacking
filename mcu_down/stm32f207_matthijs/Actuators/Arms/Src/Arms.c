@@ -24,14 +24,22 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
 }
 
-void LeftArm_SelfTest()
+void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 {
-	// Force a home sequence
-	LeftArm_EnableBrake(False);
-
-	LeftArm_State.SelTestRunning = 1;
-	LeftArm_State.MotionState = Arm_Motion_MovingUp;
-	LeftArm_State.Speed = 10;
+	if (Enabled)
+	{
+		LeftArm_EnableBrake(True);
+		LeftArm_State.SelTestRunning = 1;
+		LeftArm_State.MotionState = Arm_Motion_MovingUp;
+		LeftArm_State.Speed = 10;
+	}
+	else
+	{
+		LeftArm_EnableBrake(False);
+		LeftArm_State.SelTestRunning = 0;
+		LeftArm_State.MotionState = Arm_Motion_MovingUp;
+		LeftArm_State.Speed = 10;
+	}
 }
 
 void LeftArm_MoveToAngle(int TargetAngle)
@@ -111,14 +119,22 @@ void RightArm_Init(TIM_HandleTypeDef *htim)
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
 }
 
-void RightArm_SelfTest()
+void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 {
-	// Force a home sequence
-	RightArm_EnableBrake(False);
-
-	RightArm_State.SelTestRunning = 1;
-	RightArm_State.MotionState = Arm_Motion_MovingDown;
-	RightArm_State.Speed = 10;
+	if (Enabled)
+	{
+		RightArm_EnableBrake(True);
+		RightArm_State.SelTestRunning = 1;
+		RightArm_State.MotionState = Arm_Motion_MovingUp;
+		RightArm_State.Speed = 10;
+	}
+	else
+	{
+		RightArm_EnableBrake(False);
+		RightArm_State.SelTestRunning = 0;
+		RightArm_State.MotionState = Arm_Motion_MovingUp;
+		RightArm_State.Speed = 10;
+	}
 }
 
 void RightArm_MoveToAngle(int TargetAngle)
