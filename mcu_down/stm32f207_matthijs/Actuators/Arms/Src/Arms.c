@@ -12,8 +12,8 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 {
 	LeftArm_State.Angle = 0;
 	LeftArm_State.Direction = Arm_Up;
-	LeftArm_State.Homed = NotHomed;
-	LeftArm_State.MotionState = Motion_Disabled;
+	LeftArm_State.Homed = Arm_NotHomed;
+	LeftArm_State.MotionState = Arm_Motion_Disabled;
 	LeftArm_State.Timer = 0;
 	LeftArm_State.SelTestRunning = 0;
 	LeftArm_State.TIM = htim;
@@ -24,14 +24,22 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
 }
 
-void LeftArm_SelfTest()
+void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 {
-	// Force a home sequence
-	LeftArm_EnableBrake(False);
-
-	LeftArm_State.SelTestRunning = 1;
-	LeftArm_State.MotionState = Motion_MovingUp;
-	LeftArm_State.Speed = 10;
+	if (Enabled)
+	{
+		LeftArm_EnableBrake(False);
+		LeftArm_State.SelTestRunning = 1;
+		LeftArm_State.MotionState = Arm_Motion_MovingUp;
+		LeftArm_State.Speed = 10;
+	}
+	else
+	{
+		LeftArm_EnableBrake(True);
+		LeftArm_State.SelTestRunning = 0;
+		LeftArm_State.MotionState = Arm_Motion_Disabled;
+		LeftArm_State.Speed = 0;
+	}
 }
 
 void LeftArm_MoveToAngle(int TargetAngle)
@@ -48,15 +56,15 @@ void LeftArm_Update10Hz()
 
 		if (LeftArm_State.Timer <= 1 * UPDATE_10HZ)
 		{
-			LeftArm_State.MotionState = Motion_MovingUp;
+			LeftArm_State.MotionState = Arm_Motion_MovingUp;
 		}
 		else if (LeftArm_State.Timer <= 2 * UPDATE_10HZ)
 		{
-			LeftArm_State.MotionState = Motion_MovingDown;
+			LeftArm_State.MotionState = Arm_Motion_MovingDown;
 		}
 		else
 		{
-			LeftArm_State.MotionState = Motion_AtTarget;
+			LeftArm_State.MotionState = Arm_Motion_AtTarget;
 		}
 	}
 	else
@@ -65,7 +73,7 @@ void LeftArm_Update10Hz()
 	}
 
 	// Write correct outputs
-	if (LeftArm_State.MotionState == Motion_MovingUp)
+	if (LeftArm_State.MotionState == Arm_Motion_MovingUp)
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.Speed);
 
@@ -73,7 +81,7 @@ void LeftArm_Update10Hz()
 
 		LeftArm_EnableBrake(False);
 	}
-	else if (LeftArm_State.MotionState == Motion_MovingDown)
+	else if (LeftArm_State.MotionState == Arm_Motion_MovingDown)
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.Speed);
 
@@ -100,8 +108,8 @@ void RightArm_Init(TIM_HandleTypeDef *htim)
 {
 	RightArm_State.Angle = 0;
 	RightArm_State.Direction = Arm_Up;
-	RightArm_State.Homed = NotHomed;
-	RightArm_State.MotionState = Motion_Disabled;
+	RightArm_State.Homed = Arm_NotHomed;
+	RightArm_State.MotionState = Arm_Motion_Disabled;
 	RightArm_State.Timer = 0;
 	RightArm_State.SelTestRunning = 0;
 	RightArm_State.TIM = htim;
@@ -111,14 +119,22 @@ void RightArm_Init(TIM_HandleTypeDef *htim)
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
 }
 
-void RightArm_SelfTest()
+void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 {
-	// Force a home sequence
-	RightArm_EnableBrake(False);
-
-	RightArm_State.SelTestRunning = 1;
-	RightArm_State.MotionState = Motion_MovingDown;
-	RightArm_State.Speed = 10;
+	if (Enabled)
+	{
+		RightArm_EnableBrake(False);
+		RightArm_State.SelTestRunning = 1;
+		RightArm_State.MotionState = Arm_Motion_MovingUp;
+		RightArm_State.Speed = 10;
+	}
+	else
+	{
+		RightArm_EnableBrake(True);
+		RightArm_State.SelTestRunning = 0;
+		RightArm_State.MotionState = Arm_Motion_Disabled;
+		RightArm_State.Speed = 0;
+	}
 }
 
 void RightArm_MoveToAngle(int TargetAngle)
@@ -135,15 +151,15 @@ void RightArm_Update10Hz()
 
 		if (RightArm_State.Timer <= 1 * UPDATE_10HZ)
 		{
-			RightArm_State.MotionState = Motion_MovingDown;
+			RightArm_State.MotionState = Arm_Motion_MovingDown;
 		}
 		else if (RightArm_State.Timer <= 2 * UPDATE_10HZ)
 		{
-			RightArm_State.MotionState = Motion_MovingUp;
+			RightArm_State.MotionState = Arm_Motion_MovingUp;
 		}
 		else
 		{
-			RightArm_State.MotionState = Motion_AtTarget;
+			RightArm_State.MotionState = Arm_Motion_AtTarget;
 		}
 	}
 	else
@@ -152,7 +168,7 @@ void RightArm_Update10Hz()
 	}
 
 	// Write correct outputs
-	if (RightArm_State.MotionState == Motion_MovingUp)
+	if (RightArm_State.MotionState == Arm_Motion_MovingUp)
 	{
 		__HAL_TIM_SET_COMPARE(RightArm_State.TIM, TIM_CHANNEL_2, RightArm_State.Speed);
 
@@ -160,7 +176,7 @@ void RightArm_Update10Hz()
 
 		RightArm_EnableBrake(False);
 	}
-	else if (RightArm_State.MotionState == Motion_MovingDown)
+	else if (RightArm_State.MotionState == Arm_Motion_MovingDown)
 	{
 		__HAL_TIM_SET_COMPARE(RightArm_State.TIM, TIM_CHANNEL_2, RightArm_State.Speed);
 

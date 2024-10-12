@@ -28,6 +28,8 @@
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
 #include "Arms.h"
+#include "Base.h"
+#include "Encoders.h"
 
 /* USER CODE END Includes */
 
@@ -49,6 +51,9 @@
 TIM_HandleTypeDef htim9;
 TIM_HandleTypeDef htim14;
 
+UART_HandleTypeDef huart6;
+DMA_HandleTypeDef hdma_usart6_rx;
+
 /* USER CODE BEGIN PV */
 int Time10Hz = 0;
 /* USER CODE END PV */
@@ -56,8 +61,10 @@ int Time10Hz = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_TIM14_Init(void);
 static void MX_TIM9_Init(void);
+static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -74,9 +81,15 @@ void System_Initialize()
 
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
+	Base_Init(&htim9);
+
+	LeftArm_EnableBrake(False);
+	RightArm_EnableBrake(False);
+
+	Encoders_Init(&huart6);
 }
 
-void System_SelfTest(enum ENUM_Booleans Enabled )
+void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	RGBLeds_SelfTest(Enabled);
 
@@ -130,15 +143,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USB_DEVICE_Init();
   MX_TIM14_Init();
   MX_TIM9_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  System_Initialize();
-  System_SelfTest(True);
+	System_Initialize();
+
+	System_SelfTest(True);
+	LeftArm_EnableBrake(False);
+	RightArm_EnableBrake(False);
+
 
   Protocol_0x55_Init();
+
+
 
   /* USER CODE END 2 */
 
@@ -156,7 +177,7 @@ int main(void)
 
 		  Time10Hz += 1;
 
-		  if (Time10Hz == 100) { System_SelfTest(False);}
+//		  if (Time10Hz == 100) { System_SelfTest(False);}
 	  }
 
 	  if (Update_5Hz)
@@ -167,6 +188,8 @@ int main(void)
 	  if (Update_2Hz)
 	  {
 		  Update_2Hz = 0;
+
+
 	  }
 
 	  Check_USB_Communication();
@@ -296,6 +319,55 @@ static void MX_TIM14_Init(void)
 }
 
 /**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -308,6 +380,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
