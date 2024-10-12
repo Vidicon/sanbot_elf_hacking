@@ -25,9 +25,6 @@
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
-/* External functions --------------------------------------------------------*/
-void SystemClock_Config(void);
-
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -207,27 +204,6 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f2xx.s).                    */
 /******************************************************************************/
-
-/**
-  * @brief This function handles USB On The Go FS wake-up interrupt through EXTI line 18.
-  */
-void OTG_FS_WKUP_IRQHandler(void)
-{
-  /* USER CODE BEGIN OTG_FS_WKUP_IRQn 0 */
-
-  /* USER CODE END OTG_FS_WKUP_IRQn 0 */
-  if ((&hpcd_USB_OTG_FS)->Init.low_power_enable) {
-    /* Reset SLEEPDEEP bit of Cortex System Control Register */
-    SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
-    SystemClock_Config();
-  }
-  __HAL_PCD_UNGATE_PHYCLOCK(&hpcd_USB_OTG_FS);
-  /* Clear EXTI pending bit */
-  __HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
-  /* USER CODE BEGIN OTG_FS_WKUP_IRQn 1 */
-
-  /* USER CODE END OTG_FS_WKUP_IRQn 1 */
-}
 
 /**
   * @brief This function handles TIM8 trigger and commutation interrupts and TIM14 global interrupt.

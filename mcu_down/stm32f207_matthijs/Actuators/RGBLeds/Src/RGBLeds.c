@@ -141,7 +141,7 @@ void RGBLeds_Update10Hz()
 
 		if (RGBLeds_State[i].Blink == LED_Blink_Off)
 		{
-			RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));
+//			RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));
 		}
 	}
 

@@ -28,6 +28,7 @@
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
 #include "Arms.h"
+#include "Base.h"
 
 /* USER CODE END Includes */
 
@@ -74,6 +75,7 @@ void System_Initialize()
 
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
+	Base_Init(&htim9);
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled )
