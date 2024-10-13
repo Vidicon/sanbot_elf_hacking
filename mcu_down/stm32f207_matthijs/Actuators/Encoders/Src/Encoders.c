@@ -19,38 +19,35 @@ struct Encoders_Data_Type Encoders_GetPointer()
 //----------------------------------------------------------------
 void Encoders_Init(UART_HandleTypeDef *huart)
 {
-  /* Start UART reception in DMA mode */
-  memset(&Encoder_Raw_Buffer[0], 0, ENCODER_RX_BUFFER_SIZE);
-  HAL_UART_Receive_DMA(huart, Encoder_Raw_Buffer, ENCODER_RX_BUFFER_SIZE);
-
-//	LeftArm_State.Angle = 0;
-//	LeftArm_State.Direction = Arm_Up;
-//	LeftArm_State.Homed = NotHomed;
-//	LeftArm_State.MotionState = Motion_Disabled;
-//	LeftArm_State.Timer = 0;
-//	LeftArm_State.SelTestRunning = 0;
-//	LeftArm_State.TIM = htim;
-//	LeftArm_State.Speed = 0;
+	/* Start UART reception in DMA mode */
+	memset(&Encoder_Raw_Buffer[0], 0, ENCODER_RX_BUFFER_SIZE);
+	HAL_UART_Receive_DMA(huart, Encoder_Raw_Buffer, ENCODER_RX_BUFFER_SIZE);
 
 
-//	HAL_TIM_Base_Start(htim);
-//	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+	EncoderData.Encoder[0] = 0;
+	EncoderData.Encoder[1] = 0;
+	EncoderData.Encoder[2] = 0;
+	EncoderData.Encoder[3] = 0;
+	EncoderData.Encoder[4] = 0;
 
-	  EncoderData.Encoder[0] = 0;
-  	  EncoderData.Encoder[1] = 0;
-  	  EncoderData.Encoder[2] = 0;
-  	  EncoderData.Encoder[3] = 0;
-  	  EncoderData.Encoder[4] = 0;
+	EncoderData.Previous[0] = 0;
+	EncoderData.Previous[1] = 0;
+	EncoderData.Previous[2] = 0;
+	EncoderData.Previous[3] = 0;
+	EncoderData.Previous[4] = 0;
+
+	EncoderData.Read[0] = 0;
+	EncoderData.Read[1] = 0;
+	EncoderData.Read[2] = 0;
+	EncoderData.Read[3] = 0;
+	EncoderData.Read[4] = 0;
+
+	EncoderData.RxCounter = 0;
 }
 
 void Encoders_SelfTest()
 {
-//	// Force a home sequence
-//	LeftArm_EnableBrake(False);
-//
-//	LeftArm_State.SelTestRunning = 1;
-//	LeftArm_State.MotionState = Motion_MovingUp;
-//	LeftArm_State.Speed = 10;
+
 }
 
 /* DMA Transfer Complete Interrupt Callback */
@@ -60,9 +57,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
         /* Handle the reception of data here */
         /* Reset DMA reception if needed */
+    	EncoderData.RxCounter += 1;
 
     	for (int i=0; i < 5; i++)
     	{
+    		EncoderData.Previous[i] = EncoderData.Encoder[i];
+
 			// Negative values have 0x80 is bytes 5, 7, 9, 11, 13
     		if (Encoder_Raw_Buffer[i*2 + 5] == 0x80)
     		{

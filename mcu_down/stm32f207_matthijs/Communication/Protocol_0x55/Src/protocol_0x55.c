@@ -30,6 +30,7 @@ uint8_t Protocol_0x55_CheckFifo()
 	// No data in buffer
 	if (PROTOCOL_0X55_RxData.BytesInBuffer == 0)
 	{
+		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
 		return 0;
 	}
 
@@ -45,6 +46,7 @@ uint8_t Protocol_0x55_CheckFifo()
 
 		// Update. 1 bytes less in the buffer
 		PROTOCOL_0X55_RxData.BytesInBuffer -= 1;
+		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
 
 		return 0;
 	}
@@ -55,6 +57,7 @@ uint8_t Protocol_0x55_CheckFifo()
 	// Not all data received yet
 	if (PROTOCOL_0X55_RxData.BytesInBuffer < (3 + datalen + 2))
 	{
+		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
 		return 0;
 	}
 
@@ -63,7 +66,8 @@ uint8_t Protocol_0x55_CheckFifo()
 
 	if ((Result & 0xff) == PROTOCOL_0X55_RxData.FIFO_Data[datalen+3])
 	{
-		// CRC is correct
+		PROTOCOL_0X55_RxData.TotalMsgSize = 3+datalen+2;
+
 		return 1;
 	}
 	else
@@ -71,15 +75,30 @@ uint8_t Protocol_0x55_CheckFifo()
 		// Start = 0x55, enough data but CRC not ok.
 		// Clean the 0x55, so receiver starts to shift.
 		PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
+		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
+
 		return 0;
 	}
 }
 
 void Protocol_0x55_MarkProcessed()
 {
-	// Clear first byte. Not very nice but works.
-	// Receiver will start shifting until new 0x55 is found or BytesInBuffer = 0
-	PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
+//	// Clear first byte. Not very nice but works.
+//	// Receiver will start shifting until new 0x55 is found or BytesInBuffer = 0
+//	PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
+
+	int MsgSize = PROTOCOL_0X55_RxData.TotalMsgSize;
+
+	// Shift whole buffer
+	memmove(&PROTOCOL_0X55_RxData.FIFO_Data[0], &PROTOCOL_0X55_RxData.FIFO_Data[MsgSize], FIFO_RXSIZE - MsgSize);
+
+	// Clear last byte
+	PROTOCOL_0X55_RxData.FIFO_Data[FIFO_RXSIZE-1] = 0;
+
+	// Update. 1 bytes less in the buffer
+	PROTOCOL_0X55_RxData.BytesInBuffer -= MsgSize;
+
+
 }
 
 int Protocol_0x55_GetCommand()

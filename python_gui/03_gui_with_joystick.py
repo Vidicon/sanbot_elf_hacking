@@ -3,14 +3,7 @@ from tkinter import scrolledtext
 from tkinter import font
 
 import time
-# from time import gmtime, strftime
-# import sys
-# import json
-# from datetime import date, datetime, timedelta
-# import math
-# import random
-# import string
-
+import pygame
 
 from ModManager import ModManager
 import numpy as np
@@ -85,13 +78,9 @@ def createLedCommand(mod_manager, Parameters):
     return
 
 def createMoveCommand(mod_manager, Parameters):
-
-    print(Parameters)
-
     high = (int(Parameters[1]) >> 8)  & 0xff;
     low  = (int(Parameters[1]) & 0xff);
             
-    print(Parameters)
     mod_manager.cmd_Generic(Parameters[0], 2, np.array([high, low]))
 
     return
@@ -349,8 +338,70 @@ def show_gui(mod_manager):
 
     return root, text_area, stream_area
 
+# Function to handle pygame events
+def handle_pygame_events():
+    # Get Pygame events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            root.quit()
 
+        # Handle button presses
+        if event.type == pygame.JOYBUTTONDOWN:
+            print(f"Button {event.button} pressed.")
+
+            if (event.button == 4):
+                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, +100]))
+            if (event.button == 5):
+                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
+            if (event.button == 6):
+                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -100]))
+            if (event.button == 7):
+                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, +100]))
+
+        elif event.type == pygame.JOYBUTTONUP:
+            print(f"Button {event.button} released.")
+            
+            if (event.button == 4):
+                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+            if (event.button == 5):
+                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+            if (event.button == 6):
+                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+            if (event.button == 7):
+                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+                
+
+        # Handle joystick movements
+        if event.type == pygame.JOYAXISMOTION:
+            print(f"Axis {event.axis} moved to {event.value}.")
+
+    # Schedule the function to run again after 100 milliseconds
+    root.after(100, handle_pygame_events)
+    
 def main():
+    # Initialize pygame
+    pygame.init()
+    
+    # Initialize the joysticks
+    pygame.joystick.init()
+    
+    joystick_count = pygame.joystick.get_count()
+
+    if joystick_count == 0:
+        print("No joystick detected.")
+    else:
+        print(f"Detected {joystick_count} joystick(s).")
+    
+        # Select the first joystick
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+    
+        print(f"Using joystick: {joystick.get_name()}")
+    
+        # Get the number of buttons
+        num_buttons = joystick.get_numbuttons()
+        print(f"Number of buttons: {num_buttons}")
+
     # mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
     global mod_manager 
     global root
@@ -376,7 +427,10 @@ def main():
     mod_manager.set_receive_callback(my_receive_callback, stream_area)
     mod_manager.open_port()
     time.sleep(0.1)
-    
+  
+    # Call the handle_pygame_events function initially
+    root.after(100, handle_pygame_events)  
+  
     root.mainloop()
 
 if __name__== "__main__":

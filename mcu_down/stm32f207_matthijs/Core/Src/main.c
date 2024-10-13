@@ -53,7 +53,9 @@ UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
-int Time10Hz = 0;
+int Time20Hz = 0;
+int Selftest = False;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,15 +85,33 @@ void System_Initialize()
 	RightArm_Init(&htim9);
 }
 
-void System_SelfTest(enum ENUM_Booleans Enabled )
+void System_SelfTest(enum ENUM_Booleans Enabled)
 {
-	RGBLeds_SelfTest(Enabled);
+	Selftest = Enabled;
 
-	LeftArm_SelfTest(Enabled);
-	RightArm_SelfTest(Enabled);
+//	RGBLeds_SelfTest(Enabled);
+}
 
-	LeftArm_EnableBrake(Enabled);
-	RightArm_EnableBrake(Enabled);
+void UpdateSelfTest()
+{
+	if (Selftest)
+	{
+	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
+	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
+	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+
+	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
+	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
+	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+
+	  if (Time20Hz == 12 * UPDATE_20HZ)
+	  {
+		  RGBLeds_SetColorOff(LeftArm);
+		  RGBLeds_SetColorOff(RightArm);
+	  }
+	}
 }
 
 void Check_USB_Communication()
@@ -105,10 +125,14 @@ void Check_USB_Communication()
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
+		if (command == CMD_LA_MOVE) 	{ Command_NewSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_RA_MOVE) 	{ Command_NewSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
 		Protocol_0x55_MarkProcessed();
 	}
 }
+
+
 
 /* USER CODE END 0 */
 
@@ -148,6 +172,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
+//  System_SelfTest(True);
   System_SelfTest(False);
 
   Protocol_0x55_Init();
@@ -158,23 +183,28 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (Update_20Hz)
+	  {
+		  Update_20Hz = 0;
+		  Time20Hz += 1;
+
+		  UpdateSelfTest();
+
+		  LeftArm_Update20Hz(Encoders_GetPointer());
+		  RightArm_Update20Hz(Encoders_GetPointer());
+	  }
 
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
 		  RGBLeds_Update10Hz();
 
-		  LeftArm_Update10Hz(Encoders_GetPointer());
-		  RightArm_Update10Hz();
 
-		  Time10Hz += 1;
-
-		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
-		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
-		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
-		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-
+//		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
+//		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
+//		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+//		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
+//		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
 	  }
 
 	  if (Update_5Hz)

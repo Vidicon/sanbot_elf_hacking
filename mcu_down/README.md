@@ -23,16 +23,35 @@
 |  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |
 |  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |
 
-Notes Matthijs:
+**Notes Matthijs:**
  - IO pins are correct.
  - Enable is active high 3.3v (= Brake disable)
  - In the new firmware **Enable** is called **Brake** as the motor feels locked when this IO pin is **LOW**
  - Left arm motor runs opposite direction of Right arm
  
- Notes to be checked:
- - ??? PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, ??? 
+ **PWM generator for the motors**
+ - TIM9 is used to generator the PWM
+ - Channel 1 = left arm
+ - Channel 2 = right arm 
+ - Prescaler 15 (+1) = 16 --> 16 MHz / 16 = 1 MHz)
+ - Period = 100 count --> 10 kHz duty cycle (should be 99?)
+ - 100 counts = 100%
+ - In practice the arms run already very fast at 20 counts.
  
+---
+### Encoder counter
+- The "small" STM32F103 on the "down" board counts the pulses from the 5 encoders.
+- When an encoder changes, a message is send to the main STM32F2.
+- UART settings 115200, 8n1. Only TX from the 2nd IC. No TX from main STM32F2.
+- Max update rate = 16.6 (17) Hz.
+- Pulses counted since last message are send. Not the total pulse count.
 
+**Protocol:**
+- Message size = 15 bytes
+- Bytes 0, 1, 2, 3 are fixed (?) or not relevant [0xff 0x01 0x01 0x00]
+- Bytes 4, 6, 8, 10, 12 are the delta counts since last message
+- Bytes 5, 7, 9, 11, 13 have value 0x80 when the delta value is **negative**. 0x00 when **positive**. 
+- Byte 14 seems to be a CRC value. Not investigated which algoritm is used.
 ---
 
 ### Limit switches arms (J29 J32)
@@ -82,7 +101,7 @@ STM32F2 connections:
 
 ---
 
-### Distence sensor 4x (J26)
+### Distance sensor 4x (J26)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
@@ -90,7 +109,7 @@ STM32F2 connections:
 
 ---
 
-### Distence sensor 4x (7x) (J19)
+### Distance sensor 4x (7x) (J19)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
@@ -104,7 +123,7 @@ STM32F2 connections:
 
 ---
 
-### Distence sensor 1x (J21 J24 J28)
+### Distance sensor 1x (J21 J24 J28)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|
