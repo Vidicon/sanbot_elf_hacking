@@ -44,7 +44,7 @@ struct Arm_State_Type {
 
 	int SetpointState;
 	int ActualPosition;
-	int ActualPositionPrev;
+//	int ActualPositionPrev;
 	int TargetPosition;
 	int SetpointPosition;
 	int SetpointDirection;
@@ -63,7 +63,7 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void LeftArm_MoveToAngle(int TargetAngle);
 
-void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData);
+void LeftArm_Update20Hz(struct Encoders_Data_Type EncoderData);
 
 void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
 
@@ -76,7 +76,7 @@ void RightArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void RightArm_MoveToAngle(int TargetAngle);
 
-void RightArm_Update10Hz();
+void RightArm_Update20Hz();
 
 void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
 

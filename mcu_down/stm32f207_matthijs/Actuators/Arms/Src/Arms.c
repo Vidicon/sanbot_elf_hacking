@@ -48,28 +48,28 @@ void LeftArm_MoveToAngle(int TargetAngle)
 	// Move if correctly homed
 }
 
-void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
+void LeftArm_Update20Hz(struct Encoders_Data_Type EncoderData)
 {
 	//----------------------------------------------------------------------------
 	//  Check if selftest is running
 	//----------------------------------------------------------------------------
-	if (LeftArm_State.SelTestRunning == 1)
-	{
-		LeftArm_State.Timer += 1;
-
-		if (LeftArm_State.Timer <= 1 * UPDATE_10HZ)
-		{
-			LeftArm_State.MotionState = Arm_Motion_MovingUp;
-		}
-		else if (LeftArm_State.Timer <= 2 * UPDATE_10HZ)
-		{
-			LeftArm_State.MotionState = Arm_Motion_MovingDown;
-		}
-		else
-		{
-			LeftArm_State.MotionState = Arm_Motion_AtTarget;
-		}
-	}
+//	if (LeftArm_State.SelTestRunning == 1)
+//	{
+//		LeftArm_State.Timer += 1;
+//
+//		if (LeftArm_State.Timer <= 1 * UPDATE_10HZ)
+//		{
+//			LeftArm_State.MotionState = Arm_Motion_MovingUp;
+//		}
+//		else if (LeftArm_State.Timer <= 2 * UPDATE_10HZ)
+//		{
+//			LeftArm_State.MotionState = Arm_Motion_MovingDown;
+//		}
+//		else
+//		{
+//			LeftArm_State.MotionState = Arm_Motion_AtTarget;
+//		}
+//	}
 
 	//----------------------------------------------------------------------------
 	// Feedback controller
@@ -101,13 +101,10 @@ void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
 		RGBLeds_SetColorOn(LeftArm, Green);
 	}
 
-
 	int controller = 0;
 
-	if (LeftArm_State.SetpointState != 0)
+	if ((LeftArm_State.SetpointState == 1) || (LeftArm_State.SetpointState == -1))
 	{
-		LeftArm_State.ActualPositionPrev = LeftArm_State.ActualPosition;
-
 		LeftArm_State.Differential = error - LeftArm_State.ErrorPrev;
 		LeftArm_State.ErrorPrev = error;
 		LeftArm_State.Integral += error;
@@ -138,17 +135,25 @@ void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
 			LeftArm_State.MotionState = Arm_Motion_MovingUp;
 		}
 	}
-	else
+	else if (LeftArm_State.SetpointState == 0)
 	{
 		controller = 0;
 		LeftArm_State.Integral = 0;
-
 		LeftArm_State.MotionState = Arm_Motion_AtTarget;
 	}
+	else
+	{
+
+	}
+
+//		// Motion controller overruled.
+//		controller = 0;
+//		LeftArm_State.Integral = 0;
+//		LeftArm_State.MotionState = Arm_Motion_Disabled;
 
 
 	// TIM 9 counter = 100.
-	int max = 20;
+	int max = 25;
 	if (LeftArm_State.AmplifierSetpoint > max) {LeftArm_State.AmplifierSetpoint  = max;}
 	if (LeftArm_State.AmplifierSetpoint < -max) {LeftArm_State.AmplifierSetpoint  = -max;}
 
@@ -158,36 +163,23 @@ void LeftArm_Update10Hz(struct Encoders_Data_Type EncoderData)
 	if (LeftArm_State.MotionState == Arm_Motion_MovingUp)
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.AmplifierSetpoint);
-
 		HAL_GPIO_WritePin(LeftArmUp_GPIO_Port, LeftArmUp_Pin, GPIO_PIN_SET);
-
-//		RGBLeds_SetColorOff(LeftArm);
-//		RGBLeds_SetColorOn(LeftArm, Blue);
-
 		LeftArm_EnableBrake(False);
 	}
 	else if (LeftArm_State.MotionState == Arm_Motion_MovingDown)
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, LeftArm_State.AmplifierSetpoint);
-
 		HAL_GPIO_WritePin(LeftArmUp_GPIO_Port, LeftArmUp_Pin, GPIO_PIN_RESET);
-
-
-//		RGBLeds_SetColorOff(LeftArm);
-//		RGBLeds_SetColorOn(LeftArm, Red);
-//
 		LeftArm_EnableBrake(False);
 	}
 	else if (LeftArm_State.MotionState == Arm_Motion_AtTarget)
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, 0);
-
-		LeftArm_EnableBrake(True);
+//		LeftArm_EnableBrake(True);
 	}
-	else
+	else //Disabled, brake released
 	{
 		__HAL_TIM_SET_COMPARE(LeftArm_State.TIM, TIM_CHANNEL_1, 0);
-
 		LeftArm_EnableBrake(False);
 	}
 }
@@ -257,31 +249,8 @@ void RightArm_MoveToAngle(int TargetAngle)
 
 }
 
-void RightArm_Update10Hz()
+void RightArm_Update20Hz()
 {
-	//  Check if selftest is running
-	if (RightArm_State.SelTestRunning == 1)
-	{
-		RightArm_State.Timer += 1;
-
-		if (RightArm_State.Timer <= 1 * UPDATE_10HZ)
-		{
-			RightArm_State.MotionState = Arm_Motion_MovingDown;
-		}
-		else if (RightArm_State.Timer <= 2 * UPDATE_10HZ)
-		{
-			RightArm_State.MotionState = Arm_Motion_MovingUp;
-		}
-		else
-		{
-			RightArm_State.MotionState = Arm_Motion_AtTarget;
-		}
-	}
-	else
-	{
-
-	}
-
 	// Write correct outputs
 	if (RightArm_State.MotionState == Arm_Motion_MovingUp)
 	{

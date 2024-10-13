@@ -53,7 +53,7 @@ UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
-int Time10Hz = 0;
+int Time20Hz = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,23 +158,31 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (Update_20Hz)
+	  {
+		  Update_20Hz = 0;
+		  Time20Hz += 1;
+
+		  LeftArm_Update20Hz(Encoders_GetPointer());
+		  RightArm_Update20Hz();
+
+		  if (Time20Hz == 10 * UPDATE_20HZ)
+		  {
+			  HAL_Delay(1);
+		  }
+	  }
 
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
 		  RGBLeds_Update10Hz();
 
-		  LeftArm_Update10Hz(Encoders_GetPointer());
-		  RightArm_Update10Hz();
 
-		  Time10Hz += 1;
-
-		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
-		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
-		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
-		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-
+//		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
+//		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
+//		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+//		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
+//		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
 	  }
 
 	  if (Update_5Hz)
