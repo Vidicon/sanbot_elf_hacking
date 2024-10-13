@@ -163,13 +163,18 @@ int main(void)
 		  Update_20Hz = 0;
 		  Time20Hz += 1;
 
-		  LeftArm_Update20Hz(Encoders_GetPointer());
-		  RightArm_Update20Hz();
+		  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
+		  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+		  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
+		  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
 
-		  if (Time20Hz == 10 * UPDATE_20HZ)
-		  {
-			  HAL_Delay(1);
-		  }
+		  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
+		  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+		  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
+		  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+
+		  LeftArm_Update20Hz(Encoders_GetPointer());
+		  RightArm_Update20Hz(Encoders_GetPointer());
 	  }
 
 	  if (Update_10Hz)
