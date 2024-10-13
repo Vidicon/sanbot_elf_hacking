@@ -25,6 +25,9 @@ CMD_BASE_COLOR  = 0x12
 
 CMD_GET_ENCODERS  = 0x20
 
+CMD_LA_MOVE		= 0x30
+CMD_RA_MOVE		= 0x31
+
 
 CMD_RED     = 1
 CMD_GREEN   = 2
@@ -45,7 +48,7 @@ CMD_LED_BLINK_VERYFAST  = 6
 #===============================================================================
 def my_receive_callback(data, stream_area):
     hex_values = ' '.join([format(x, '02X') for x in data])
-    print("< " + hex_values)
+    # print("< " + hex_values)
     
     # Decode
     response = data[1]
@@ -78,6 +81,18 @@ def createLedCommand(mod_manager, Parameters):
     
     print(Parameters)
     mod_manager.cmd_Generic(Parameters[0], 2, np.array(Parameters[1:]))
+
+    return
+
+def createMoveCommand(mod_manager, Parameters):
+
+    print(Parameters)
+
+    high = (int(Parameters[1]) >> 8)  & 0xff;
+    low  = (int(Parameters[1]) & 0xff);
+            
+    print(Parameters)
+    mod_manager.cmd_Generic(Parameters[0], 2, np.array([high, low]))
 
     return
 
@@ -265,6 +280,54 @@ def show_gui(mod_manager):
                                command=lambda t=np.array([CMD_BASE_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t))
     button_Base_Blue_Blink.grid(row=6, column=2, sticky="w")
 
+    #--------------------------------------------------------------------------------------
+    # Move Left arm
+    #--------------------------------------------------------------------------------------
+    button_LA_Move_1 = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Left Move 1", 
+                              command=lambda t=np.array([CMD_LA_MOVE, 0]): createMoveCommand(mod_manager, t))
+    button_LA_Move_1.grid(row=1, column=3, sticky="w")
+
+    button_LA_Move_2 = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Left Move 2", 
+                              command=lambda t=np.array([CMD_LA_MOVE, 100]): createMoveCommand(mod_manager, t))
+    button_LA_Move_2.grid(row=2, column=3, sticky="w")
+
+    button_LA_Move_3 = tk.Button(frame, 
+                                height= 1, 
+                                width=10, 
+                                text="Left  Move 3", 
+                                command=lambda t=np.array([CMD_LA_MOVE, 300]): createMoveCommand(mod_manager, t))
+    button_LA_Move_3.grid(row=3, column=3, sticky="w")
+
+    #--------------------------------------------------------------------------------------
+    # Move Right arm
+    #--------------------------------------------------------------------------------------
+    button_RA_Move_1 = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Right Move 1", 
+                              command=lambda t=np.array([CMD_RA_MOVE, 0]): createMoveCommand(mod_manager, t))
+    button_RA_Move_1.grid(row=1, column=4, sticky="w")
+
+    button_RA_Move_2 = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Right Move 2", 
+                              command=lambda t=np.array([CMD_RA_MOVE, -100]): createMoveCommand(mod_manager, t))
+    button_RA_Move_2.grid(row=2, column=4, sticky="w")
+
+    button_RA_Move_3 = tk.Button(frame, 
+                                height= 1, 
+                                width=10, 
+                                text="Right  Move 3", 
+                                command=lambda t=np.array([CMD_RA_MOVE, -300]): createMoveCommand(mod_manager, t))
+    button_RA_Move_3.grid(row=3, column=4, sticky="w")
+    
     #--------------------------------------------------------------------------------------
     # Generic buttons
     #--------------------------------------------------------------------------------------
