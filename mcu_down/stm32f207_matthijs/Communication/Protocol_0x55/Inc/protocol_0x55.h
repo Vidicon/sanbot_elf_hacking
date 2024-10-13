@@ -24,6 +24,7 @@
 struct PROTOCOL_0X55_Data_Type {
 			uint8_t FIFO_Data[FIFO_RXSIZE+1];
 			int BytesInBuffer;
+			int TotalMsgSize;
 		};
 
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer();
