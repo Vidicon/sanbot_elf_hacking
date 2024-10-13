@@ -15,6 +15,8 @@
 #define CMD_BASE_COLOR  0x12
 
 #define CMD_GET_ENCODERS 0x20
+#define CMD_LA_MOVE		 0x30
+#define CMD_RA_MOVE		 0x31
 
 #define RESP_BIT 		0x80
 

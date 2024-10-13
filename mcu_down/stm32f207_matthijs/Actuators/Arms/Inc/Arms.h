@@ -50,6 +50,8 @@ struct Arm_State_Type {
 	struct Encoders_Data_Type *EncoderPtr;
 	};
 
+void Command_NewSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
+
 void GenericArm_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
 void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart);

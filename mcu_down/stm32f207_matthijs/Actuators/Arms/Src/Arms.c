@@ -8,6 +8,22 @@
 struct Arm_State_Type LeftArm_State;
 struct Arm_State_Type RightArm_State;
 
+
+void Command_NewSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte)
+{
+	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
+
+	if (BodyPart == LeftArm)
+	{
+		LeftArm_NewSetpoint(combined);
+	}
+
+	if (BodyPart == RightArm)
+	{
+		RightArm_NewSetpoint(combined);
+	}
+}
+
 void GenericArm_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart)
 {
 	//	 Works inverted. High to release brake.
@@ -79,14 +95,14 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 		if (Arm_State->MainState == 3)
 		{
 			RGBLeds_SetColorOff(BodyPart);
-			RGBLeds_SetColorOn(BodyPart, Red);
-		}
-
-		if (Arm_State->MainState == 4)
-		{
-			RGBLeds_SetColorOff(BodyPart);
 			RGBLeds_SetColorOn(BodyPart, Green);
 		}
+
+//		if (Arm_State->MainState == 4)
+//		{
+//			RGBLeds_SetColorOff(BodyPart);
+//			RGBLeds_SetColorOn(BodyPart, Green);
+//		}
 
 		//----------------------------------------------------------------------------
 		//
