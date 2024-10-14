@@ -15,7 +15,10 @@
 enum ENUM_BodyParts{
     LeftArm,
     RightArm,
-	Base
+	Base,
+	LeftBaseMotor,
+	CenterBaseMotor,
+	RightBaseMotor
 };
 
 enum ENUM_BodyParts BodyParts;

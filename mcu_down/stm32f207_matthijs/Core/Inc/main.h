@@ -71,6 +71,14 @@ void Error_Handler(void);
 #define RightArmUp_GPIO_Port GPIOE
 #define RightArmBrake_Pin GPIO_PIN_4
 #define RightArmBrake_GPIO_Port GPIOE
+#define CenterBrake_Pin GPIO_PIN_0
+#define CenterBrake_GPIO_Port GPIOF
+#define LeftBrake_Pin GPIO_PIN_2
+#define LeftBrake_GPIO_Port GPIOF
+#define RightBrake_Pin GPIO_PIN_4
+#define RightBrake_GPIO_Port GPIOF
+#define TIM11_CH1_Pin GPIO_PIN_7
+#define TIM11_CH1_GPIO_Port GPIOF
 #define RightArmRed_Pin GPIO_PIN_10
 #define RightArmRed_GPIO_Port GPIOD
 #define RightArmGreen_Pin GPIO_PIN_14

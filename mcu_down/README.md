@@ -14,14 +14,14 @@
 
 ### Motors (J8 J9 J10 J14 J15)
 
-|      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 |
-|----------|----------|----------|----------|----------|----------|----------|----------|
-|             |         encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
-|  Motor Left       |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
-|  Motor Center     |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
-|  Motor Right      |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
-|  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |
-|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |
+|      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | TIMER|
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+|             |         encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  | |
+|  Motor Left       |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   | | 
+|  Motor Center     |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |TIM11| 
+|  Motor Right      |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   || 
+|  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |TIM9| 
+|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |TIM9| 
 
 **Notes Matthijs:**
  - IO pins are correct.
@@ -30,7 +30,9 @@
  - Left arm motor runs opposite direction of Right arm
  
  **PWM generator for the motors**
- - TIM9 is used to generator the PWM
+ - TIM12 is used for the **Left** and **Right** base motors
+ - TIM11 is used for the **Center** base motor
+ - TIM9 is used to for the **Arm** motors.
  - Channel 1 = left arm
  - Channel 2 = right arm 
  - Prescaler 15 (+1) = 16 --> 16 MHz / 16 = 1 MHz)
@@ -38,6 +40,11 @@
  - 100 counts = 100%
  - In practice the arms run already very fast at 20 counts.
  
+
+
+**Brakes**
+- All brakes work and pins are correct.
+
 ---
 ### Encoder counter
 - The "small" STM32F103 on the "down" board counts the pulses from the 5 encoders.
