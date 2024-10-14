@@ -118,8 +118,8 @@ void UpdateSelfTest()
 //	  }
 
 
-	  if (Time20Hz == 1 * UPDATE_20HZ) { Temp(20);}
-	  if (Time20Hz == 3 * UPDATE_20HZ) { Temp(0); }
+//	  if (Time20Hz == 1 * UPDATE_20HZ) { Temp(20);}
+//	  if (Time20Hz == 3 * UPDATE_20HZ) { Temp(0); }
 	}
 }
 
@@ -187,9 +187,13 @@ int main(void)
 
   Protocol_0x55_Init();
 
-  GenericBase_HAL_Brake(True, LeftBaseMotor);
-  GenericBase_HAL_Brake(True, CenterBaseMotor);
-  GenericBase_HAL_Brake(True, RightBaseMotor);
+//  GenericBase_HAL_Brake(True, LeftBaseMotor);
+//  GenericBase_HAL_Brake(True, CenterBaseMotor);
+//  GenericBase_HAL_Brake(True, RightBaseMotor);
+
+  GenericBase_HAL_Brake(False, LeftBaseMotor);
+  GenericBase_HAL_Brake(False, CenterBaseMotor);
+  GenericBase_HAL_Brake(False, RightBaseMotor);
 
   /* USER CODE END 2 */
 
