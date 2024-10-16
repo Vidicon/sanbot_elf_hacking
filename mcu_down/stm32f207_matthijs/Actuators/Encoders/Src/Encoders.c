@@ -30,18 +30,18 @@ void Encoders_Init(UART_HandleTypeDef *huart)
 	EncoderData.Encoder[3] = 0;
 	EncoderData.Encoder[4] = 0;
 
-	EncoderData.Previous[0] = 0;
-	EncoderData.Previous[1] = 0;
-	EncoderData.Previous[2] = 0;
-	EncoderData.Previous[3] = 0;
-	EncoderData.Previous[4] = 0;
-
-	EncoderData.Read[0] = 0;
-	EncoderData.Read[1] = 0;
-	EncoderData.Read[2] = 0;
-	EncoderData.Read[3] = 0;
-	EncoderData.Read[4] = 0;
-
+//	EncoderData.Previous[0] = 0;
+//	EncoderData.Previous[1] = 0;
+//	EncoderData.Previous[2] = 0;
+//	EncoderData.Previous[3] = 0;
+//	EncoderData.Previous[4] = 0;
+//
+//	EncoderData.Read[0] = 0;
+//	EncoderData.Read[1] = 0;
+//	EncoderData.Read[2] = 0;
+//	EncoderData.Read[3] = 0;
+//	EncoderData.Read[4] = 0;
+//
 	EncoderData.RxCounter = 0;
 }
 
@@ -53,7 +53,9 @@ void Encoders_SelfTest()
 /* DMA Transfer Complete Interrupt Callback */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if(huart->Instance == USART6)
+    int TmpEncoder = 0;
+
+	if(huart->Instance == USART6)
     {
         /* Handle the reception of data here */
         /* Reset DMA reception if needed */
@@ -61,16 +63,21 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     	for (int i=0; i < 5; i++)
     	{
-    		EncoderData.Previous[i] = EncoderData.Encoder[i];
-
 			// Negative values have 0x80 is bytes 5, 7, 9, 11, 13
     		if (Encoder_Raw_Buffer[i*2 + 5] == 0x80)
     		{
-    			EncoderData.Encoder[i] -= Encoder_Raw_Buffer[i*2+4];
+    			// Clear the 0x80 bit
+    			Encoder_Raw_Buffer[i*2 + 5] = Encoder_Raw_Buffer[i*2 + 5] ^ 0x80;
+
+    			TmpEncoder = (Encoder_Raw_Buffer[i*2 + 5] << 8) + Encoder_Raw_Buffer[i*2+4];
+
+    			EncoderData.Encoder[i] -= TmpEncoder;
     		}
     		else
     		{
-    			EncoderData.Encoder[i] += Encoder_Raw_Buffer[i*2+4];
+    			TmpEncoder = (Encoder_Raw_Buffer[i*2 + 5] << 8) + Encoder_Raw_Buffer[i*2+4];
+
+    			EncoderData.Encoder[i] += TmpEncoder;
     		}
     	}
 

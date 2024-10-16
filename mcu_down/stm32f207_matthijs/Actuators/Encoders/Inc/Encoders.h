@@ -14,8 +14,8 @@
 
 struct Encoders_Data_Type {
 	int Encoder[5];
-	int Previous[5];
-	int Read[5];
+//	int Previous[5];
+//	int Read[5];
 	int RxCounter;
 	};
 
