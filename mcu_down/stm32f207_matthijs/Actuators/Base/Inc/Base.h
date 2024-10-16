@@ -30,23 +30,33 @@ struct Base_State_Type {
 	int PrevError;
 	int AmplifierSetpoint;
 
-	int ActualPosition;
 	int TargetPosition;
-	int SetpointPosition;
 	int SetpointDirection;
 	int BrakeWindow;
 
-	int ErrorPrev;
 	int Integral;
 	int Differential;
 
-	int Error;
 	int Output;
 
 	int MainState;
 
-	uint32_t TIM_CHANNEL;
+	// Velocity controller
+	int SetpointVelocity;
+	int ActualVelocity;
+	int ActualVelocity_Prev;
+	int ActualPosition_Prev;
 
+	int ErrorPosition;
+	int ErrorPositionPrev;
+	int ErrorVelocity;
+
+	int ActualPosition;
+	int SetpointPosition;
+
+	int NewData;
+
+	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
 	};
 
@@ -54,20 +64,26 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11);
 
 void Base_Update20Hz(struct Encoders_Data_Type EncoderData, struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart);
 
-void Base_VelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
+//void Base_VelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
+
+void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot);
 
 
-void CenterBaseMotor_Update20Hz(struct Encoders_Data_Type EncoderData);
+void CenterBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
-void LeftBaseMotor_Update20Hz(struct Encoders_Data_Type EncoderData);
+//void LeftBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
+//
+//void RightBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
-void RightBaseMotor_Update20Hz(struct Encoders_Data_Type EncoderData);
-
-void GenericBase_Update20Hz(struct Encoders_Data_Type EncoderData, struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart);
+void GenericBase_Update20Hz(struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart);
 
 void GenericBase_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
+void GenericBase_HAL_Direction(enum ENUM_Booleans Left, enum ENUM_BodyParts BodyPart);
+
 void Temp(int speed);
+
+void TracingUpdate();
 
 #endif
 

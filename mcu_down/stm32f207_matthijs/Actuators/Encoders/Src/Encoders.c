@@ -14,6 +14,11 @@ struct Encoders_Data_Type Encoders_GetPointer()
 	return EncoderData;
 }
 
+struct Encoders_Data_Type *Encoders_GetPointer_New()
+{
+	return &EncoderData;
+}
+
 //----------------------------------------------------------------
 //
 //----------------------------------------------------------------
@@ -30,18 +35,12 @@ void Encoders_Init(UART_HandleTypeDef *huart)
 	EncoderData.Encoder[3] = 0;
 	EncoderData.Encoder[4] = 0;
 
-//	EncoderData.Previous[0] = 0;
-//	EncoderData.Previous[1] = 0;
-//	EncoderData.Previous[2] = 0;
-//	EncoderData.Previous[3] = 0;
-//	EncoderData.Previous[4] = 0;
-//
-//	EncoderData.Read[0] = 0;
-//	EncoderData.Read[1] = 0;
-//	EncoderData.Read[2] = 0;
-//	EncoderData.Read[3] = 0;
-//	EncoderData.Read[4] = 0;
-//
+	EncoderData.NewData[0] = 0;
+	EncoderData.NewData[1] = 0;
+	EncoderData.NewData[2] = 0;
+	EncoderData.NewData[3] = 0;
+	EncoderData.NewData[4] = 0;
+
 	EncoderData.RxCounter = 0;
 }
 
@@ -63,7 +62,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     	for (int i=0; i < 5; i++)
     	{
-			// Negative values have 0x80 is bytes 5, 7, 9, 11, 13
+    		EncoderData.NewData[i] = 1;
+
+    		// Negative values have 0x80 is bytes 5, 7, 9, 11, 13
     		if (Encoder_Raw_Buffer[i*2 + 5] == 0x80)
     		{
     			// Clear the 0x80 bit

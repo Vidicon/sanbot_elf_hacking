@@ -101,25 +101,30 @@ void UpdateSelfTest()
 {
 	if (Selftest)
 	{
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
-//	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
-//	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//
-//	  if (Time20Hz == 12 * UPDATE_20HZ)
-//	  {
-//		  RGBLeds_SetColorOff(LeftArm);
-//		  RGBLeds_SetColorOff(RightArm);
-//	  }
+	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
+	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
+	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
 
+	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
+	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
+	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
 
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { Temp(20);}
-//	  if (Time20Hz == 3 * UPDATE_20HZ) { Temp(0); }
+	  if (Time20Hz == 12 * UPDATE_20HZ)
+	  {
+		  RGBLeds_SetColorOff(LeftArm);
+		  RGBLeds_SetColorOff(RightArm);
+	  }
+
+	  int Vel = 5;
+//
+//	  if ((Time20Hz % 200) == 0) { Base_VelocitySetpoint(0,0,Vel);}
+//	  if ((Time20Hz % 200) == 80) { Base_VelocitySetpoint(0,0,0);}
+//
+//	  if ((Time20Hz % 200) == 100) { Base_VelocitySetpoint(0,0,-Vel);}
+//	  if ((Time20Hz % 200) == 180) { Base_VelocitySetpoint(0,0,0);}
+
 	}
 }
 
@@ -140,8 +145,6 @@ void Check_USB_Communication()
 		Protocol_0x55_MarkProcessed();
 	}
 }
-
-
 
 /* USER CODE END 0 */
 
@@ -211,9 +214,12 @@ int main(void)
 		  LeftArm_Update20Hz(Encoders_GetPointer());
 		  RightArm_Update20Hz(Encoders_GetPointer());
 
-		  LeftBaseMotor_Update20Hz(Encoders_GetPointer());
-		  CenterBaseMotor_Update20Hz(Encoders_GetPointer());
-		  RightBaseMotor_Update20Hz(Encoders_GetPointer());
+//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer());
+//		  CenterBaseMotor_Update20Hz(Encoders_GetPointer());
+		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
+//		  RightBaseMotor_Update20Hz(Encoders_GetPointer());
+
+		  TracingUpdate();
 	  }
 
 	  if (Update_10Hz)
@@ -484,7 +490,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, CenterBrake_Pin|LeftBrake_Pin|RightBrake_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, CenterBrake_Pin|CenterDir_Pin|LeftBrake_Pin|RightBrake_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
@@ -502,8 +508,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CenterBrake_Pin LeftBrake_Pin RightBrake_Pin */
-  GPIO_InitStruct.Pin = CenterBrake_Pin|LeftBrake_Pin|RightBrake_Pin;
+  /*Configure GPIO pins : CenterBrake_Pin CenterDir_Pin LeftBrake_Pin RightBrake_Pin */
+  GPIO_InitStruct.Pin = CenterBrake_Pin|CenterDir_Pin|LeftBrake_Pin|RightBrake_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

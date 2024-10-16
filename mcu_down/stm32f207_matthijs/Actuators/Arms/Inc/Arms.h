@@ -36,11 +36,11 @@ struct Arm_State_Type {
 	int SetpointDirection;
 	int BrakeWindow;
 
-	int ErrorPrev;
+	int ErrorPositionPrev;
 	int Integral;
 	int Differential;
 
-	int Error;
+	int ErrorPosition;
 	int Output;
 
 	int MainState;

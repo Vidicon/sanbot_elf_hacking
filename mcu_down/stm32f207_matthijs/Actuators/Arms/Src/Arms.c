@@ -79,11 +79,11 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 	if ((Arm_State->MainState >= 2) && (Arm_State->MainState <= 4))
 	{
 		Arm_State->SetpointPosition = Arm_State->TargetPosition;
-		Arm_State->Error = Arm_State->SetpointPosition - Arm_State->ActualPosition;
+		Arm_State->ErrorPosition = Arm_State->SetpointPosition - Arm_State->ActualPosition;
 
 		// Check end-condition
-		if ((Arm_State->MainState == 2) && (Arm_State->Error <= +Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
-		if ((Arm_State->MainState == 3) && (Arm_State->Error >= -Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
+		if ((Arm_State->MainState == 2) && (Arm_State->ErrorPosition <= +Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
+		if ((Arm_State->MainState == 3) && (Arm_State->ErrorPosition >= -Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
 
 
 		if (Arm_State->MainState == 2)
@@ -107,11 +107,11 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 		//----------------------------------------------------------------------------
 		//
 		//----------------------------------------------------------------------------
-		Arm_State->Differential = Arm_State->Error - Arm_State->ErrorPrev;
-		Arm_State->ErrorPrev = Arm_State->Error;
-		Arm_State->Integral += Arm_State->Error;
+		Arm_State->Differential = Arm_State->ErrorPosition - Arm_State->ErrorPositionPrev;
+		Arm_State->ErrorPositionPrev = Arm_State->ErrorPosition;
+		Arm_State->Integral += Arm_State->ErrorPosition;
 
-		int kp = 40 * Arm_State->Error;
+		int kp = 40 * Arm_State->ErrorPosition;
 		int Max_Kp = 800;
 
 		if (kp > Max_Kp) {kp = Max_Kp;}
@@ -142,9 +142,10 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 		}
 	}
 
-
+	// Move done
 	if (Arm_State->MainState == 4)
 	{
+		Arm_State->AmplifierSetpoint = 0;
 		Arm_State->Output = 0;
 		Arm_State->Integral = 0;
 		Arm_State->MotionState = Arm_Motion_AtTarget;
