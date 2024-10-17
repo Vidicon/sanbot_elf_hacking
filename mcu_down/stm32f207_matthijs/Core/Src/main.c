@@ -211,13 +211,12 @@ int main(void)
 
 		  UpdateSelfTest();
 
-		  LeftArm_Update20Hz(Encoders_GetPointer());
-		  RightArm_Update20Hz(Encoders_GetPointer());
+		  LeftArm_Update20Hz(Encoders_GetPointer_New());
+		  RightArm_Update20Hz(Encoders_GetPointer_New());
 
-//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer());
-//		  CenterBaseMotor_Update20Hz(Encoders_GetPointer());
+//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer_New());
 		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
-//		  RightBaseMotor_Update20Hz(Encoders_GetPointer());
+//		  RightBaseMotor_Update20Hz(Encoders_GetPointer_New());
 
 		  TracingUpdate();
 	  }
@@ -244,7 +243,7 @@ int main(void)
 	  {
 		  Update_2Hz = 0;
 
-		  SendEncoders(Encoders_GetPointer());
+		  SendEncoders(Encoders_GetPointer_New());
 	  }
 
 	  Check_USB_Communication();

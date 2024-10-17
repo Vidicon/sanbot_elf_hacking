@@ -65,7 +65,7 @@ void GenericArm_HAL_Direction(enum ENUM_Booleans Up, enum ENUM_BodyParts BodyPar
 	}
 }
 
-void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart)
+void GenericArm_Update20Hz(struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart)
 {
 	//	0 = setpoint off, brake off
 	//  1 = setpoint off, brake ON
@@ -212,10 +212,10 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
-void LeftArm_Update20Hz(struct Encoders_Data_Type EncoderData)
+void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	LeftArm_State.ActualPosition = EncoderData.Encoder[3];
-	GenericArm_Update20Hz(EncoderData, &LeftArm_State, LeftArm);
+	LeftArm_State.ActualPosition = EncoderData->Encoder[3];
+	GenericArm_Update20Hz(&LeftArm_State, LeftArm);
 }
 
 void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)
@@ -272,10 +272,10 @@ void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
-void RightArm_Update20Hz(struct Encoders_Data_Type EncoderData)
+void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	RightArm_State.ActualPosition = EncoderData.Encoder[4];
-	GenericArm_Update20Hz(EncoderData, &RightArm_State, RightArm);
+	RightArm_State.ActualPosition = EncoderData->Encoder[4];
+	GenericArm_Update20Hz(&RightArm_State, RightArm);
 }
 
 void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)

@@ -57,8 +57,8 @@ char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
-void SendEncoders(struct Encoders_Data_Type EncoderData);
+void SendEncoders(struct Encoders_Data_Type *EncoderData);
 
-void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type EncoderData);
+void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *EncoderData);
 
 #endif

@@ -21,7 +21,7 @@ struct Encoders_Data_Type {
 
 
 //------------------------------------------------
-struct Encoders_Data_Type Encoders_GetPointer();
+struct Encoders_Data_Type *Encoders_GetPointer_New();
 
 void Encoders_Init(UART_HandleTypeDef *huart);
 
