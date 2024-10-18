@@ -37,11 +37,14 @@ struct Base_State_Type {
 	int Integral;
 	int Differential;
 
-	int Output;
 
 	int MainState;
 
 	// Velocity controller
+	int TargetVelocity;
+	int TargetAcceleration;
+
+
 	int SetpointVelocity;
 	int ActualVelocity;
 	int ActualVelocity_Prev;
@@ -50,11 +53,17 @@ struct Base_State_Type {
 	int ErrorPosition;
 	int ErrorPositionPrev;
 	int ErrorVelocity;
+	int ErrorVelocityInt;
 
 	int ActualPosition;
 	int SetpointPosition;
 
 	int NewData;
+
+	int PID_Output;
+
+	int Logging1;
+	int Logging2;
 
 	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
@@ -66,8 +75,7 @@ void Base_Update20Hz(struct Encoders_Data_Type EncoderData, struct Base_State_Ty
 
 //void Base_VelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
 
-void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot);
-
+void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot, int Acceleration);
 
 void CenterBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
 

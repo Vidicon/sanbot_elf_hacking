@@ -56,6 +56,7 @@ DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
 int Time20Hz = 0;
+int Time16Hz = 0;
 int Selftest = False;
 
 /* USER CODE END PV */
@@ -116,16 +117,14 @@ void UpdateSelfTest()
 		  RGBLeds_SetColorOff(LeftArm);
 		  RGBLeds_SetColorOff(RightArm);
 	  }
-
-	  int Vel = 5;
-//
-//	  if ((Time20Hz % 200) == 0) { Base_VelocitySetpoint(0,0,Vel);}
-//	  if ((Time20Hz % 200) == 80) { Base_VelocitySetpoint(0,0,0);}
-//
-//	  if ((Time20Hz % 200) == 100) { Base_VelocitySetpoint(0,0,-Vel);}
-//	  if ((Time20Hz % 200) == 180) { Base_VelocitySetpoint(0,0,0);}
-
 	}
+
+	int Vel = 15;
+	int Acc = 1;
+
+//	if ((Time20Hz % 300) == 0) { Base_VelocitySetpoint(0,0,Vel, Acc);}
+//	if ((Time20Hz % 300) == 60) { Base_VelocitySetpoint(0,0,-Vel, Acc);}
+//	if ((Time20Hz % 300) == 120) { Base_VelocitySetpoint(0,0,0, Acc);}
 }
 
 void Check_USB_Communication()
@@ -185,14 +184,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-  System_SelfTest(True);
-//  System_SelfTest(False);
+  System_SelfTest(False);
 
   Protocol_0x55_Init();
-
-//  GenericBase_HAL_Brake(True, LeftBaseMotor);
-//  GenericBase_HAL_Brake(True, CenterBaseMotor);
-//  GenericBase_HAL_Brake(True, RightBaseMotor);
 
   GenericBase_HAL_Brake(False, LeftBaseMotor);
   GenericBase_HAL_Brake(False, CenterBaseMotor);
@@ -213,6 +207,12 @@ int main(void)
 
 		  LeftArm_Update20Hz(Encoders_GetPointer_New());
 		  RightArm_Update20Hz(Encoders_GetPointer_New());
+	  }
+
+	  if (Update_16Hz)
+	  {
+		  Update_16Hz = 0;
+		  Time16Hz += 1;
 
 //		  LeftBaseMotor_Update20Hz(Encoders_GetPointer_New());
 		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
@@ -220,6 +220,7 @@ int main(void)
 
 		  TracingUpdate();
 	  }
+
 
 	  if (Update_10Hz)
 	  {

@@ -29,6 +29,7 @@
 /* USER CODE BEGIN TD */
 
 extern int Update_20Hz;
+extern int Update_16Hz;
 extern int Update_10Hz;
 extern int Update_5Hz;
 extern int Update_2Hz;
@@ -242,6 +243,12 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 	{
 		Update_2Hz = 1;
 	}
+
+	if ((TIM14_Counter % 3) == 0)
+	{
+		Update_16Hz = 1;
+	}
+
 
   /* USER CODE END TIM8_TRG_COM_TIM14_IRQn 0 */
   HAL_TIM_IRQHandler(&htim14);

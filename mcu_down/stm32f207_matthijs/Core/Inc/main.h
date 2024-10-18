@@ -39,6 +39,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 int Update_20Hz;
+int Update_16Hz;
 int Update_10Hz;
 int Update_5Hz;
 int Update_2Hz;
