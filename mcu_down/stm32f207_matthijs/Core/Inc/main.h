@@ -78,10 +78,12 @@ void Error_Handler(void);
 #define CenterDir_GPIO_Port GPIOF
 #define LeftBrake_Pin GPIO_PIN_2
 #define LeftBrake_GPIO_Port GPIOF
+#define LeftDir_Pin GPIO_PIN_3
+#define LeftDir_GPIO_Port GPIOF
 #define RightBrake_Pin GPIO_PIN_4
 #define RightBrake_GPIO_Port GPIOF
-#define TIM11_CH1_Pin GPIO_PIN_7
-#define TIM11_CH1_GPIO_Port GPIOF
+#define RightDir_Pin GPIO_PIN_5
+#define RightDir_GPIO_Port GPIOF
 #define RightArmRed_Pin GPIO_PIN_10
 #define RightArmRed_GPIO_Port GPIOD
 #define RightArmGreen_Pin GPIO_PIN_14

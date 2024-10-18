@@ -186,7 +186,7 @@ void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
 }
 
-char Protocol_0x55_GetData(int Index)
+signed char Protocol_0x55_GetData(int Index)
 {
 	return PROTOCOL_0X55_RxData.FIFO_Data[Index];
 }

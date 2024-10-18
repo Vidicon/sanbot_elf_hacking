@@ -244,7 +244,7 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 		Update_2Hz = 1;
 	}
 
-	if ((TIM14_Counter % 3) == 0)
+	if ((TIM14_Counter % 6) == 0)
 	{
 		Update_16Hz = 1;
 	}

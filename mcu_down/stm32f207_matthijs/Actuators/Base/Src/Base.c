@@ -15,20 +15,19 @@ struct Base_State_Type CenterBaseMotor_State;
 
 char TextBuffer[100];
 
-void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11)
+void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
 {
-//	LeftMotor_State.TIM = htim;
-//	LeftMotor_State.TIM_CHANNEL = TIM_CHANNEL_3;
-//
-//	LeftMotor_State.MotionState = Base_Motion_Disabled;
-//	LeftMotor_State.MainState = 0;
-//
-//	RightMotor_State.TIM = htim;
-//	RightMotor_State.TIM_CHANNEL = TIM_CHANNEL_4;
-//
-//	RightMotor_State.MotionState = Base_Motion_Disabled;
-//	RightMotor_State.MainState = 0;
+	//------------------------------------------------------------------
+	LeftBaseMotor_State.TIM = htim12;
+	LeftBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_1;
 
+	LeftBaseMotor_State.MotionState = Base_Motion_Disabled;
+	LeftBaseMotor_State.MainState = 0;
+
+	HAL_TIM_Base_Start(htim12);
+	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_1);
+
+	//------------------------------------------------------------------
 	CenterBaseMotor_State.TIM = htim11;
 	CenterBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_1;
 
@@ -38,242 +37,136 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11)
 	HAL_TIM_Base_Start(htim11);
 	HAL_TIM_PWM_Start(htim11, TIM_CHANNEL_1);
 
-//	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_4);
-//	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_5);
+	//------------------------------------------------------------------
+	RightBaseMotor_State.TIM = htim12;
+	RightBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_2;
+
+	RightBaseMotor_State.MotionState = Base_Motion_Disabled;
+	RightBaseMotor_State.MainState = 0;
+
+	HAL_TIM_Base_Start(htim12);
+	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_2);
 }
 
-//void Base_VelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte)
-//{
-//	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
-//
-//	if (BodyPart == CenterBaseMotor)
-//	{
-//	}
-//
-//}
-
-void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot, int Acceleration)
+void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 {
+	// -100 --> 0 --> +100
+
 	// TODO: mapping from XYPhi to 3 motors. Some matrix is needed here.
+	// Smooth setpoint generator
 
-	CenterBaseMotor_State.TargetVelocity = PhiDot;
-	CenterBaseMotor_State.TargetAcceleration = Acceleration;
-
-//	CenterBaseMotor_State.SetpointVelocity = PhiDot;
-//
-//
-//	//	CenterBaseMotor_State.MainState = 4;
-//
 //	if (PhiDot > 0)
 //	{
-//		CenterBaseMotor_State.MainState = 2;
+//		LeftBaseMotor_State.Direction = Base_Motion_Positive;
+//		LeftBaseMotor_State.PWM_Output = (100 - PhiDot);
+//
+//		CenterBaseMotor_State.Direction = Base_Motion_Positive;
+//		CenterBaseMotor_State.PWM_Output = (100 - PhiDot);
+//
+//		RightBaseMotor_State.Direction = Base_Motion_Positive;
+//		RightBaseMotor_State.PWM_Output = (100 - PhiDot);
 //	}
 //
 //	if (PhiDot < 0)
 //	{
-//		CenterBaseMotor_State.MainState = 3;
+//		LeftBaseMotor_State.Direction = Base_Motion_Negative;
+//		LeftBaseMotor_State.PWM_Output = (PhiDot + 100);
+//
+//		CenterBaseMotor_State.Direction = Base_Motion_Negative;
+//		CenterBaseMotor_State.PWM_Output = (PhiDot + 100);
+//
+//		RightBaseMotor_State.Direction = Base_Motion_Negative;
+//		RightBaseMotor_State.PWM_Output = (PhiDot + 100);
 //	}
+
+	//-------------------------------------------------------------
+	if (Vx >= 0)
+	{
+		LeftBaseMotor_State.Direction = Base_Motion_Negative;
+		LeftBaseMotor_State.PWM_Output = (100 - Vx);
+
+		CenterBaseMotor_State.Direction = Base_Motion_Positive;
+		CenterBaseMotor_State.PWM_Output = (100);
+
+		RightBaseMotor_State.Direction = Base_Motion_Positive;
+		RightBaseMotor_State.PWM_Output = (100 - Vx);
+	}
+
+	if (Vx < 0)
+	{
+		LeftBaseMotor_State.Direction = Base_Motion_Positive;
+		LeftBaseMotor_State.PWM_Output = (Vx + 100);
+
+		CenterBaseMotor_State.Direction = Base_Motion_Negative;
+		CenterBaseMotor_State.PWM_Output = (100);
+
+		RightBaseMotor_State.Direction = Base_Motion_Negative;
+		RightBaseMotor_State.PWM_Output = (Vx + 100);
+	}
+
 
 	GenericBase_HAL_Brake(False, LeftBaseMotor);
 	GenericBase_HAL_Brake(False, CenterBaseMotor);
 	GenericBase_HAL_Brake(False, RightBaseMotor);
 }
 
-void CenterBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData)
+void Base_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	// Setpoint
-	if (CenterBaseMotor_State.SetpointVelocity < CenterBaseMotor_State.TargetVelocity)
-	{
-		CenterBaseMotor_State.SetpointVelocity += CenterBaseMotor_State.TargetAcceleration;
-	}
-	else if (CenterBaseMotor_State.SetpointVelocity > CenterBaseMotor_State.TargetVelocity)
-	{
-		CenterBaseMotor_State.SetpointVelocity -= CenterBaseMotor_State.TargetAcceleration;
-	}
-	else
-	{
-		// Correct velocity
-	}
-
-	// Encoders
-	// 16 Hz, so sometimes no new data.
-
+	LeftBaseMotor_State.ActualPosition = EncoderData->Encoder[0];
 	CenterBaseMotor_State.ActualPosition = EncoderData->Encoder[1];
-	CenterBaseMotor_State.NewData = EncoderData->NewData[1];
-	EncoderData->NewData[1] = 0;
+	RightBaseMotor_State.ActualPosition = EncoderData->Encoder[2];
 
-	GenericBase_Update20Hz(&CenterBaseMotor_State, CenterBaseMotor);
-}
+	GenericBase_HAL_Brake(False, LeftBaseMotor);
+	GenericBase_HAL_Brake(False, CenterBaseMotor);
+	GenericBase_HAL_Brake(False, RightBaseMotor);
 
-//void LeftBaseMotor_Update20Hz(struct Encoders_Data_Type EncoderData)
-//{
-//	LeftBaseMotor_State.ActualPosition = EncoderData.Encoder[0];
-//	GenericBase_Update20Hz(&LeftBaseMotor_State, LeftBaseMotor);
-//}
-//
-//void RightBaseMotor_Update20Hz(struct Encoders_Data_Type EncoderData)
-//{
-//	RightBaseMotor_State.ActualPosition = EncoderData.Encoder[2];
-//	GenericBase_Update20Hz(&RightBaseMotor_State, RightBaseMotor);
-//}
+	GenericBase_HAL_Direction(LeftBaseMotor_State.Direction, LeftBaseMotor);
+	GenericBase_HAL_Direction(CenterBaseMotor_State.Direction, CenterBaseMotor);
+	GenericBase_HAL_Direction(RightBaseMotor_State.Direction, RightBaseMotor);
 
-
-void GenericBase_Update20Hz(struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart)
-{
-	//----------------------------------------------------------------------------
-	// Velocity feedback controller
-	//----------------------------------------------------------------------------
-
-	if (Base_State->NewData == 1)
-	{
-		Base_State->ActualVelocity = Base_State->ActualPosition - Base_State->ActualPosition_Prev;
-		Base_State->ActualPosition_Prev = Base_State->ActualPosition;
-	}
-
-	//----------------------------------------------------------------------------
-	//
-	//----------------------------------------------------------------------------
-	Base_State->ErrorVelocity = Base_State->SetpointVelocity - Base_State->ActualVelocity;
-	Base_State->ErrorVelocityInt += Base_State->ErrorVelocity;
-
-	// Kp
-	int kp = 20 * Base_State->ErrorVelocity ;
-	int Max_Kp = 500;
-
-	if (kp > Max_Kp) {kp = Max_Kp;}
-	if (kp < -Max_Kp) {kp = -Max_Kp;}
-
-	Base_State->Logging1 = kp;
-
-	// Ki
-	int ki = Base_State->ErrorVelocityInt;
-
-	int Max_Ki = 200;
-	if (ki > Max_Ki) {ki = Max_Ki;}
-	if (ki < -Max_Ki) {ki = -Max_Ki;}
-
-	Base_State->ErrorVelocityInt = ki;
-
-	Base_State->Logging2 = ki;
-
-	Base_State->PID_Output = kp + ki * 0;
-
-	int FF = 1000;
-	if (Base_State->SetpointVelocity > 0) {Base_State->PID_Output += FF;}
-	if (Base_State->SetpointVelocity < 0) {Base_State->PID_Output -= FF;}
-
-	Base_State->PID_Output += Base_State->SetpointVelocity * 0;
-
-
-	// Feedback controller
-	if (Base_State->PID_Output >= 0)
-	{
-		Base_State->AmplifierSetpoint = Base_State->PID_Output/100;
-		Base_State->MotionState = Base_Motion_MovingDown;
-	}
-	else
-	{
-		Base_State->AmplifierSetpoint = -1 * Base_State->PID_Output/100;
-		Base_State->MotionState = Base_Motion_MovingUp;
-	}
-
-
-
-
-	//	int kd = 25 * Base_State->Differential;
-//	int Max_Kd = 1000;
-//
-//	if (kd > Max_Kd) {kd = Max_Kd;}
-//	if (kd < -Max_Kd) {kd = -Max_Kd;}
-//
-//	int FF = 400;
-////	if (Base_State->MainState == 2 ) { FF = +1;}
-////	if (Base_State->MainState == 3 ) { FF = -1;}
-//
-////	Base_State->Output = kp + kd + FF * 200 * 0;
-
-//
-//
-//
-//
-//
-//
-//	// At setpoint
-//	if (Base_State->MainState == 4)
-//	{
-//		Base_State->AmplifierSetpoint = 0;
-//		Base_State->Output = 0;
-//		Base_State->Integral = 0;
-//		Base_State->MotionState = Base_Motion_AtTarget;
-//	}
-//
-//
-//	//----------------------------------------------------------------------------
-//	// Write correct outputs
-//	//----------------------------------------------------------------------------
-//	if (Base_State->MainState == 0)
-//	{
-//
-//	}
-//	else if (Base_State->MainState == 1)	// Brake
-//
-//	{
-//
-//	}
-//	else if ((Base_State->MainState >= 2) && (Base_State->MainState <= 4))
-//	{
-		// TIM 9 counter = 100.
-		int max = 50;
-		if (Base_State->AmplifierSetpoint > max)  {Base_State->AmplifierSetpoint = max;}
-		if (Base_State->AmplifierSetpoint < -max) {Base_State->AmplifierSetpoint = -max;}
-
-		if (Base_State->MotionState == Base_Motion_MovingUp)
-		{
-			__HAL_TIM_SET_COMPARE(Base_State->TIM, Base_State->TIM_CHANNEL, Base_State->AmplifierSetpoint);
-			GenericBase_HAL_Direction(True, BodyPart);
-		}
-		else if (Base_State->MotionState == Base_Motion_MovingDown)
-		{
-			__HAL_TIM_SET_COMPARE(Base_State->TIM, Base_State->TIM_CHANNEL, Base_State->AmplifierSetpoint);
-			GenericBase_HAL_Direction(False, BodyPart);
-		}
-		else if (Base_State->MotionState == Base_Motion_AtTarget)
-		{
-			__HAL_TIM_SET_COMPARE(Base_State->TIM, Base_State->TIM_CHANNEL, 0);
-		}
-//	}
-//
-//	// Memory stuff
-//	Base_State->ErrorPositionPrev = Base_State->ErrorPosition;
-//	Base_State->ActualVelocity_Prev = Base_State->ActualVelocity;
-//	Base_State->ActualPosition_Prev =  Base_State->ActualPosition;
+	GenericBase_HAL_PWM(LeftBaseMotor_State.PWM_Output, LeftBaseMotor);
+	GenericBase_HAL_PWM(CenterBaseMotor_State.PWM_Output, CenterBaseMotor);
+	GenericBase_HAL_PWM(RightBaseMotor_State.PWM_Output, RightBaseMotor);
 }
 
 void GenericBase_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart)
 {
 	//	 Works inverted. High to release brake.
+	if (BodyPart == LeftBaseMotor)		{ HAL_GPIO_WritePin(LeftBrake_GPIO_Port, LeftBrake_Pin, !BrakeEnable); }
+	if (BodyPart == CenterBaseMotor)	{ HAL_GPIO_WritePin(CenterBrake_GPIO_Port, CenterBrake_Pin, !BrakeEnable); }
+	if (BodyPart == RightBaseMotor)		{ HAL_GPIO_WritePin(RightBrake_GPIO_Port, RightBrake_Pin, !BrakeEnable); }
+}
+
+void GenericBase_HAL_Direction(enum ENUM_BaseMotionState Direction, enum ENUM_BodyParts BodyPart)
+{
+	if ((BodyPart == LeftBaseMotor) && (Direction == Base_Motion_Positive))  { HAL_GPIO_WritePin(LeftDir_GPIO_Port, LeftDir_Pin, GPIO_PIN_RESET); }
+	if ((BodyPart == LeftBaseMotor) && (Direction == Base_Motion_Negative)) { HAL_GPIO_WritePin(LeftDir_GPIO_Port, LeftDir_Pin, GPIO_PIN_SET); }
+
+	if ((BodyPart == CenterBaseMotor) && (Direction == Base_Motion_Positive))  { HAL_GPIO_WritePin(CenterDir_GPIO_Port, CenterDir_Pin, GPIO_PIN_RESET); }
+	if ((BodyPart == CenterBaseMotor) && (Direction == Base_Motion_Negative))  { HAL_GPIO_WritePin(CenterDir_GPIO_Port, CenterDir_Pin, GPIO_PIN_SET); }
+
+	if ((BodyPart == RightBaseMotor) && (Direction == Base_Motion_Positive))  { HAL_GPIO_WritePin(RightDir_GPIO_Port, RightDir_Pin, GPIO_PIN_RESET); }
+	if ((BodyPart == RightBaseMotor) && (Direction == Base_Motion_Negative)) { HAL_GPIO_WritePin(RightDir_GPIO_Port, RightDir_Pin, GPIO_PIN_SET); }
+}
+
+
+void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
+{
 	if (BodyPart == LeftBaseMotor)
 	{
-		HAL_GPIO_WritePin(LeftBrake_GPIO_Port, LeftBrake_Pin, !BrakeEnable);
+		__HAL_TIM_SET_COMPARE(LeftBaseMotor_State.TIM, LeftBaseMotor_State.TIM_CHANNEL, PWM);
 	}
 
 	if (BodyPart == CenterBaseMotor)
 	{
-		HAL_GPIO_WritePin(CenterBrake_GPIO_Port, CenterBrake_Pin, !BrakeEnable);
+		__HAL_TIM_SET_COMPARE(CenterBaseMotor_State.TIM, CenterBaseMotor_State.TIM_CHANNEL, PWM);
 	}
 
 	if (BodyPart == RightBaseMotor)
 	{
-		HAL_GPIO_WritePin(RightBrake_GPIO_Port, RightBrake_Pin, !BrakeEnable);
+		__HAL_TIM_SET_COMPARE(RightBaseMotor_State.TIM, RightBaseMotor_State.TIM_CHANNEL, PWM);
 	}
 }
-
-void GenericBase_HAL_Direction(enum ENUM_Booleans Left, enum ENUM_BodyParts BodyPart)
-{
-	if ((BodyPart == CenterBaseMotor) && (Left == True))  { HAL_GPIO_WritePin(CenterDir_GPIO_Port, CenterDir_Pin, GPIO_PIN_RESET); }
-	if ((BodyPart == CenterBaseMotor) && (Left == False)) { HAL_GPIO_WritePin(CenterDir_GPIO_Port, CenterDir_Pin, GPIO_PIN_SET); }
-}
-
 
 void Temp(int speed)
 {
@@ -291,13 +184,10 @@ void TracingUpdate()
 {
 	memset(TextBuffer, 0x00, 100);
 
-	sprintf(TextBuffer, "%ld,%d,%ld,%ld,%ld,%ld\n",
-												(long)(CenterBaseMotor_State.TargetVelocity),
-												(long)(CenterBaseMotor_State.SetpointVelocity),
-												(long)(CenterBaseMotor_State.ActualVelocity),
-												(long)(CenterBaseMotor_State.AmplifierSetpoint),
-												(long)(CenterBaseMotor_State.Logging1),
-												(long)(CenterBaseMotor_State.Logging2));
+	sprintf(TextBuffer, "%ld,%d,%ld\n",
+												(long)(LeftBaseMotor_State.ActualPosition),
+												(long)(CenterBaseMotor_State.ActualPosition),
+												(long)(RightBaseMotor_State.ActualPosition));
 	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
 }
 

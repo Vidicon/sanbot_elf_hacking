@@ -19,8 +19,8 @@ enum ENUM_BaseMotionState {
 	Base_Motion_Disabled,
 	Base_Motion_AtTarget,
 	Base_Motion_Error,
-	Base_Motion_MovingUp,
-	Base_Motion_MovingDown
+	Base_Motion_Positive,
+	Base_Motion_Negative
 };
 
 struct Base_State_Type {
@@ -44,7 +44,6 @@ struct Base_State_Type {
 	int TargetVelocity;
 	int TargetAcceleration;
 
-
 	int SetpointVelocity;
 	int ActualVelocity;
 	int ActualVelocity_Prev;
@@ -60,7 +59,7 @@ struct Base_State_Type {
 
 	int NewData;
 
-	int PID_Output;
+	int PWM_Output;
 
 	int Logging1;
 	int Logging2;
@@ -69,25 +68,17 @@ struct Base_State_Type {
 	struct Encoders_Data_Type *EncoderPtr;
 	};
 
-void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11);
+void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12);
 
-void Base_Update20Hz(struct Encoders_Data_Type EncoderData, struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart);
+void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot);
 
-//void Base_VelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
-
-void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot, int Acceleration);
-
-void CenterBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
-
-//void LeftBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
-//
-//void RightBaseMotor_Update20Hz(struct Encoders_Data_Type *EncoderData);
-
-void GenericBase_Update20Hz(struct Base_State_Type *Base_State, enum ENUM_BodyParts BodyPart);
+void Base_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
 void GenericBase_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
-void GenericBase_HAL_Direction(enum ENUM_Booleans Left, enum ENUM_BodyParts BodyPart);
+void GenericBase_HAL_Direction(enum ENUM_BaseMotionState Direction, enum ENUM_BodyParts BodyPart);
+
+void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart);
 
 void Temp(int speed);
 
