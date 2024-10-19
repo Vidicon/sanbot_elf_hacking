@@ -42,6 +42,7 @@ axis1 = 0
 axis2 = 0
 axis3 = 0
 axis4 = 0
+axis5 = 0
 
 
 #===============================================================================
@@ -353,12 +354,14 @@ def show_gui(mod_manager):
 # Function to handle pygame events
 def handle_pygame_events():
     
-    global axis0, axis1, axis2, axis3, axis4
+    global axis0, axis1, axis2, axis3, axis4, axis5
+    
     axis0_event= False
     axis1_event= False
     axis2_event= False
     axis3_event= False
     axis4_event= False
+    axis5_event= False
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -368,26 +371,26 @@ def handle_pygame_events():
         if event.type == pygame.JOYBUTTONDOWN:
             print(f"Button {event.button} pressed.")
 
-            if (event.button == 4):
-                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, +100]))
-            if (event.button == 5):
-                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
-            if (event.button == 6):
-                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -100]))
-            if (event.button == 7):
-                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, +100]))
+            # if (event.button == 4):
+            #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, +100]))
+            # if (event.button == 5):
+            #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
+            # if (event.button == 6):
+            #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -100]))
+            # if (event.button == 7):
+            #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, +100]))
 
         elif event.type == pygame.JOYBUTTONUP:
             print(f"Button {event.button} released.")
             
-            if (event.button == 4):
-                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
-            if (event.button == 5):
-                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
-            if (event.button == 6):
-                createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
-            if (event.button == 7):
-                createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+            # if (event.button == 4):
+            #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+            # if (event.button == 5):
+            #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+            # if (event.button == 6):
+            #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+            # if (event.button == 7):
+            #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
                 
 
         # Handle joystick movements
@@ -411,14 +414,27 @@ def handle_pygame_events():
                 axis3_event = True
                 axis3 = event.value
             
-            # if (event.axis == 4):
-            #     axis4_event = True
-            #     axis4 = event.value
+            if (event.axis == 4):
+                axis4_event = True
+                axis4 = event.value
            
-    if (axis0_event == True) or (axis1_event == True) or (axis2_event == True) or (axis3_event == True): 
-        
-        print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 2 : {-1*axis2:.2f}, Axis 3 : {-1*axis3:.2f}")
+            if (event.axis == 5):
+                axis5_event = True
+                axis5 = event.value
+
+    if (axis0_event == True) or (axis1_event == True) or (axis3_event == True): 
+        print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 3 : {-1*axis3:.2f}")
         createBaseCommand(mod_manager, np.array([CMD_BASE_MOVE, int(axis0*50), int(-1*axis1*50), int(-1*axis3*50)]))
+
+
+    if (axis2_event == True): 
+        print(f"Axis 2 : {-1*axis2:.2f}")
+        createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, int(axis2+1)*50]))
+
+    if (axis5_event == True): 
+        print(f"Axis 5 : {-1*axis5:.2f}")
+        createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, int(axis5+1)*50]))
+
 
     # Schedule the function to run again after 100 milliseconds
     root.after(100, handle_pygame_events)
