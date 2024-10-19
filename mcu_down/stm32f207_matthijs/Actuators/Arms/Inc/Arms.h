@@ -36,11 +36,11 @@ struct Arm_State_Type {
 	int SetpointDirection;
 	int BrakeWindow;
 
-	int ErrorPrev;
+	int ErrorPositionPrev;
 	int Integral;
 	int Differential;
 
-	int Error;
+	int ErrorPosition;
 	int Output;
 
 	int MainState;
@@ -54,7 +54,7 @@ void Command_NewSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowBy
 
 void GenericArm_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
-void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart);
+void GenericArm_Update20Hz(struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart);
 
 void GenericArm_HAL_Direction(enum ENUM_Booleans Up, enum ENUM_BodyParts BodyPart);
 
@@ -65,7 +65,7 @@ void LeftArm_Init(TIM_HandleTypeDef *htim);
 
 void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
-void LeftArm_Update20Hz(struct Encoders_Data_Type EncoderData);
+void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
 void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
 
@@ -78,7 +78,7 @@ void RightArm_Init(TIM_HandleTypeDef *htim);
 
 void RightArm_SelfTest(enum ENUM_Booleans Enabled);
 
-void RightArm_Update20Hz(struct Encoders_Data_Type EncoderData);
+void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
 void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
 

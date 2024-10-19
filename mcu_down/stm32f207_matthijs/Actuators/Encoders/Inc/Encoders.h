@@ -14,14 +14,14 @@
 
 struct Encoders_Data_Type {
 	int Encoder[5];
-	int Previous[5];
-	int Read[5];
+//	int Previous[5];
+	int NewData[5];
 	int RxCounter;
 	};
 
 
 //------------------------------------------------
-struct Encoders_Data_Type Encoders_GetPointer();
+struct Encoders_Data_Type *Encoders_GetPointer_New();
 
 void Encoders_Init(UART_HandleTypeDef *huart);
 

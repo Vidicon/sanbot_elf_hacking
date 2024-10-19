@@ -28,6 +28,7 @@
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
 #include "Arms.h"
+#include "Base.h"
 
 /* USER CODE END Includes */
 
@@ -47,6 +48,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim9;
+TIM_HandleTypeDef htim11;
+TIM_HandleTypeDef htim12;
 TIM_HandleTypeDef htim14;
 
 UART_HandleTypeDef huart6;
@@ -54,6 +57,7 @@ DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
 int Time20Hz = 0;
+int Time16Hz = 0;
 int Selftest = False;
 
 /* USER CODE END PV */
@@ -65,6 +69,8 @@ static void MX_DMA_Init(void);
 static void MX_TIM14_Init(void);
 static void MX_TIM9_Init(void);
 static void MX_USART6_UART_Init(void);
+static void MX_TIM11_Init(void);
+static void MX_TIM12_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -83,6 +89,8 @@ void System_Initialize()
 
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
+
+	Base_Init(&htim9, &htim11, &htim12);
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
@@ -94,24 +102,32 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 
 void UpdateSelfTest()
 {
-	if (Selftest)
-	{
-	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
-	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
-	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+//	if (Selftest)
+//	{
+//	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
+//	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+//	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
+//	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
+//
+//	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
+//	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+//	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
+//	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
+//
+//	  if (Time20Hz == 12 * UPDATE_20HZ)
+//	  {
+//		  RGBLeds_SetColorOff(LeftArm);
+//		  RGBLeds_SetColorOff(RightArm);
+//	  }
+//	}
 
-	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
-	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
-	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-
-	  if (Time20Hz == 12 * UPDATE_20HZ)
-	  {
-		  RGBLeds_SetColorOff(LeftArm);
-		  RGBLeds_SetColorOff(RightArm);
-	  }
-	}
+//	int Vel = 30;
+//	int Acc = 1;
+//
+//	if ((Time20Hz % 300) == 0) 		{ Base_VelocitySetpoint(0, 0, Vel);}
+//	if ((Time20Hz % 300) == 60) 	{ Base_VelocitySetpoint(0, 0, 0);}
+//	if ((Time20Hz % 300) == 120) 	{ Base_VelocitySetpoint(0, 0, -Vel);}
+//	if ((Time20Hz % 300) == 180) 	{ Base_VelocitySetpoint(0, 0, 0);}
 }
 
 void Check_USB_Communication()
@@ -128,11 +144,15 @@ void Check_USB_Communication()
 		if (command == CMD_LA_MOVE) 	{ Command_NewSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_RA_MOVE) 	{ Command_NewSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
+		if (command == CMD_BASE_MOVE)
+		{
+			Base_VelocitySetpoint(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4), Protocol_0x55_GetData(5));
+		}
+
+
 		Protocol_0x55_MarkProcessed();
 	}
 }
-
-
 
 /* USER CODE END 0 */
 
@@ -169,13 +189,18 @@ int main(void)
   MX_TIM14_Init();
   MX_TIM9_Init();
   MX_USART6_UART_Init();
+  MX_TIM11_Init();
+  MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-//  System_SelfTest(True);
   System_SelfTest(False);
 
   Protocol_0x55_Init();
+
+  GenericBase_HAL_Brake(False, LeftBaseMotor);
+  GenericBase_HAL_Brake(False, CenterBaseMotor);
+  GenericBase_HAL_Brake(False, RightBaseMotor);
 
   /* USER CODE END 2 */
 
@@ -190,9 +215,24 @@ int main(void)
 
 		  UpdateSelfTest();
 
-		  LeftArm_Update20Hz(Encoders_GetPointer());
-		  RightArm_Update20Hz(Encoders_GetPointer());
+		  LeftArm_Update20Hz(Encoders_GetPointer_New());
+		  RightArm_Update20Hz(Encoders_GetPointer_New());
 	  }
+
+	  if (Update_16Hz)
+	  {
+		  Update_16Hz = 0;
+		  Time16Hz += 1;
+
+//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer_New());
+//		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
+//		  RightBaseMotor_Update20Hz(Encoders_GetPointer_New());
+
+		  Base_Update20Hz(Encoders_GetPointer_New());
+
+		  TracingUpdate();
+	  }
+
 
 	  if (Update_10Hz)
 	  {
@@ -216,7 +256,7 @@ int main(void)
 	  {
 		  Update_2Hz = 0;
 
-		  SendEncoders(Encoders_GetPointer());
+		  SendEncoders(Encoders_GetPointer_New());
 	  }
 
 	  Check_USB_Communication();
@@ -315,6 +355,98 @@ static void MX_TIM9_Init(void)
 }
 
 /**
+  * @brief TIM11 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM11_Init(void)
+{
+
+  /* USER CODE BEGIN TIM11_Init 0 */
+
+  /* USER CODE END TIM11_Init 0 */
+
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM11_Init 1 */
+
+  /* USER CODE END TIM11_Init 1 */
+  htim11.Instance = TIM11;
+  htim11.Init.Prescaler = 15;
+  htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim11.Init.Period = 100;
+  htim11.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim11.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim11) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim11) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim11, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM11_Init 2 */
+
+  /* USER CODE END TIM11_Init 2 */
+  HAL_TIM_MspPostInit(&htim11);
+
+}
+
+/**
+  * @brief TIM12 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM12_Init(void)
+{
+
+  /* USER CODE BEGIN TIM12_Init 0 */
+
+  /* USER CODE END TIM12_Init 0 */
+
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM12_Init 1 */
+
+  /* USER CODE END TIM12_Init 1 */
+  htim12.Instance = TIM12;
+  htim12.Init.Prescaler = 15;
+  htim12.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim12.Init.Period = 100;
+  htim12.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim12.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_PWM_Init(&htim12) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim12, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim12, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM12_Init 2 */
+
+  /* USER CODE END TIM12_Init 2 */
+  HAL_TIM_MspPostInit(&htim12);
+
+}
+
+/**
   * @brief TIM14 Initialization Function
   * @param None
   * @retval None
@@ -405,7 +537,9 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -413,6 +547,10 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, CenterBrake_Pin|CenterDir_Pin|LeftBrake_Pin|LeftDir_Pin
+                          |RightBrake_Pin|RightDir_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
@@ -423,19 +561,21 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin LeftArmUp_Pin */
-  GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|LeftArmUp_Pin;
+  /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin RightArmBrake_Pin LeftArmUp_Pin */
+  GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : RightArmBrake_Pin */
-  GPIO_InitStruct.Pin = RightArmBrake_Pin;
+  /*Configure GPIO pins : CenterBrake_Pin CenterDir_Pin LeftBrake_Pin LeftDir_Pin
+                           RightBrake_Pin RightDir_Pin */
+  GPIO_InitStruct.Pin = CenterBrake_Pin|CenterDir_Pin|LeftBrake_Pin|LeftDir_Pin
+                          |RightBrake_Pin|RightDir_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RightArmBrake_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RightArmRed_Pin RightArmGreen_Pin RightArmBlue_Pin */
   GPIO_InitStruct.Pin = RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin;

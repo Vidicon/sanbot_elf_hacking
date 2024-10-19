@@ -20,6 +20,7 @@ CMD_GET_ENCODERS  = 0x20
 
 CMD_LA_MOVE		= 0x30
 CMD_RA_MOVE		= 0x31
+CMD_BASE_MOVE   = 0x32
 
 
 CMD_RED     = 1
@@ -35,6 +36,13 @@ CMD_LED_BLINK_OFF       = 3
 CMD_LED_BLINK_SLOW      = 4
 CMD_LED_BLINK_FAST      = 5
 CMD_LED_BLINK_VERYFAST  = 6
+
+axis0 = 0
+axis1 = 0
+axis2 = 0
+axis3 = 0
+axis4 = 0
+
 
 #===============================================================================
 # Define the receive callback function
@@ -85,6 +93,10 @@ def createMoveCommand(mod_manager, Parameters):
 
     return
 
+def createBaseCommand(mod_manager, Parameters):
+    mod_manager.cmd_Generic(Parameters[0], 3, np.array(Parameters[1:]))
+
+    return
 
 #===============================================================================
 # Clear logging
@@ -340,7 +352,14 @@ def show_gui(mod_manager):
 
 # Function to handle pygame events
 def handle_pygame_events():
-    # Get Pygame events
+    
+    global axis0, axis1, axis2, axis3, axis4
+    axis0_event= False
+    axis1_event= False
+    axis2_event= False
+    axis3_event= False
+    axis4_event= False
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             root.quit()
@@ -373,7 +392,33 @@ def handle_pygame_events():
 
         # Handle joystick movements
         if event.type == pygame.JOYAXISMOTION:
-            print(f"Axis {event.axis} moved to {event.value}.")
+            # print(f"Axis {event.axis} moved to {event.value}.")
+
+            # Only keep the fist value of the queue
+            if (event.axis == 0):
+                axis0_event = True
+                axis0 = event.value
+
+            if (event.axis == 1):
+                axis1_event = True
+                axis1 = event.value
+
+            if (event.axis == 2):
+                axis2_event = True
+                axis2 = event.value
+
+            if (event.axis == 3):
+                axis3_event = True
+                axis3 = event.value
+            
+            # if (event.axis == 4):
+            #     axis4_event = True
+            #     axis4 = event.value
+           
+    if (axis0_event == True) or (axis1_event == True) or (axis2_event == True) or (axis3_event == True): 
+        
+        print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 2 : {-1*axis2:.2f}, Axis 3 : {-1*axis3:.2f}")
+        createBaseCommand(mod_manager, np.array([CMD_BASE_MOVE, int(axis0*50), int(-1*axis1*50), int(-1*axis3*50)]))
 
     # Schedule the function to run again after 100 milliseconds
     root.after(100, handle_pygame_events)

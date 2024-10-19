@@ -9,13 +9,17 @@
 #define INC_ROBOTGLOBALS_H_
 
 #define UPDATE_20HZ 20
+#define UPDATE_16HZ 16
 #define UPDATE_10HZ 10
 #define UPDATE_5HZ 5
 
 enum ENUM_BodyParts{
     LeftArm,
     RightArm,
-	Base
+	Base,
+	LeftBaseMotor,
+	CenterBaseMotor,
+	RightBaseMotor
 };
 
 enum ENUM_BodyParts BodyParts;

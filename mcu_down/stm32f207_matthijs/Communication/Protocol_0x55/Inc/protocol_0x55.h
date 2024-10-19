@@ -17,6 +17,7 @@
 #define CMD_GET_ENCODERS 0x20
 #define CMD_LA_MOVE		 0x30
 #define CMD_RA_MOVE		 0x31
+#define CMD_BASE_MOVE	 0x32
 
 #define RESP_BIT 		0x80
 
@@ -53,12 +54,12 @@ void Protocol_0x55_Send(char *data, uint8_t datalen);
 
 uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize);
 
-char Protocol_0x55_GetData(int Index);
+signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
-void SendEncoders(struct Encoders_Data_Type EncoderData);
+void SendEncoders(struct Encoders_Data_Type *EncoderData);
 
-void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type EncoderData);
+void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *EncoderData);
 
 #endif

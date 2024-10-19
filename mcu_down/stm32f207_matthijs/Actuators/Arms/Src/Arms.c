@@ -65,7 +65,7 @@ void GenericArm_HAL_Direction(enum ENUM_Booleans Up, enum ENUM_BodyParts BodyPar
 	}
 }
 
-void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart)
+void GenericArm_Update20Hz(struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart)
 {
 	//	0 = setpoint off, brake off
 	//  1 = setpoint off, brake ON
@@ -79,11 +79,11 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 	if ((Arm_State->MainState >= 2) && (Arm_State->MainState <= 4))
 	{
 		Arm_State->SetpointPosition = Arm_State->TargetPosition;
-		Arm_State->Error = Arm_State->SetpointPosition - Arm_State->ActualPosition;
+		Arm_State->ErrorPosition = Arm_State->SetpointPosition - Arm_State->ActualPosition;
 
 		// Check end-condition
-		if ((Arm_State->MainState == 2) && (Arm_State->Error <= +Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
-		if ((Arm_State->MainState == 3) && (Arm_State->Error >= -Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
+		if ((Arm_State->MainState == 2) && (Arm_State->ErrorPosition <= +Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
+		if ((Arm_State->MainState == 3) && (Arm_State->ErrorPosition >= -Arm_State->BrakeWindow)) { Arm_State->MainState = 4;}
 
 
 		if (Arm_State->MainState == 2)
@@ -107,11 +107,11 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 		//----------------------------------------------------------------------------
 		//
 		//----------------------------------------------------------------------------
-		Arm_State->Differential = Arm_State->Error - Arm_State->ErrorPrev;
-		Arm_State->ErrorPrev = Arm_State->Error;
-		Arm_State->Integral += Arm_State->Error;
+		Arm_State->Differential = Arm_State->ErrorPosition - Arm_State->ErrorPositionPrev;
+		Arm_State->ErrorPositionPrev = Arm_State->ErrorPosition;
+		Arm_State->Integral += Arm_State->ErrorPosition;
 
-		int kp = 40 * Arm_State->Error;
+		int kp = 40 * Arm_State->ErrorPosition;
 		int Max_Kp = 800;
 
 		if (kp > Max_Kp) {kp = Max_Kp;}
@@ -142,9 +142,10 @@ void GenericArm_Update20Hz(struct Encoders_Data_Type EncoderData, struct Arm_Sta
 		}
 	}
 
-
+	// Move done
 	if (Arm_State->MainState == 4)
 	{
+		Arm_State->AmplifierSetpoint = 0;
 		Arm_State->Output = 0;
 		Arm_State->Integral = 0;
 		Arm_State->MotionState = Arm_Motion_AtTarget;
@@ -211,10 +212,10 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
-void LeftArm_Update20Hz(struct Encoders_Data_Type EncoderData)
+void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	LeftArm_State.ActualPosition = EncoderData.Encoder[3];
-	GenericArm_Update20Hz(EncoderData, &LeftArm_State, LeftArm);
+	LeftArm_State.ActualPosition = EncoderData->Encoder[3];
+	GenericArm_Update20Hz(&LeftArm_State, LeftArm);
 }
 
 void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)
@@ -271,10 +272,10 @@ void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
-void RightArm_Update20Hz(struct Encoders_Data_Type EncoderData)
+void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	RightArm_State.ActualPosition = EncoderData.Encoder[4];
-	GenericArm_Update20Hz(EncoderData, &RightArm_State, RightArm);
+	RightArm_State.ActualPosition = EncoderData->Encoder[4];
+	GenericArm_Update20Hz(&RightArm_State, RightArm);
 }
 
 void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)

@@ -39,6 +39,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 int Update_20Hz;
+int Update_16Hz;
 int Update_10Hz;
 int Update_5Hz;
 int Update_2Hz;
@@ -71,6 +72,18 @@ void Error_Handler(void);
 #define RightArmUp_GPIO_Port GPIOE
 #define RightArmBrake_Pin GPIO_PIN_4
 #define RightArmBrake_GPIO_Port GPIOE
+#define CenterBrake_Pin GPIO_PIN_0
+#define CenterBrake_GPIO_Port GPIOF
+#define CenterDir_Pin GPIO_PIN_1
+#define CenterDir_GPIO_Port GPIOF
+#define LeftBrake_Pin GPIO_PIN_2
+#define LeftBrake_GPIO_Port GPIOF
+#define LeftDir_Pin GPIO_PIN_3
+#define LeftDir_GPIO_Port GPIOF
+#define RightBrake_Pin GPIO_PIN_4
+#define RightBrake_GPIO_Port GPIOF
+#define RightDir_Pin GPIO_PIN_5
+#define RightDir_GPIO_Port GPIOF
 #define RightArmRed_Pin GPIO_PIN_10
 #define RightArmRed_GPIO_Port GPIOD
 #define RightArmGreen_Pin GPIO_PIN_14
