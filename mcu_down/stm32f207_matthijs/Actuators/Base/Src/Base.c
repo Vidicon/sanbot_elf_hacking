@@ -64,10 +64,6 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	// PhiDot = rotational velocity around Rz.
 	//-------------------------------------------------------------------------------------------------
 
-//	Vx = 50;
-//	Vy = 50;
-//	PhiDot = 0;
-
 	long M1 = 0;
 	long M2 = 0;
 	long M3 = 0;
@@ -83,10 +79,6 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	M2 = M2 / 200;
 	M3 = M3 / 200;
 
-//	M1 = 0;
-//	M2 = 0;
-//	M3 = 0;
-
 	if (M1 > 0) { RightBaseMotor_State.Direction = Base_Motion_Negative;} else {RightBaseMotor_State.Direction = Base_Motion_Positive;}
 	RightBaseMotor_State.PWM_Output = (100 - abs(M1));
 
@@ -95,7 +87,6 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 
 	if (M3 > 0) { CenterBaseMotor_State.Direction = Base_Motion_Negative;} else {CenterBaseMotor_State.Direction = Base_Motion_Positive;}
 	CenterBaseMotor_State.PWM_Output = (100 - abs(M3));
-
 
 	GenericBase_HAL_Brake(False, LeftBaseMotor);
 	GenericBase_HAL_Brake(False, CenterBaseMotor);
@@ -158,18 +149,6 @@ void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 	{
 		__HAL_TIM_SET_COMPARE(RightBaseMotor_State.TIM, RightBaseMotor_State.TIM_CHANNEL, PWM);
 	}
-}
-
-void Temp(int speed)
-{
-	__HAL_TIM_SET_COMPARE(CenterBaseMotor_State.TIM, CenterBaseMotor_State.TIM_CHANNEL, speed);
-
-//	GenericArm_HAL_Direction(True, BodyPart);
-//	HAL_GPIO_WritePin(LeftArmUp_GPIO_Port, LeftArmUp_Pin, GPIO_PIN_SET);
-
-//	GenericArm_HAL_Brake(False, BodyPart);
-
-//	HAL_GPIO_WritePin(LeftArmBrake_GPIO_Port,  LeftArmBrake_Pin,  !BrakeEnable);
 }
 
 void TracingUpdate()

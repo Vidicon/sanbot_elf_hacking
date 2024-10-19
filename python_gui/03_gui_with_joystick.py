@@ -144,12 +144,12 @@ def show_gui(mod_manager):
                                command=lambda t=[0]: createCommand(mod_manager, CMD_VERSION, t))
     button_version.grid(row=0, column=0, sticky="w")
 
-    button_LA_Off = tk.Button(frame, 
+    button_LA_White = tk.Button(frame, 
                               height= 1, 
                               width=10, 
                               text="Left White", 
                               command=lambda t=np.array([CMD_LA_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t))
-    button_LA_Off.grid(row=1, column=0, sticky="w")
+    button_LA_White.grid(row=1, column=0, sticky="w")
 
     button_LA_Red = tk.Button(frame, 
                               height= 1, 
@@ -173,12 +173,12 @@ def show_gui(mod_manager):
     button_LA_Blue.grid(row=4, column=0, sticky="w")
 
 
-    button_LA_Blue = tk.Button(frame, 
+    button_LA_Off = tk.Button(frame, 
                                height= 1, 
                                width=10, 
                                text="Left Off", 
                                command=lambda t=np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]): createLedCommand(mod_manager, t))
-    button_LA_Blue.grid(row=5, column=0, sticky="w")
+    button_LA_Off.grid(row=5, column=0, sticky="w")
 
 
     button_LA_Blue_Blink = tk.Button(frame, 
@@ -191,12 +191,12 @@ def show_gui(mod_manager):
     #--------------------------------------------------------------------------------------
     # Right arm
     #--------------------------------------------------------------------------------------
-    button_RA_Off = tk.Button(frame, 
+    button_RA_White = tk.Button(frame, 
                               height= 1, 
                               width=10, 
                               text="Right White", 
                               command=lambda t=np.array([CMD_RA_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t))
-    button_RA_Off.grid(row=1, column=1, sticky="w")
+    button_RA_White.grid(row=1, column=1, sticky="w")
 
     button_RA_Red = tk.Button(frame, 
                               height= 1, 
@@ -220,12 +220,12 @@ def show_gui(mod_manager):
     button_RA_Blue.grid(row=4, column=1, sticky="w")
 
 
-    button_RA_Blue = tk.Button(frame, 
+    button_RA_Off = tk.Button(frame, 
                                height= 1, 
                                width=10, 
                                text="Right Off", 
                                command=lambda t=np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]): createLedCommand(mod_manager, t))
-    button_RA_Blue.grid(row=5, column=1, sticky="w")
+    button_RA_Off.grid(row=5, column=1, sticky="w")
 
 
     button_RA_Blue_Blink = tk.Button(frame, 
@@ -371,6 +371,27 @@ def handle_pygame_events():
         if event.type == pygame.JOYBUTTONDOWN:
             print(f"Button {event.button} pressed.")
 
+            if (event.button == 0):
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
+
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_GREEN, CMD_LED_ON]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_GREEN, CMD_LED_ON]))
+
+            if (event.button == 1):
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
+
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_RED, CMD_LED_ON]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_RED, CMD_LED_ON]))
+
+            if (event.button == 2):
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
+
+                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_BLUE, CMD_LED_ON]))
+                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_BLUE, CMD_LED_ON]))
+
             # if (event.button == 4):
             #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, +100]))
             # if (event.button == 5):
@@ -429,11 +450,11 @@ def handle_pygame_events():
 
     if (axis2_event == True): 
         print(f"Axis 2 : {-1*axis2:.2f}")
-        createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, int(axis2+1)*50]))
+        createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, int(axis2+1)*-200]))
 
     if (axis5_event == True): 
         print(f"Axis 5 : {-1*axis5:.2f}")
-        createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, int(axis5+1)*50]))
+        createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, int(axis5+1)*200]))
 
 
     # Schedule the function to run again after 100 milliseconds

@@ -27,38 +27,45 @@ struct Arm_State_Type {
 	enum ENUM_ArmMotionState MotionState;
 	enum ENUM_ArmDirection ArmDirection;
 	TIM_HandleTypeDef *TIM;
-	int PrevError;
-	int AmplifierSetpoint;
+
+//	int PrevError;
+//	int AmplifierSetpoint;
+//
+//	int SetpointDirection;
+//	int BrakeWindow;
+//
+//	int ErrorPositionPrev;
+//	int Integral;
+//	int Differential;
+//
+//	int Output;
+//
+//	int MainState;
+
+	int VelocitySetpoint;
+	int Direction;
+	int PWM_Output;
 
 	int ActualPosition;
 	int TargetPosition;
 	int SetpointPosition;
-	int SetpointDirection;
-	int BrakeWindow;
-
-	int ErrorPositionPrev;
-	int Integral;
-	int Differential;
-
 	int ErrorPosition;
-	int Output;
-
-	int MainState;
 
 	uint32_t TIM_CHANNEL;
-
 	struct Encoders_Data_Type *EncoderPtr;
 	};
 
-void Command_NewSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
+void Arm_PositionSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
 
-void GenericArm_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
+void GenericArms_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
-void GenericArm_Update20Hz(struct Arm_State_Type *Arm_State, enum ENUM_BodyParts BodyPart);
+void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
-void GenericArm_HAL_Direction(enum ENUM_Booleans Up, enum ENUM_BodyParts BodyPart);
+void GenericArms_HAL_Direction(enum ENUM_ArmMotionState Direction, enum ENUM_BodyParts BodyPart);
 
-void GenericArm_Init(struct Arm_State_Type LeftArm_State);
+void GenericArms_Init(struct Arm_State_Type LeftArm_State);
+
+
 
 //------------------------------------------------
 void LeftArm_Init(TIM_HandleTypeDef *htim);

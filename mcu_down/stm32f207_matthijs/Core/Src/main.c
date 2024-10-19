@@ -141,8 +141,8 @@ void Check_USB_Communication()
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
-		if (command == CMD_LA_MOVE) 	{ Command_NewSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
-		if (command == CMD_RA_MOVE) 	{ Command_NewSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_LA_MOVE) 	{ Arm_PositionSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_RA_MOVE) 	{ Arm_PositionSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
 		if (command == CMD_BASE_MOVE)
 		{
@@ -215,24 +215,11 @@ int main(void)
 
 		  UpdateSelfTest();
 
-		  LeftArm_Update20Hz(Encoders_GetPointer_New());
-		  RightArm_Update20Hz(Encoders_GetPointer_New());
-	  }
-
-	  if (Update_16Hz)
-	  {
-		  Update_16Hz = 0;
-		  Time16Hz += 1;
-
-//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer_New());
-//		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
-//		  RightBaseMotor_Update20Hz(Encoders_GetPointer_New());
-
 		  Base_Update20Hz(Encoders_GetPointer_New());
+		  Arms_Update20Hz(Encoders_GetPointer_New());
 
 		  TracingUpdate();
 	  }
-
 
 	  if (Update_10Hz)
 	  {
