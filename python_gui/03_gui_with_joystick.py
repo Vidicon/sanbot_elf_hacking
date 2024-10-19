@@ -37,6 +37,7 @@ CMD_LED_BLINK_SLOW      = 4
 CMD_LED_BLINK_FAST      = 5
 CMD_LED_BLINK_VERYFAST  = 6
 
+axis0 = 0
 axis1 = 0
 axis2 = 0
 axis3 = 0
@@ -352,7 +353,8 @@ def show_gui(mod_manager):
 # Function to handle pygame events
 def handle_pygame_events():
     
-    global axis1, axis2, axis3, axis4
+    global axis0, axis1, axis2, axis3, axis4
+    axis0_event= False
     axis1_event= False
     axis2_event= False
     axis3_event= False
@@ -390,9 +392,13 @@ def handle_pygame_events():
 
         # Handle joystick movements
         if event.type == pygame.JOYAXISMOTION:
-            print(f"Axis {event.axis} moved to {event.value}.")
+            # print(f"Axis {event.axis} moved to {event.value}.")
 
             # Only keep the fist value of the queue
+            if (event.axis == 0):
+                axis0_event = True
+                axis0 = event.value
+
             if (event.axis == 1):
                 axis1_event = True
                 axis1 = event.value
@@ -405,12 +411,14 @@ def handle_pygame_events():
                 axis3_event = True
                 axis3 = event.value
             
-            if (event.axis == 4):
-                axis4_event = True
-                axis4 = event.value
+            # if (event.axis == 4):
+            #     axis4_event = True
+            #     axis4 = event.value
            
-    if (axis3_event == True) or (axis1_event == True): 
-        createBaseCommand(mod_manager, np.array([CMD_BASE_MOVE, int(axis1*90), 0, int(axis3*90)]))
+    if (axis0_event == True) or (axis1_event == True) or (axis2_event == True) or (axis3_event == True): 
+        
+        print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 2 : {-1*axis2:.2f}, Axis 3 : {-1*axis3:.2f}")
+        createBaseCommand(mod_manager, np.array([CMD_BASE_MOVE, int(axis0*50), int(-1*axis1*50), int(-1*axis3*50)]))
 
     # Schedule the function to run again after 100 milliseconds
     root.after(100, handle_pygame_events)

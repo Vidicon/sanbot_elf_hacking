@@ -198,8 +198,7 @@ class ModManager:
         data[datalength + 3] = (crc & 0xff);
         data[datalength + 4] = ((crc >> 8)& 0xff);
         
-        self.print_array_as_hex(data)
-        
+        # self.print_array_as_hex(data)
         self.send_data(data)
         
         return
