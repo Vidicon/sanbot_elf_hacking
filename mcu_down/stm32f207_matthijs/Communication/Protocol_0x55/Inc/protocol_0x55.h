@@ -13,6 +13,7 @@
 #define CMD_LA_COLOR    0x10
 #define CMD_RA_COLOR    0x11
 #define CMD_BASE_COLOR  0x12
+#define CMD_BA_COLOR    0x13
 
 #define CMD_GET_ENCODERS 0x20
 #define CMD_LA_MOVE		 0x30

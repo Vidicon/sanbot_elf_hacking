@@ -59,6 +59,8 @@ DMA_HandleTypeDef hdma_usart6_rx;
 int Time20Hz = 0;
 int Time16Hz = 0;
 int Selftest = False;
+int temp = 0;
+
 
 /* USER CODE END PV */
 
@@ -97,7 +99,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
-//	RGBLeds_SelfTest(Enabled);
+	LeftArm_Home();
+	RightArm_Home();
 }
 
 void UpdateSelfTest()
@@ -141,8 +144,14 @@ void Check_USB_Communication()
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
-		if (command == CMD_LA_MOVE) 	{ Command_NewSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
-		if (command == CMD_RA_MOVE) 	{ Command_NewSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_BA_COLOR)
+		{
+			RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+			RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
+		if (command == CMD_LA_MOVE) 	{ Arm_PositionSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_RA_MOVE) 	{ Arm_PositionSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
 		if (command == CMD_BASE_MOVE)
 		{
@@ -215,36 +224,22 @@ int main(void)
 
 		  UpdateSelfTest();
 
-		  LeftArm_Update20Hz(Encoders_GetPointer_New());
-		  RightArm_Update20Hz(Encoders_GetPointer_New());
-	  }
-
-	  if (Update_16Hz)
-	  {
-		  Update_16Hz = 0;
-		  Time16Hz += 1;
-
-//		  LeftBaseMotor_Update20Hz(Encoders_GetPointer_New());
-//		  CenterBaseMotor_Update20Hz(Encoders_GetPointer_New());
-//		  RightBaseMotor_Update20Hz(Encoders_GetPointer_New());
-
 		  Base_Update20Hz(Encoders_GetPointer_New());
+		  Arms_Update20Hz(Encoders_GetPointer_New());
 
 		  TracingUpdate();
 	  }
-
 
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
 		  RGBLeds_Update10Hz();
 
-
-//		  if (Time10Hz == 2 * UPDATE_10HZ) { LeftArm_NewSetpoint(300); }
-//		  if (Time10Hz == 10 * UPDATE_10HZ) { LeftArm_NewSetpoint(150); }
-//		  if (Time10Hz == 18 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
-//		  if (Time10Hz == 25 * UPDATE_10HZ) { LeftArm_NewSetpoint(75); }
-//		  if (Time10Hz == 32 * UPDATE_10HZ) { LeftArm_NewSetpoint(0); }
+//		  temp = HAL_GPIO_ReadPin(PG10_GPIO_Port, PG10_Pin);
+//		  temp = HAL_GPIO_ReadPin(PG11_GPIO_Port, PG11_Pin);
+//
+//		  temp = HAL_GPIO_ReadPin(PD6_GPIO_Port, PD6_Pin);
+//		  temp = HAL_GPIO_ReadPin(PD7_GPIO_Port, PD7_Pin);
 	  }
 
 	  if (Update_5Hz)
@@ -539,11 +534,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
@@ -577,6 +572,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : PF13_Pin PF14_Pin PF15_Pin */
+  GPIO_InitStruct.Pin = PF13_Pin|PF14_Pin|PF15_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : RightLimitBack_Pin RightLimitUp_Pin LeftLimitUp_Pin LeftLimitBack_Pin */
+  GPIO_InitStruct.Pin = RightLimitBack_Pin|RightLimitUp_Pin|LeftLimitUp_Pin|LeftLimitBack_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PE7_Pin PE8_Pin PE9_Pin */
+  GPIO_InitStruct.Pin = PE7_Pin|PE8_Pin|PE9_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
   /*Configure GPIO pins : RightArmRed_Pin RightArmGreen_Pin RightArmBlue_Pin */
   GPIO_InitStruct.Pin = RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -590,6 +603,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PD6_Pin PD7_Pin */
+  GPIO_InitStruct.Pin = PD6_Pin|PD7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BaseRed_Pin BaseGreen_Pin BaseBlue_Pin */
   GPIO_InitStruct.Pin = BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin;
