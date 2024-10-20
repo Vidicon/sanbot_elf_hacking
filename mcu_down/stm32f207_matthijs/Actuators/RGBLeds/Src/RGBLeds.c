@@ -28,7 +28,6 @@ void RGBLeds_SetAllColors(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color 
 		RGBLeds_BlinkColor(BodyPart, Color, LED_Blink_Off);
 	}
 
-
 	if ((Command >= LED_Blink_Off) && (Command <= LED_Blink_VeryFast))
 	{
 		RGBLeds_BlinkColor(BodyPart, Color, Command);
@@ -43,6 +42,8 @@ void RGBLeds_SetColorOn(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Co
 		HAL_GPIO_WritePin(LeftArmRed_GPIO_Port,   LeftArmRed_Pin,   GPIO_PIN_SET);
 		HAL_GPIO_WritePin(LeftArmGreen_GPIO_Port, LeftArmGreen_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(LeftArmBlue_GPIO_Port,  LeftArmBlue_Pin,  GPIO_PIN_SET);
+
+		RGBLeds_BlinkColor(LeftArm, None, LED_Blink_Off);
 
 		if (Color == Red)   {HAL_GPIO_WritePin(LeftArmRed_GPIO_Port,   LeftArmRed_Pin,   GPIO_PIN_RESET);}
 		if (Color == Green) {HAL_GPIO_WritePin(LeftArmGreen_GPIO_Port, LeftArmGreen_Pin, GPIO_PIN_RESET);}
@@ -61,6 +62,8 @@ void RGBLeds_SetColorOn(enum ENUM_BodyParts BodyPart, enum ENUM_RGBLeds_Color Co
 		HAL_GPIO_WritePin(RightArmRed_GPIO_Port,   RightArmRed_Pin,   GPIO_PIN_SET);
 		HAL_GPIO_WritePin(RightArmGreen_GPIO_Port, RightArmGreen_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(RightArmBlue_GPIO_Port,  RightArmBlue_Pin,  GPIO_PIN_SET);
+
+		RGBLeds_BlinkColor(RightArm, None, LED_Blink_Off);
 
 		if (Color == Red)   {HAL_GPIO_WritePin(RightArmRed_GPIO_Port,   RightArmRed_Pin,   GPIO_PIN_RESET);}
 		if (Color == Green) {HAL_GPIO_WritePin(RightArmGreen_GPIO_Port, RightArmGreen_Pin, GPIO_PIN_RESET);}

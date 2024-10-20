@@ -31,16 +31,23 @@
  
  **PWM generator for the motors**
  - TIM12 is used for the **Left** and **Right** base motors
- - TIM11 is used for the **Center** base motor
- - TIM9 is used to for the **Arm** motors.
- - Channel 1 = left arm
- - Channel 2 = right arm 
- - Prescaler 15 (+1) = 16 --> 16 MHz / 16 = 1 MHz)
- - Period = 100 count --> 10 kHz duty cycle (should be 99?)
- - 100 counts = 100%
- - In practice the arms run already very fast at 20 counts.
- 
 
+- TIM12 - Channel 1 = right base
+- TIM12 - Channel 2 = left base
+ .
+ - TIM11 is used for the **Center** base motor
+- TIM11 - Channel 1 = center
+. 
+ - TIM9 is used to for the **Arm** motors.
+ - TIM9 - Channel 1 = left arm
+ - TIM9 - Channel 2 = right arm 
+ .
+ - Prescaler 15 (+1) = 16 --> 16 MHz / 16 = 1 MHz)
+ - Period = 100 count --> 10 kHz duty cycle (should be 99?)  
+- PWM 100% = 0 speed.
+- PWM 50% = 50% speed.
+- PWM 0% = 100% speed.
+- ALL motors have **internal speed controller**. The PWM is the setpoint.
 
 **Brakes**
 - All brakes work and pins are correct.
@@ -63,11 +70,20 @@
 
 ### Limit switches arms (J29 J32)
 
-|          | Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
+|**LEFT**  | Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
 |----------|----------|----------|----------|----------|----------|
+|Color     | White    | Black    | Black    |  Black   | Black    |
+|Left      | Arm full up| 1.1V   |  Arm full back|  1.1 1V|  GND   |
+|IO Pins   | PG0      |     -    | PG1      |      -   | -        |
+
+| **RIGHT**| Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
+|----------|----------|----------|----------|----------|----------|
+|Color     | White    | Black    | Black    |  Black   | Black    |
+|Right     | Arm full back| 1.1 V   | Arm full up|  1.1 V   |   GND   |
+|IO Pins   |       |     -    |       |      -   | -        |
 
 Notes Matthijs:
-- To do
+- IO Pins ok.
 
 ---
 

@@ -7,6 +7,7 @@
 
 enum ENUM_ArmHomeState {
 	Arm_NotHomed,
+	Arm_Homing,
 	Arm_Homed
 };
 
@@ -20,12 +21,14 @@ enum ENUM_ArmMotionState {
 	Arm_Motion_AtTarget,
 	Arm_Motion_Error,
 	Arm_Motion_MovingUp,
-	Arm_Motion_MovingDown
+	Arm_Motion_MovingDown,
 };
 
 struct Arm_State_Type {
 	enum ENUM_ArmMotionState MotionState;
 	enum ENUM_ArmDirection ArmDirection;
+	enum ENUM_ArmHomeState HomeState;
+
 	TIM_HandleTypeDef *TIM;
 
 //	int PrevError;
@@ -51,6 +54,8 @@ struct Arm_State_Type {
 	int SetpointPosition;
 	int ErrorPosition;
 
+	int HomeCounter;
+
 	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
 	};
@@ -72,26 +77,30 @@ void LeftArm_Init(TIM_HandleTypeDef *htim);
 
 void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
-void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
+void LeftArm_Home();
 
-void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
-
-void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
-
-void LeftArm_NewSetpoint(int NewSetpoint);
+//void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
+//
+//void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
+//
+//void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
+//
+//void LeftArm_NewSetpoint(int NewSetpoint);
 
 //------------------------------------------------
 void RightArm_Init(TIM_HandleTypeDef *htim);
 
 void RightArm_SelfTest(enum ENUM_Booleans Enabled);
 
-void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
+void RightArm_Home();
 
-void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
-
-void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
-
-void RightArm_NewSetpoint(int NewSetpoint);
+//void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
+//
+//void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
+//
+//void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
+//
+//void RightArm_NewSetpoint(int NewSetpoint);
 
 //------------------------------------------------
 #endif /* ARMS_INC_ARMS_H_ */

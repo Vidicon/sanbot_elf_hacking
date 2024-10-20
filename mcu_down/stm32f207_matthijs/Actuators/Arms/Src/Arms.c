@@ -80,69 +80,144 @@ void GenericArms_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 
 void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
+	// Read limit switches
+	int LeftLimitBack = HAL_GPIO_ReadPin(LeftLimitBack_GPIO_Port,LeftLimitBack_Pin);
+	int LeftLimitUp = HAL_GPIO_ReadPin(LeftLimitUp_GPIO_Port, LeftLimitUp_Pin);
+
 	//--------------------------------------------------------------------------------
 	// Left arm
 	//--------------------------------------------------------------------------------
 	LeftArm_State.ActualPosition = EncoderData->Encoder[3];
-	LeftArm_State.ErrorPosition = LeftArm_State.TargetPosition - LeftArm_State.ActualPosition;
 
-	if (LeftArm_State.ErrorPosition > 20)
+	if (LeftArm_State.HomeState == Arm_NotHomed)
 	{
-		LeftArm_State.Direction = Arm_Motion_MovingDown;
-		LeftArm_State.PWM_Output = (100 - abs(35));
+		LeftArm_State.HomeCounter = 0;
+
+		RGBLeds_SetAllColors(LeftArm, Red, LED_On);
 	}
-	else if (LeftArm_State.ErrorPosition > 10)
+	else if (LeftArm_State.HomeState == Arm_Homing)
 	{
-		LeftArm_State.Direction = Arm_Motion_MovingDown;
-		LeftArm_State.PWM_Output = (100 - abs(20));
+		LeftArm_State.HomeCounter += 1;
+
+		if (LeftArm_State.HomeCounter <= 1 * UPDATE_20HZ)
+		{
+			RGBLeds_SetAllColors(LeftArm, Red, LED_Blink_Slow);
+			LeftArm_State.Direction = Arm_Motion_MovingUp;
+			LeftArm_State.PWM_Output = (100 - abs(20));
+
+			if (LeftLimitUp == 1) { LeftArm_State.HomeCounter = 10 * UPDATE_20HZ;}
+		}
+		else
+		{
+			LeftArm_State.Direction = Arm_Motion_MovingDown;
+			LeftArm_State.PWM_Output = (100 - abs(20));
+
+			if (LeftLimitBack == 1)
+			{
+				EncoderData->Encoder[3] = 0;
+				Arm_PositionSetpoint(LeftArm, -1, 00);
+				LeftArm_State.HomeState = Arm_Homed;
+
+				RGBLeds_SetAllColors(LeftArm, Green, LED_On);
+			}
+		}
 	}
-	else if (LeftArm_State.ErrorPosition < -20)
+	else if (LeftArm_State.HomeState == Arm_Homed)
 	{
-		LeftArm_State.Direction = Arm_Motion_MovingUp;
-		LeftArm_State.PWM_Output = (100 - abs(35));
-	}
-	else if (LeftArm_State.ErrorPosition < -10)
-	{
-		LeftArm_State.Direction = Arm_Motion_MovingUp;
-		LeftArm_State.PWM_Output = (100 - abs(20));
-	}
-	else
-	{
-		LeftArm_State.PWM_Output = (100 - abs(0));
+		LeftArm_State.ErrorPosition = LeftArm_State.TargetPosition - LeftArm_State.ActualPosition;
+
+		int Speed = abs(LeftArm_State.ErrorPosition)/3;
+
+		if (Speed < 10) {Speed = 10;}
+		if (Speed > 40) {Speed = 40;}
+
+		if (LeftArm_State.ErrorPosition > 10)
+		{
+			LeftArm_State.Direction = Arm_Motion_MovingDown;
+			LeftArm_State.PWM_Output = (100 - abs(Speed));
+		}
+		else if (LeftArm_State.ErrorPosition < -10)
+		{
+			LeftArm_State.Direction = Arm_Motion_MovingUp;
+			LeftArm_State.PWM_Output = (100 - abs(Speed));
+		}
+		else
+		{
+			LeftArm_State.PWM_Output = (100 - abs(0));
+		}
 	}
 
 	//--------------------------------------------------------------------------------
 	// Right arm
 	//--------------------------------------------------------------------------------
 	RightArm_State.ActualPosition = EncoderData->Encoder[4];
-	RightArm_State.ErrorPosition = RightArm_State.TargetPosition - RightArm_State.ActualPosition;
 
-	if (RightArm_State.ErrorPosition > 20)
-	{
-		RightArm_State.Direction = Arm_Motion_MovingDown;
-		RightArm_State.PWM_Output = (100 - abs(35));
-	}
-	else if (RightArm_State.ErrorPosition > 10)
-	{
-		RightArm_State.Direction = Arm_Motion_MovingDown;
-		RightArm_State.PWM_Output = (100 - abs(20));
-	}
-	else if (RightArm_State.ErrorPosition < -20)
-	{
-		RightArm_State.Direction = Arm_Motion_MovingUp;
-		RightArm_State.PWM_Output = (100 - abs(35));
-	}
-	else if (RightArm_State.ErrorPosition < -10)
-	{
-		RightArm_State.Direction = Arm_Motion_MovingUp;
-		RightArm_State.PWM_Output = (100 - abs(20));
-	}
-	else
-	{
-		RightArm_State.PWM_Output = (100 - abs(0));
-	}
+	// Read limit switches
+	int RightLimitBack = HAL_GPIO_ReadPin(RightLimitBack_GPIO_Port, RightLimitBack_Pin);
+	int RightLimitUp = HAL_GPIO_ReadPin(RightLimitUp_GPIO_Port, RightLimitUp_Pin);
 
+	//--------------------------------------------------------------------------------
+	// Right arm
+	//--------------------------------------------------------------------------------
+	RightArm_State.ActualPosition = EncoderData->Encoder[4];
 
+	if (RightArm_State.HomeState == Arm_NotHomed)
+	{
+		RightArm_State.HomeCounter = 0;
+
+		RGBLeds_SetAllColors(RightArm, Red, LED_On);
+	}
+	else if (RightArm_State.HomeState == Arm_Homing)
+	{
+		RightArm_State.HomeCounter += 1;
+
+		if (RightArm_State.HomeCounter <= 1 * UPDATE_20HZ)
+		{
+			RGBLeds_SetAllColors(RightArm, Red, LED_Blink_Slow);
+			RightArm_State.Direction = Arm_Motion_MovingDown;
+			RightArm_State.PWM_Output = (100 - abs(20));
+
+			if (RightLimitUp == 1) { RightArm_State.HomeCounter = 10 * UPDATE_20HZ;}
+		}
+		else
+		{
+			RightArm_State.Direction = Arm_Motion_MovingUp;
+			RightArm_State.PWM_Output = (100 - abs(20));
+
+			if (RightLimitBack == 1)
+			{
+				EncoderData->Encoder[4] = 0;
+				Arm_PositionSetpoint(RightArm, 1, 00);
+				RightArm_State.HomeState = Arm_Homed;
+
+				RGBLeds_SetAllColors(RightArm, Green, LED_On);
+			}
+		}
+	}
+	else if (RightArm_State.HomeState == Arm_Homed)
+	{
+		RightArm_State.ErrorPosition = RightArm_State.TargetPosition - RightArm_State.ActualPosition;
+
+		int Speed = abs(RightArm_State.ErrorPosition)/3;
+
+		if (Speed < 10) {Speed = 10;}
+		if (Speed > 40) {Speed = 40;}
+
+		if (RightArm_State.ErrorPosition > 10)
+		{
+			RightArm_State.Direction = Arm_Motion_MovingDown;
+			RightArm_State.PWM_Output = (100 - abs(Speed));
+		}
+		else if (RightArm_State.ErrorPosition < -10)
+		{
+			RightArm_State.Direction = Arm_Motion_MovingUp;
+			RightArm_State.PWM_Output = (100 - abs(Speed));
+		}
+		else
+		{
+			RightArm_State.PWM_Output = (100 - abs(0));
+		}
+	}
 
 	GenericArms_HAL_Brake(False, LeftArm);
 	GenericArms_HAL_Brake(False, RightArm);
@@ -161,6 +236,7 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 {
 	LeftArm_State.ArmDirection = Arm_Up;
 	LeftArm_State.MotionState = Arm_Motion_Disabled;
+	LeftArm_State.HomeState = Arm_NotHomed;
 
 	LeftArm_State.TIM = htim;
 	LeftArm_State.TIM_CHANNEL = TIM_CHANNEL_1;
@@ -169,7 +245,13 @@ void LeftArm_Init(TIM_HandleTypeDef *htim)
 
 	HAL_TIM_Base_Start(htim);
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+}
 
+void LeftArm_Home()
+{
+	// Move forward a litte
+	LeftArm_State.HomeState = Arm_Homing;
+	LeftArm_State.HomeCounter = 0;
 }
 
 void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
@@ -177,46 +259,6 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
-//void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
-//{
-//	LeftArm_State.ActualPosition = EncoderData->Encoder[3];
-//	GenericArm_Update20Hz(&LeftArm_State, LeftArm);
-//}
-//
-//void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)
-//{
-////	 Works inverted. High to release brake.
-//	HAL_GPIO_WritePin(LeftArmBrake_GPIO_Port, LeftArmBrake_Pin, !BrakeEnable);
-//}
-
-//void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable)
-//{
-//	// Request state 1 to enable the brake.
-//	// Disable any controller running.
-//	LeftArm_State.MainState = 1;
-//}
-//
-//void LeftArm_NewSetpoint(int NewSetpoint)
-//{
-//	LeftArm_State.VelocitySetpoint =
-//
-//}Arm
-//
-//void Command_NewVelocitySetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte)
-//{
-//	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
-//
-//	if (BodyPart == LeftArm)
-//	{
-//		LeftArm_NewSetpoint(combined);
-//	}
-//
-//	if (BodyPart == RightArm)
-//	{
-//		RightArm_NewSetpoint(combined);
-//	}
-//}
-//
 //----------------------------------------------------------------
 //
 //----------------------------------------------------------------
@@ -224,55 +266,25 @@ void RightArm_Init(TIM_HandleTypeDef *htim)
 {
 	RightArm_State.ArmDirection = Arm_Up;
 	RightArm_State.MotionState = Arm_Motion_Disabled;
-	RightArm_State.TIM = htim;
+	RightArm_State.HomeState = Arm_NotHomed;
 
 	RightArm_State.TIM = htim;
 	RightArm_State.TIM_CHANNEL = TIM_CHANNEL_2;
+
+	RightArm_State.TargetPosition = 0;
 
 	HAL_TIM_Base_Start(htim);
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
 }
 
-//void RightArm_SelfTest(enum ENUM_Booleans Enabled)
-//{
-//	// To do
-//}
-//
-//void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData)
-//{
-//	RightArm_State.ActualPosition = EncoderData->Encoder[4];
-//	GenericArm_Update20Hz(&RightArm_State, RightArm);
-//}
-//
-//void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable)
-//{
-////	 Works inverted. High to release brake.
-//	HAL_GPIO_WritePin(RightArmBrake_GPIO_Port, RightArmBrake_Pin, !BrakeEnable);
-//}
-//
-//void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable)
-//{
-//	// Request state 1 to enable the brake.
-//	// Disable any controller running.
-//	RightArm_State.MainState = 1;
-//}
-//
-//void RightArm_NewSetpoint(int NewSetpoint)
-//{
-//	// Check if new setpoint is different from current position
-//	RightArm_State.TargetPosition = NewSetpoint;
-//
-//	RightArm_State.MainState = 0;
-//
-//	if (NewSetpoint > RightArm_State.ActualPosition)
-//	{
-//		RightArm_State.MainState  = 2;
-//	}
-//
-//	if (NewSetpoint < RightArm_State.ActualPosition)
-//	{
-//		RightArm_State.MainState  = 3;
-//	}
-//
-//	RightArm_State.BrakeWindow = 10 + abs(RightArm_State.ActualPosition - NewSetpoint) / 10;
-//}
+void RightArm_Home()
+{
+	// Move forward a litte
+	RightArm_State.HomeState = Arm_Homing;
+	RightArm_State.HomeCounter = 0;
+}
+
+void RightArm_SelfTest(enum ENUM_Booleans Enabled)
+{
+	// To do
+}
