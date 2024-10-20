@@ -15,6 +15,7 @@ CMD_VERSION     = 0x01
 CMD_LA_COLOR    = 0x10
 CMD_RA_COLOR    = 0x11
 CMD_BASE_COLOR  = 0x12
+CMD_BA_COLOR    = 0x13
 
 CMD_GET_ENCODERS  = 0x20
 
@@ -43,6 +44,9 @@ axis2 = 0
 axis3 = 0
 axis4 = 0
 axis5 = 0
+
+button4_toggle = 0
+button5_toggle = 0
 
 
 #===============================================================================
@@ -355,6 +359,10 @@ def show_gui(mod_manager):
 def handle_pygame_events():
     
     global axis0, axis1, axis2, axis3, axis4, axis5
+
+    global button4_toggle
+    global button5_toggle
+
     
     axis0_event= False
     axis1_event= False
@@ -372,28 +380,39 @@ def handle_pygame_events():
             print(f"Button {event.button} pressed.")
 
             if (event.button == 0):
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
-
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_GREEN, CMD_LED_ON]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_GREEN, CMD_LED_ON]))
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_GREEN, CMD_LED_ON]))
 
             if (event.button == 1):
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
-
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_RED, CMD_LED_ON]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_RED, CMD_LED_ON]))
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_RED, CMD_LED_ON]))
 
             if (event.button == 2):
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_BLUE, CMD_LED_ON]))
 
-                createLedCommand(mod_manager, np.array([CMD_LA_COLOR, CMD_BLUE, CMD_LED_ON]))
-                createLedCommand(mod_manager, np.array([CMD_RA_COLOR, CMD_BLUE, CMD_LED_ON]))
+            if (event.button == 3):
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_ALL, CMD_LED_OFF]))
 
-            # if (event.button == 4):
-            #     createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, +100]))
+            # Left forward
+            if (event.button == 4):
+                button4_toggle += 1
+                button4_toggle = (button4_toggle & 1)
+                
+                if (button4_toggle == 1):
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -200]))
+                
+                if (button4_toggle == 0):
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+
+            # Left forward
+            if (event.button == 5):
+                button5_toggle += 1
+                button5_toggle = (button5_toggle & 1)
+                
+                if (button5_toggle == 1):
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 200]))
+                
+                if (button5_toggle == 0):
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+
             # if (event.button == 5):
             #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
             # if (event.button == 6):
