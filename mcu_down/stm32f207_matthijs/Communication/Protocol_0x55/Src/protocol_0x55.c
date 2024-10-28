@@ -222,8 +222,6 @@ void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *Encoder
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);
 	Protocol_0x55_Send(Buffer, payloadLen);
-
-	return;
 }
 
 void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State)
@@ -234,6 +232,15 @@ void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State)
 
 void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type *MotionSensors_State)
 {
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_MOTIONSENSORS, RESPONSE_TRUE);
 
+	Buffer[3] = MotionSensors_State->CurrentValue[0];
+	Buffer[4] = MotionSensors_State->CurrentValue[1];
+
+	int payloadLen = 2;
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
 }
 

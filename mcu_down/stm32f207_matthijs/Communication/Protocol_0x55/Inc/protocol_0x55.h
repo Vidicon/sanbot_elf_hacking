@@ -10,18 +10,20 @@
 
 #define FIFO_RXSIZE			256
 
-#define CMD_VERSION     0x01
-#define CMD_LA_COLOR    0x10
-#define CMD_RA_COLOR    0x11
-#define CMD_BASE_COLOR  0x12
-#define CMD_BA_COLOR    0x13
+#define CMD_VERSION     		0x01
+#define CMD_LA_COLOR    		0x10
+#define CMD_RA_COLOR    		0x11
+#define CMD_BASE_COLOR  		0x12
+#define CMD_BA_COLOR    		0x13
 
-#define CMD_GET_ENCODERS 0x20
-#define CMD_LA_MOVE		 0x30
-#define CMD_RA_MOVE		 0x31
-#define CMD_BASE_MOVE	 0x32
+#define CMD_GET_ENCODERS		0x20
+#define CMD_GET_MOTIONSENSORS  	0x21
 
-#define RESP_BIT 		0x80
+#define CMD_LA_MOVE		 		0x30
+#define CMD_RA_MOVE		 		0x31
+#define CMD_BASE_MOVE	 		0x32
+
+#define RESP_BIT 				0x80
 
 
 struct PROTOCOL_0X55_Data_Type {

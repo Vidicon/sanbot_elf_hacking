@@ -578,9 +578,9 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RightLimitBack_Pin RightLimitUp_Pin PG7_Pin PG8_Pin
+  /*Configure GPIO pins : RightLimitBack_Pin RightLimitUp_Pin MotionBack_Pin MotionFront_Pin
                            LeftLimitUp_Pin LeftLimitBack_Pin */
-  GPIO_InitStruct.Pin = RightLimitBack_Pin|RightLimitUp_Pin|PG7_Pin|PG8_Pin
+  GPIO_InitStruct.Pin = RightLimitBack_Pin|RightLimitUp_Pin|MotionBack_Pin|MotionFront_Pin
                           |LeftLimitUp_Pin|LeftLimitBack_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
