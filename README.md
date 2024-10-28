@@ -5,9 +5,10 @@ Reverse engineering and hacking the Sanbot Elf
 
 
 
-## mcu_down
-[mcu_down](./mcu_down/README.md)
+## Body_MCU
+[MCU_Body](./mcu_down/README.md)
 
 
 
-## mcu_top
+## Head_MCU
+[MCU_Head](./mcu_head/README.md)
