@@ -3,8 +3,9 @@ import numpy as np
 import threading
 
 class ModManager:
-    def __init__(self, port, baudrate=57600, timeout=1):
-        self.port = port
+    def __init__(self, port1, port2, baudrate=57600, timeout=1):
+        self.port = port1
+        self.port2 = port2
         self.baudrate = baudrate
         self.timeout = timeout
         self.serial_port = None
@@ -22,7 +23,18 @@ class ModManager:
             print(f"Serial port {self.port} opened successfully.")
             self.start_receive_thread()           
         except serial.SerialException as e:
-            print(f"Failed to open serial port {self.port}: {e}")
+            print(f"Failed to open serial port 1 {self.port}: {e}")
+
+            try:
+                self.serial_port = serial.Serial(
+                    port=self.port2,
+                    baudrate=self.baudrate,
+                    timeout=self.timeout
+                )
+                print(f"Serial port {self.port} opened successfully.")
+                self.start_receive_thread()           
+            except serial.SerialException as e:
+                print(f"Failed to open serial port 2 {self.port}: {e}")
 
 
     def close_port(self):

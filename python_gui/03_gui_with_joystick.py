@@ -397,10 +397,10 @@ def handle_pygame_events():
                 button4_toggle = (button4_toggle & 1)
                 
                 if (button4_toggle == 1):
-                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -200]))
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -400]))
                 
                 if (button4_toggle == 0):
-                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 0]))
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -200]))
 
             # Left forward
             if (event.button == 5):
@@ -408,10 +408,10 @@ def handle_pygame_events():
                 button5_toggle = (button5_toggle & 1)
                 
                 if (button5_toggle == 1):
-                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 200]))
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 400]))
                 
                 if (button5_toggle == 0):
-                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 0]))
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 200]))
 
             # if (event.button == 5):
             #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
@@ -512,7 +512,7 @@ def main():
    
     if ("LINUX" in platform.system().upper()):
         print ("Linux detected!")
-        mod_manager = ModManager(port='/dev/ttyACM0', baudrate=115200)
+        mod_manager = ModManager(port1='/dev/ttyACM0', port2='/dev/ttyACM1', baudrate=115200)
         # mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
     else:
         mod_manager = ModManager(port='COM9', baudrate=115200)
