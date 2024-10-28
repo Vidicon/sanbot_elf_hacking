@@ -18,6 +18,7 @@ CMD_BASE_COLOR  = 0x12
 CMD_BA_COLOR    = 0x13
 
 CMD_GET_ENCODERS  = 0x20
+CMD_GET_MOTIONSENSORS  = 0x21
 
 CMD_LA_MOVE		= 0x30
 CMD_RA_MOVE		= 0x31
@@ -49,6 +50,10 @@ button4_toggle = 0
 button5_toggle = 0
 
 
+button_version = []
+button_Motion_Front = []
+button_Motion_Back = []
+
 #===============================================================================
 # Define the receive callback function
 #===============================================================================
@@ -62,7 +67,6 @@ def my_receive_callback(data, stream_area):
     if (response == (CMD_VERSION | RESP_BIT)):
         
         string_from_bytearray = data[3:-2].decode('utf-8') 
-        
         text_area.insert(tk.END, "< " + string_from_bytearray + "\n")
         text_area.yview_moveto(1)  # Scrolling to the bottom        
     
@@ -71,8 +75,31 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         int16_array_5 = np.frombuffer(new_byte_array, dtype='>i2')
         
-        stream_area.insert(tk.END, "< Encoders : " + str(int16_array_5) + "\n")
-        stream_area.yview_moveto(1)  # Scrolling to the bottom        
+        stream_area.insert(tk.END, "< Encoders   : " + str(int16_array_5) + "\n")
+        stream_area.yview_moveto(1)  # Scrolling to the bottom       
+        
+        
+    if (response == (CMD_GET_MOTIONSENSORS | RESP_BIT)):
+        new_byte_array = data[3:-2]
+        int8_array = np.frombuffer(new_byte_array, dtype='>i1')
+        
+        stream_area.insert(tk.END, "< Motion     : " + str(int8_array) + "\n")
+        stream_area.yview_moveto(1)  # Scrolling to the bottom       
+
+        
+        default_bg = button_version.cget('bg')
+
+        if (int8_array[0] == 1):
+            button_Motion_Front.config(bg="yellow") 
+        else:
+            button_Motion_Front.config(bg=default_bg) 
+            
+        if (int8_array[1] == 1):
+            button_Motion_Back.config(bg="yellow") 
+        else:
+            button_Motion_Back.config(bg=default_bg) 
+                    
+        
     
     
 def createCommand(mod_manager, InputCommmand, Parameters):
@@ -141,6 +168,7 @@ def show_gui(mod_manager):
     #--------------------------------------------------------------------------------------
     # Left arm
     #--------------------------------------------------------------------------------------
+    global button_version
     button_version = tk.Button(frame, 
                                height= 1, 
                                width=10, 
@@ -335,11 +363,28 @@ def show_gui(mod_manager):
     button_RA_Move_3.grid(row=3, column=4, sticky="w")
     
     #--------------------------------------------------------------------------------------
+    # Motion sensors front & back
+    #--------------------------------------------------------------------------------------
+    global button_Motion_Front
+    button_Motion_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Motion Front")
+    button_Motion_Front.grid(row=1, column=5, sticky="w")
+
+    global button_Motion_Back
+    button_Motion_Back = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Motion Back")
+    button_Motion_Back.grid(row=2, column=5, sticky="w")
+
+
+    #--------------------------------------------------------------------------------------
     # Generic buttons
     #--------------------------------------------------------------------------------------
     button_clear = tk.Button(frame, height= 1, text="Clear", command=lambda t="\"failed\"": clear_logging())
     button_clear.grid(row=11, column=0, columnspan=1, sticky="w")
-
 
     #--------------------------------------------------------------------------------------
     # event data area

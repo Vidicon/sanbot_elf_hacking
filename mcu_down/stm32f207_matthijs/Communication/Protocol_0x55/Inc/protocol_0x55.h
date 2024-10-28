@@ -3,24 +3,27 @@
 
 #include "stm32f2xx.h"
 #include "Encoders.h"
+#include "MotionSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
 
 #define FIFO_RXSIZE			256
 
-#define CMD_VERSION     0x01
-#define CMD_LA_COLOR    0x10
-#define CMD_RA_COLOR    0x11
-#define CMD_BASE_COLOR  0x12
-#define CMD_BA_COLOR    0x13
+#define CMD_VERSION     		0x01
+#define CMD_LA_COLOR    		0x10
+#define CMD_RA_COLOR    		0x11
+#define CMD_BASE_COLOR  		0x12
+#define CMD_BA_COLOR    		0x13
 
-#define CMD_GET_ENCODERS 0x20
-#define CMD_LA_MOVE		 0x30
-#define CMD_RA_MOVE		 0x31
-#define CMD_BASE_MOVE	 0x32
+#define CMD_GET_ENCODERS		0x20
+#define CMD_GET_MOTIONSENSORS  	0x21
 
-#define RESP_BIT 		0x80
+#define CMD_LA_MOVE		 		0x30
+#define CMD_RA_MOVE		 		0x31
+#define CMD_BASE_MOVE	 		0x32
+
+#define RESP_BIT 				0x80
 
 
 struct PROTOCOL_0X55_Data_Type {
@@ -59,8 +62,16 @@ signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
+
+
 void SendEncoders(struct Encoders_Data_Type *EncoderData);
 
 void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *EncoderData);
+
+
+void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State);
+
+void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type *MotionSensors_State);
+
 
 #endif

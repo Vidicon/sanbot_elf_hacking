@@ -29,6 +29,7 @@
 #include "RobotGlobals.h"
 #include "Arms.h"
 #include "Base.h"
+#include "MotionSensors.h"
 
 /* USER CODE END Includes */
 
@@ -93,6 +94,8 @@ void System_Initialize()
 	RightArm_Init(&htim9);
 
 	Base_Init(&htim9, &htim11, &htim12);
+
+	MotionSensors_Init();
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
@@ -224,10 +227,10 @@ int main(void)
 
 		  UpdateSelfTest();
 
-		  Base_Update20Hz(Encoders_GetPointer_New());
-		  Arms_Update20Hz(Encoders_GetPointer_New());
+		  Base_Update20Hz(Encoders_GetPointer());
+		  Arms_Update20Hz(Encoders_GetPointer());
 
-		  TracingUpdate();
+//		  TracingUpdate();
 	  }
 
 	  if (Update_10Hz)
@@ -235,23 +238,20 @@ int main(void)
 		  Update_10Hz = 0;
 		  RGBLeds_Update10Hz();
 
-//		  temp = HAL_GPIO_ReadPin(PG10_GPIO_Port, PG10_Pin);
-//		  temp = HAL_GPIO_ReadPin(PG11_GPIO_Port, PG11_Pin);
-//
-//		  temp = HAL_GPIO_ReadPin(PD6_GPIO_Port, PD6_Pin);
-//		  temp = HAL_GPIO_ReadPin(PD7_GPIO_Port, PD7_Pin);
+		  MotionSensors_Update10Hz();
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
+
 	  }
 
 	  if (Update_2Hz)
 	  {
 		  Update_2Hz = 0;
 
-		  SendEncoders(Encoders_GetPointer_New());
+		  SendEncoders(Encoders_GetPointer());
 	  }
 
 	  Check_USB_Communication();
@@ -578,8 +578,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RightLimitBack_Pin RightLimitUp_Pin LeftLimitUp_Pin LeftLimitBack_Pin */
-  GPIO_InitStruct.Pin = RightLimitBack_Pin|RightLimitUp_Pin|LeftLimitUp_Pin|LeftLimitBack_Pin;
+  /*Configure GPIO pins : RightLimitBack_Pin RightLimitUp_Pin MotionBack_Pin MotionFront_Pin
+                           LeftLimitUp_Pin LeftLimitBack_Pin */
+  GPIO_InitStruct.Pin = RightLimitBack_Pin|RightLimitUp_Pin|MotionBack_Pin|MotionFront_Pin
+                          |LeftLimitUp_Pin|LeftLimitBack_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
