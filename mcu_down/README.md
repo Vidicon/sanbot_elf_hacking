@@ -83,7 +83,7 @@
 |IO Pins   |  PG0     |     -    |  PG1     |      -   | -        |
 
 Notes Matthijs:
-- IO Pins ok.
+* IO pins are correct.
 
 
 ---
@@ -119,9 +119,14 @@ STM32F2 connections:
 
 ### PIR Sensors (J35 J44)
 
-| Pin 1 | Pin 2 | Pin 3 |
-|----------|----------|----------|
-|   Signal  |   GND  |   5v  |
+|     | Pin 1 | Pin 2 | Pin 3 |
+|----------|----------|----------|----------|
+| Signals |   Motion |   GND  |   5v  |
+| Front sensor|   PG8 |   -  |   -  |
+| Back sensor|   PG7 |   -  |   -  |
+
+Notes Matthijs:
+* IO pins are correct.
 
 ---
 
