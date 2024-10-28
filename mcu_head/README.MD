@@ -4,9 +4,11 @@
 ## Connectors:
 
 ### Power in (J1)
-
-|   GND  |   GND  |   GND  |   GND  |
-|----------|----------|----------|----------|
 |   Logic_12V  |   Logic_12V  |   Motor_12V  |   Motor_12V  |
+|----------|----------|----------|----------|
+|   GND  |   GND  |   GND  |   GND  |
+[!CAUTION]
+connector is 180deg rotated compart to body_pcb! 
+
 
 ---
