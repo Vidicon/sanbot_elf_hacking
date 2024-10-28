@@ -335,11 +335,26 @@ def show_gui(mod_manager):
     button_RA_Move_3.grid(row=3, column=4, sticky="w")
     
     #--------------------------------------------------------------------------------------
+    # Motion sensors front & back
+    #--------------------------------------------------------------------------------------
+    button_Motion_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Motion Front")
+    button_Motion_Front.grid(row=1, column=5, sticky="w")
+
+    button_Motion_Back = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="Motion Back")
+    button_Motion_Back.grid(row=2, column=5, sticky="w")
+
+
+    #--------------------------------------------------------------------------------------
     # Generic buttons
     #--------------------------------------------------------------------------------------
     button_clear = tk.Button(frame, height= 1, text="Clear", command=lambda t="\"failed\"": clear_logging())
     button_clear.grid(row=11, column=0, columnspan=1, sticky="w")
-
 
     #--------------------------------------------------------------------------------------
     # event data area

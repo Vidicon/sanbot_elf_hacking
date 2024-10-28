@@ -3,6 +3,7 @@
 
 #include "stm32f2xx.h"
 #include "Encoders.h"
+#include "MotionSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -59,8 +60,16 @@ signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
+
+
 void SendEncoders(struct Encoders_Data_Type *EncoderData);
 
 void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *EncoderData);
+
+
+void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State);
+
+void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type *MotionSensors_State);
+
 
 #endif

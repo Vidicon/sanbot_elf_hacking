@@ -106,6 +106,10 @@ void Error_Handler(void);
 #define RightArmGreen_GPIO_Port GPIOD
 #define RightArmBlue_Pin GPIO_PIN_15
 #define RightArmBlue_GPIO_Port GPIOD
+#define PG7_Pin GPIO_PIN_7
+#define PG7_GPIO_Port GPIOG
+#define PG8_Pin GPIO_PIN_8
+#define PG8_GPIO_Port GPIOG
 #define LeftArmRed_Pin GPIO_PIN_13
 #define LeftArmRed_GPIO_Port GPIOH
 #define LeftArmGreen_Pin GPIO_PIN_14

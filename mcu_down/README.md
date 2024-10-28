@@ -74,16 +74,17 @@
 |----------|----------|----------|----------|----------|----------|
 |Color     | White    | Black    | Black    |  Black   | Black    |
 |Left      | Arm full up| 1.1V   |  Arm full back|  1.1 1V|  GND   |
-|IO Pins   | PG0      |     -    | PG1      |      -   | -        |
+|IO Pins   | PG11      |     -    | PG10      |      -   | -        |
 
 | **RIGHT**| Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
 |----------|----------|----------|----------|----------|----------|
 |Color     | White    | Black    | Black    |  Black   | Black    |
 |Right     | Arm full back| 1.1 V   | Arm full up|  1.1 V   |   GND   |
-|IO Pins   |       |     -    |       |      -   | -        |
+|IO Pins   |  PG0     |     -    |  PG1     |      -   | -        |
 
 Notes Matthijs:
 - IO Pins ok.
+
 
 ---
 
@@ -116,11 +117,11 @@ STM32F2 connections:
 
 ---
 
-### Pir Sensors (J35 J44)
+### PIR Sensors (J35 J44)
 
 | Pin 1 | Pin 2 | Pin 3 |
 |----------|----------|----------|
-|   signal  |   GND  |   5v  |
+|   Signal  |   GND  |   5v  |
 
 ---
 
