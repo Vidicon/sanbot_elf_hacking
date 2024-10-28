@@ -293,21 +293,21 @@ def show_gui(mod_manager):
                               height= 1, 
                               width=10, 
                               text="Left Move 1", 
-                              command=lambda t=np.array([CMD_LA_MOVE, 0]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(mod_manager, t))
     button_LA_Move_1.grid(row=1, column=3, sticky="w")
 
     button_LA_Move_2 = tk.Button(frame, 
                               height= 1, 
                               width=10, 
                               text="Left Move 2", 
-                              command=lambda t=np.array([CMD_LA_MOVE, 100]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_LA_MOVE, -350]): createMoveCommand(mod_manager, t))
     button_LA_Move_2.grid(row=2, column=3, sticky="w")
 
     button_LA_Move_3 = tk.Button(frame, 
                                 height= 1, 
                                 width=10, 
                                 text="Left  Move 3", 
-                                command=lambda t=np.array([CMD_LA_MOVE, 300]): createMoveCommand(mod_manager, t))
+                                command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(mod_manager, t))
     button_LA_Move_3.grid(row=3, column=3, sticky="w")
 
     #--------------------------------------------------------------------------------------
@@ -317,21 +317,21 @@ def show_gui(mod_manager):
                               height= 1, 
                               width=10, 
                               text="Right Move 1", 
-                              command=lambda t=np.array([CMD_RA_MOVE, 0]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_RA_MOVE, 150]): createMoveCommand(mod_manager, t))
     button_RA_Move_1.grid(row=1, column=4, sticky="w")
 
     button_RA_Move_2 = tk.Button(frame, 
                               height= 1, 
                               width=10, 
                               text="Right Move 2", 
-                              command=lambda t=np.array([CMD_RA_MOVE, -100]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_RA_MOVE, 350]): createMoveCommand(mod_manager, t))
     button_RA_Move_2.grid(row=2, column=4, sticky="w")
 
     button_RA_Move_3 = tk.Button(frame, 
                                 height= 1, 
                                 width=10, 
                                 text="Right  Move 3", 
-                                command=lambda t=np.array([CMD_RA_MOVE, -300]): createMoveCommand(mod_manager, t))
+                                command=lambda t=np.array([CMD_RA_MOVE, 500]): createMoveCommand(mod_manager, t))
     button_RA_Move_3.grid(row=3, column=4, sticky="w")
     
     #--------------------------------------------------------------------------------------
