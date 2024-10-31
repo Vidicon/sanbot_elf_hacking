@@ -13,7 +13,7 @@ struct Base_State_Type LeftBaseMotor_State;
 struct Base_State_Type RightBaseMotor_State;
 struct Base_State_Type CenterBaseMotor_State;
 
-char TextBuffer[100];
+//char TextBuffer[100];
 
 void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
 {
@@ -151,14 +151,14 @@ void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 	}
 }
 
-void TracingUpdate()
-{
-	memset(TextBuffer, 0x00, 100);
-
-	sprintf(TextBuffer, "%ld,%d,%ld\n",
-												(long)(LeftBaseMotor_State.ActualPosition),
-												(long)(CenterBaseMotor_State.ActualPosition),
-												(long)(RightBaseMotor_State.ActualPosition));
-	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
-}
+//void TracingUpdate()
+//{
+//	memset(TextBuffer, 0x00, 100);
+//
+//	sprintf(TextBuffer, "%ld,%d,%ld\n",
+//												(long)(LeftBaseMotor_State.ActualPosition),
+//												(long)(CenterBaseMotor_State.ActualPosition),
+//												(long)(RightBaseMotor_State.ActualPosition));
+//	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
+//}
 

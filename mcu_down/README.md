@@ -132,9 +132,10 @@ Notes Matthijs:
 
 ### Distance sensor 4x (J26)
 
-| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
-|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-|   3.3v  |   CLK  |   GND  |   Data  |   CS1  |   CS2  |   CS3  |   CS4  |   NC  |   NC  |   NC  |   NC  |   NC  |   NC  |
+|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |   NC  |
+| IO Pin |   - |     |-     |     | -   |   |     |  |     |     | -    | -    |  -   |     -|
 
 ---
 
@@ -145,10 +146,10 @@ Notes Matthijs:
 |   3.3v  |   SCL  |   GND  |   SDA  |   GND  |   EN1  |   EN2  |   EN3  |   EN4  |   EN5  |   EN6  |   EN7  |
 |     |   PD7  |     |   PD6  |     |   PD5  |   PD4  |   PD3  |   PD2  |   PD1  |   PD0  |   PC12  |
 
- - uses the sharp [GP2Y0E03](https://nl.mouser.com/ProductDetail/Sharp-Microelectronics/GP2Y0E03?qs=2FIyTMJ0hNk7Anrxo3D7Gw%3D%3D)
- - sensors are connected in parallel to the 3.3v, GND, SCL, and SDA and each sensor has a ENable line
+ - Uses the sharp [GP2Y0E03](https://nl.mouser.com/ProductDetail/Sharp-Microelectronics/GP2Y0E03?qs=2FIyTMJ0hNk7Anrxo3D7Gw%3D%3D)
+ - Sensors are connected in parallel to the 3.3v, GND, SCL, and SDA and each sensor has a ENable line
  - Enable line is set to high, after >500us the distance can be read over I2c
- - the sensor I2c is not connected to I2c peripheral in the stm32, a software implementation needs to be used. 
+ - The sensor I2c is not connected to I2c peripheral in the stm32, a software implementation needs to be used. 
 
 ---
 

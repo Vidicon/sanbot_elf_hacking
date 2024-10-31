@@ -30,6 +30,7 @@
 #include "Arms.h"
 #include "Base.h"
 #include "MotionSensors.h"
+#include "Soft_I2C.h"
 
 /* USER CODE END Includes */
 
@@ -60,8 +61,9 @@ DMA_HandleTypeDef hdma_usart6_rx;
 int Time20Hz = 0;
 int Time16Hz = 0;
 int Selftest = False;
-int temp = 0;
-
+int TempCS = 0;
+int Distance = 0;
+char TextBuffer[100];
 
 /* USER CODE END PV */
 
@@ -102,8 +104,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
-	LeftArm_Home();
-	RightArm_Home();
+//	LeftArm_Home();
+//	RightArm_Home();
 }
 
 void UpdateSelfTest()
@@ -164,6 +166,14 @@ void Check_USB_Communication()
 
 		Protocol_0x55_MarkProcessed();
 	}
+}
+
+void TracingUpdate()
+{
+	memset(TextBuffer, 0x00, 100);
+
+	sprintf(TextBuffer, "%ld\n",(long)(Distance));
+	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
 }
 
 /* USER CODE END 0 */
@@ -230,7 +240,6 @@ int main(void)
 		  Base_Update20Hz(Encoders_GetPointer());
 		  Arms_Update20Hz(Encoders_GetPointer());
 
-//		  TracingUpdate();
 	  }
 
 	  if (Update_10Hz)
@@ -239,12 +248,33 @@ int main(void)
 		  RGBLeds_Update10Hz();
 
 		  MotionSensors_Update10Hz();
+
+		  TempCS += 1;
+
+		  HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(EN2_Distance_J26_GPIO_Port, EN2_Distance_J26_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(EN3_Distance_J26_GPIO_Port, EN3_Distance_J26_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_RESET);
+
+		  if (TempCS == 2)
+		  {
+			  TempCS = 0;
+
+			  Soft_I2C_Write(0x40, 0x5E);
+			  Distance = Soft_I2C_Read(0x40);
+
+			  HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(EN2_Distance_J26_GPIO_Port, EN2_Distance_J26_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(EN3_Distance_J26_GPIO_Port, EN3_Distance_J26_Pin, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_RESET);
+
+//			  TracingUpdate();
+		  }
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
-
 	  }
 
 	  if (Update_2Hz)
@@ -534,11 +564,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
@@ -546,6 +576,12 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOF, CenterBrake_Pin|CenterDir_Pin|LeftBrake_Pin|LeftDir_Pin
                           |RightBrake_Pin|RightDir_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, SCL_Distance_J26_Pin|EN1_Distance_J26_Pin|EN2_Distance_J26_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, EN3_Distance_J26_Pin|EN4_Distance_J26_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
@@ -571,6 +607,33 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SCL_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = SCL_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(SCL_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDA_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN1_Distance_J26_Pin EN2_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J26_Pin|EN2_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN3_Distance_J26_Pin EN4_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = EN3_Distance_J26_Pin|EN4_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PF13_Pin PF14_Pin PF15_Pin */
   GPIO_InitStruct.Pin = PF13_Pin|PF14_Pin|PF15_Pin;
