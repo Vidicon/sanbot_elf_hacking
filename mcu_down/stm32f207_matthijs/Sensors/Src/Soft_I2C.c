@@ -14,50 +14,55 @@
 #define SCL_PIN    SCL_Distance_J26_Pin
 #define SDA_PIN    SDA_Distance_J26_Pin
 #define I2C_PORT   GPIOC
-
+#define SDA_PIN_POS  1
 
 //#define Soft_I2C_DELAY()   HAL_Delay(1)  // Simple delay for I2C timing (1ms for slow clock)
 #define Soft_I2C_DELAY()   delay_us(1)
 
-// Functions to control the SCL and SDA lines
-void Soft_I2C_SCL_High() { HAL_GPIO_WritePin(I2C_PORT, SCL_PIN, GPIO_PIN_SET); }
-void Soft_I2C_SCL_Low()  { HAL_GPIO_WritePin(I2C_PORT, SCL_PIN, GPIO_PIN_RESET); }
-void Soft_I2C_SDA_High() { HAL_GPIO_WritePin(I2C_PORT, SDA_PIN, GPIO_PIN_SET); }
-void Soft_I2C_SDA_Low()  { HAL_GPIO_WritePin(I2C_PORT, SDA_PIN, GPIO_PIN_RESET); }
+//// Functions to control the SCL and SDA lines
+//void Soft_I2C_SCL_High() { HAL_GPIO_WritePin(I2C_PORT, SCL_PIN, GPIO_PIN_SET); }
+//void Soft_I2C_SCL_Low()  { HAL_GPIO_WritePin(I2C_PORT, SCL_PIN, GPIO_PIN_RESET); }
+//void Soft_I2C_SDA_High() { HAL_GPIO_WritePin(I2C_PORT, SDA_PIN, GPIO_PIN_SET); }
+//void Soft_I2C_SDA_Low()  { HAL_GPIO_WritePin(I2C_PORT, SDA_PIN, GPIO_PIN_RESET); }
 
-void Soft_I2C_SDA_Input()
-{
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+// Fast GPIO macros using BSRR register
+#define Soft_I2C_SCL_High()  (I2C_PORT->BSRR = SCL_PIN)
+#define Soft_I2C_SCL_Low()   (I2C_PORT->BSRR = (SCL_PIN << 16))
+#define Soft_I2C_SDA_High()  (I2C_PORT->BSRR = SDA_PIN)
+#define Soft_I2C_SDA_Low()   (I2C_PORT->BSRR = (SDA_PIN << 16))
 
-	/*Configure GPIO pin : SDA_Distance_J26_Pin */
-	GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+//void Soft_I2C_SDA_Input()
+//{
+//	GPIO_InitTypeDef GPIO_InitStruct = {0};
+//
+//	/*Configure GPIO pin : SDA_Distance_J26_Pin */
+//	GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
+//	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+//	GPIO_InitStruct.Pull = GPIO_NOPULL;
+//	HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+//}
+
+//void Soft_I2C_SDA_Output()
+//{
+//	GPIO_InitTypeDef GPIO_InitStruct = {0};
+//
+//	/*Configure GPIO pin : SDA_Distance_J26_Pin */
+//	GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
+//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+//	GPIO_InitStruct.Pull = GPIO_NOPULL;
+//	HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+//}
+
+
+// SDA Input and Output Mode Setup
+void Soft_I2C_SDA_Input() {
+    I2C_PORT->MODER &= ~(0x3 << (2 * SDA_PIN_POS));  // Set to input mode
 }
 
-//void Soft_I2C_SDA_Input() { GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-//                        GPIO_InitStruct.Pin = SDA_PIN; \
-//                        GPIO_InitStruct.Mode = GPIO_MODE_INPUT; \
-//                        GPIO_InitStruct.Pull = GPIO_NOPULL; \
-//                        HAL_GPIO_Init(I2C_PORT, &GPIO_InitStruct); }
-
-void Soft_I2C_SDA_Output()
-{
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-	/*Configure GPIO pin : SDA_Distance_J26_Pin */
-	GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+void Soft_I2C_SDA_Output() {
+    I2C_PORT->MODER |= (0x1 << (2 * SDA_PIN_POS));  // Set to output mode
 }
 
-//void Soft_I2C_SDA_Output() { GPIO_InitTypeDef GPIO_InitStruct = {0}; \
-//                         GPIO_InitStruct.Pin = SDA_PIN; \
-//                         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD; \
-//                         GPIO_InitStruct.Pull = GPIO_NOPULL; \
-//                         HAL_GPIO_Init(I2C_PORT, &GPIO_InitStruct); }
 
 uint8_t Soft_I2C_Read_SDA() {
     return HAL_GPIO_ReadPin(I2C_PORT, SDA_PIN);
@@ -68,9 +73,9 @@ uint8_t Soft_I2C_Read_SDA() {
 
 void delay_us(uint32_t us) {
     // Get the current TIM2 counter value
-    uint32_t start = TIM9->CNT;
+//    uint32_t start = TIM9->CNT;
     // Wait until the time elapsed
-    while ((TIM9->CNT - start) < us);
+//    while ((TIM9->CNT - start) < us);
 }
 
 // I2C Start Condition
@@ -80,6 +85,7 @@ void Soft_I2C_Start() {
 	Soft_I2C_SDA_High();
 	Soft_I2C_SCL_High();
 	Soft_I2C_DELAY();
+
 	Soft_I2C_SDA_Low();
 	Soft_I2C_DELAY();
 	Soft_I2C_SCL_Low();
@@ -174,12 +180,6 @@ int Soft_I2C_Read(uint8_t slave_address)
 {
     uint8_t data1;
     uint8_t data2;
-
-    Soft_I2C_DELAY();
-    Soft_I2C_DELAY();
-    Soft_I2C_DELAY();
-    Soft_I2C_DELAY();
-    Soft_I2C_DELAY();
 
     Soft_I2C_Start();
 
