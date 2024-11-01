@@ -98,6 +98,8 @@ void System_Initialize()
 	Base_Init(&htim9, &htim11, &htim12);
 
 	MotionSensors_Init();
+
+	Soft_I2C_Init();
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
