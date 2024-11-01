@@ -23,13 +23,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usbd_cdc_if.h"
 #include "protocol_0x55.h"
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
 #include "Arms.h"
 #include "Base.h"
 #include "MotionSensors.h"
+#include "DistanceSensors.h"
 #include "Soft_I2C.h"
 
 /* USER CODE END Includes */
@@ -98,7 +99,7 @@ void System_Initialize()
 	Base_Init(&htim9, &htim11, &htim12);
 
 	MotionSensors_Init();
-
+	DistanceSensors_Init();
 	Soft_I2C_Init();
 }
 
@@ -250,6 +251,7 @@ int main(void)
 		  RGBLeds_Update10Hz();
 
 		  MotionSensors_Update10Hz();
+		  DistanceSensors_Update10Hz();
 
 		  TempCS += 1;
 
