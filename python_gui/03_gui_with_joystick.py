@@ -80,7 +80,7 @@ def SetDistanceButtonBGColor(button, distance):
 #===============================================================================
 def my_receive_callback(data, stream_area):
     hex_values = ' '.join([format(x, '02X') for x in data])
-    # print("< " + hex_values)
+    print("< " + hex_values)
     
     # Decode
     response = data[1]

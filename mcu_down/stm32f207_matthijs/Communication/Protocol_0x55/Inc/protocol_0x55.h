@@ -4,11 +4,12 @@
 #include "stm32f2xx.h"
 #include "Encoders.h"
 #include "MotionSensors.h"
+#include "DistanceSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
 
-#define FIFO_RXSIZE			256
+#define FIFO_SIZE			512
 
 #define CMD_VERSION     		0x01
 #define CMD_LA_COLOR    		0x10
@@ -19,6 +20,9 @@
 #define CMD_GET_ENCODERS		0x20
 #define CMD_GET_MOTIONSENSORS  	0x21
 
+#define CMD_GET_DISTANCESENSORS 0x22
+
+
 #define CMD_LA_MOVE		 		0x30
 #define CMD_RA_MOVE		 		0x31
 #define CMD_BASE_MOVE	 		0x32
@@ -27,7 +31,7 @@
 
 
 struct PROTOCOL_0X55_Data_Type {
-			uint8_t FIFO_Data[FIFO_RXSIZE+1];
+			uint8_t FIFO_Data[FIFO_SIZE+1];
 			int BytesInBuffer;
 			int TotalMsgSize;
 		};
@@ -73,5 +77,9 @@ void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State);
 
 void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type *MotionSensors_State);
 
+
+void SendDistanceSensors(struct Distance_Sensor_Type *DistanceData);
+
+void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *DistanceData);
 
 #endif
