@@ -17,8 +17,9 @@ CMD_RA_COLOR    = 0x11
 CMD_BASE_COLOR  = 0x12
 CMD_BA_COLOR    = 0x13
 
-CMD_GET_ENCODERS  = 0x20
-CMD_GET_MOTIONSENSORS  = 0x21
+CMD_GET_ENCODERS        = 0x20
+CMD_GET_MOTIONSENSORS   = 0x21
+CMD_GET_DISTANCESENSORS  =0x22
 
 CMD_LA_MOVE		= 0x30
 CMD_RA_MOVE		= 0x31
@@ -54,6 +55,26 @@ button_version = []
 button_Motion_Front = []
 button_Motion_Back = []
 
+distance1_Front = []
+distance2_Front = []
+distance3_Front = []
+distance4_Front = []
+distance5_Front = []
+distance6_Front = []
+distance7_Front = []
+distance8_Front = []
+
+def SetDistanceButtonBGColor(button, distance):
+    button.config(text=str(distance)) 
+    
+    if (distance < 15000):
+        button.config(bg="red") 
+    elif (distance < 30000):
+        button.config(bg="yellow") 
+    else:
+        button.config(bg="lime")  
+
+
 #===============================================================================
 # Define the receive callback function
 #===============================================================================
@@ -86,9 +107,6 @@ def my_receive_callback(data, stream_area):
         stream_area.insert(tk.END, "< Motion     : " + str(int8_array) + "\n")
         stream_area.yview_moveto(1)  # Scrolling to the bottom       
 
-        
-        default_bg = button_version.cget('bg')
-
         if (int8_array[0] == 1):
             button_Motion_Front.config(bg="yellow") 
         else:
@@ -100,7 +118,29 @@ def my_receive_callback(data, stream_area):
             button_Motion_Back.config(bg=default_bg) 
                     
         
-    
+    if (response == (CMD_GET_DISTANCESENSORS | RESP_BIT)):
+        new_byte_array = data[3:-2]
+        uint8_array = np.frombuffer(new_byte_array, dtype='>u1')
+        
+        stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
+        stream_area.yview_moveto(1)  # Scrolling to the bottom      
+        
+        # --------------------------------------------------------------------------
+        combined1_int = int.from_bytes(new_byte_array[0:2], byteorder='big')  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance1_Front, combined1_int)
+        
+        # --------------------------------------------------------------------------
+        combined2_int = int.from_bytes(new_byte_array[2:4], byteorder='big')  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance2_Front, combined2_int)
+
+        # --------------------------------------------------------------------------
+        combined3_int = int.from_bytes(new_byte_array[4:6], byteorder='big')  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance3_Front, combined3_int)
+
+        # --------------------------------------------------------------------------
+        combined4_int = int.from_bytes(new_byte_array[6:8], byteorder='big')  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance4_Front, combined4_int)
+
     
 def createCommand(mod_manager, InputCommmand, Parameters):
     
@@ -164,7 +204,7 @@ def show_gui(mod_manager):
     # default_font = font.nametofont("TkDefaultFont")  # Get the default font
     # default_font.configure(family="courier", size=10)  # Change family and size
     # font.nametofont("TkHeadingFont").configure(family="Ubuntu", size=10)  # Change heading font
-
+    
     #--------------------------------------------------------------------------------------
     # Left arm
     #--------------------------------------------------------------------------------------
@@ -175,6 +215,9 @@ def show_gui(mod_manager):
                                text="Get Version", 
                                command=lambda t=[0]: createCommand(mod_manager, CMD_VERSION, t))
     button_version.grid(row=0, column=0, sticky="w")
+
+    global default_bg 
+    default_bg = button_version.cget('bg')
 
     button_LA_White = tk.Button(frame, 
                               height= 1, 
@@ -380,6 +423,34 @@ def show_gui(mod_manager):
     button_Motion_Back.grid(row=2, column=5, sticky="w")
 
 
+    global distance1_Front
+    distance1_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="inf")
+    distance1_Front.grid(row=1, column=6, sticky="w")
+
+    global distance2_Front
+    distance2_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="inf")
+    distance2_Front.grid(row=2, column=6, sticky="w")
+
+    global distance3_Front
+    distance3_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="inf")
+    distance3_Front.grid(row=3, column=6, sticky="w")
+
+    global distance4_Front
+    distance4_Front = tk.Button(frame, 
+                              height= 1, 
+                              width=10, 
+                              text="inf")
+    distance4_Front.grid(row=4, column=6, sticky="w")
+
     #--------------------------------------------------------------------------------------
     # Generic buttons
     #--------------------------------------------------------------------------------------
@@ -558,20 +629,15 @@ def main():
     if ("LINUX" in platform.system().upper()):
         print ("Linux detected!")
         mod_manager = ModManager(port1='/dev/ttyACM0', port2='/dev/ttyACM1', baudrate=115200)
-        # mod_manager = ModManager(port='/dev/ttyACM1', baudrate=115200)
     else:
         mod_manager = ModManager(port='COM9', baudrate=115200)
         
-   
     root, text_area, stream_area = show_gui(mod_manager)
 
-    # # List available fonts (optional, for debugging)
-    # available_fonts = font.families()
-    # print("Available Fonts:", available_fonts)
-  
     # Set the receive callback
-    mod_manager.set_receive_callback(my_receive_callback, stream_area)
     mod_manager.open_port()
+    mod_manager.set_receive_callback(my_receive_callback, stream_area)
+
     time.sleep(0.1)
   
     # Call the handle_pygame_events function initially
