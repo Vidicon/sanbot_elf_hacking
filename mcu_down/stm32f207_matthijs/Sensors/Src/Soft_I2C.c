@@ -195,3 +195,8 @@ int Soft_I2C_Read(uint8_t slave_address)
     return (int)(data1 << 8) + data2;
 }
 
+void Soft_I2C_Configure_Pins(uint16_t in_SDA_pin, uint16_t in_SLC_pin, uint16_t in_I2C_Port)
+{
+
+}
+
