@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 // Do some pre-calculations to speed up the I2C cycle.
 //------------------------------------------------------------------------------
-#define SDA_PIN_POS  1
+#define SDA_PIN_POS  SDA_PIN >> 1		// Calculate pin position
 #define SDA_PIN_POS_SHIFT_INPUT  (0x03 << (2 * SDA_PIN_POS))
 #define SDA_PIN_POS_SHIFT_OUTPUT (0x01 << (2 * SDA_PIN_POS))
 
@@ -44,7 +44,8 @@ void Soft_I2C_SDA_Output() {
 // Low level read to speed up
 //------------------------------------------------------------------------------
 uint8_t Soft_I2C_Read_SDA() {
-    return (I2C_PORT->IDR & (1 << SDA_PIN)) ? 1 : 0;
+	return (I2C_PORT->IDR & (1 << SDA_PIN_POS)) ? 1 : 0;
+//	return HAL_GPIO_ReadPin(SDA_Distance_J26_GPIO_Port, SDA_Distance_J26_Pin);
 }
 
 //------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 
 #include "DistanceSensors.h"
 #include <main.h>
+#include "Soft_I2C.h"
 
 struct Distance_Sensor_Type DistanceData;
 
