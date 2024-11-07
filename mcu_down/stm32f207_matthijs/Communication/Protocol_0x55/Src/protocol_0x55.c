@@ -40,13 +40,16 @@ uint8_t Protocol_0x55_CheckFifo()
 	}
 
 	//=================================================================================================
-	// When the USB connects, there seems to be a bug which make the last TX message appear in the RX queue
+	// When the USB connects the 1st time, there seems to be a bug which makes the last TX message appear (partly) in the RX queue
+	// Always with the 0xd5 start byte. So easy to detect as there is no other data in the RX queue.
 	//=================================================================================================
 	if (PROTOCOL_0X55_RxData.FIFO_Data[0] == (0x55 | RESP_BIT))
 	{
 		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
 		PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
 		memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_SIZE);
+
+		return 0;
 	}
 
 	// Start byte should be 0x55
@@ -66,8 +69,12 @@ uint8_t Protocol_0x55_CheckFifo()
 		return 0;
 	}
 
+	// When we are here, the current start byte = 0x55
 	// Data length according the received message
 	uint8_t datalen = PROTOCOL_0X55_RxData.FIFO_Data[2];
+
+	// Als we uit sync zijn en de start is 0x55 en de datalen is heel groot, moeten we lang wachten.
+	// TO DO: limit datalen to 32? Is een risico.
 
 	// Not all data received yet
 	if (PROTOCOL_0X55_RxData.BytesInBuffer < (3 + datalen + 2))
