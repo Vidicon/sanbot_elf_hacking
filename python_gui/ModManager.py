@@ -127,53 +127,6 @@ class ModManager:
         
         return data
     
-    # def send_speed(self, ID, speed):
-    #     datalength = 3
-    #     data = self.create_message(datalength)
-        
-    #     data[0] = 0x55
-    #     data[1] = 0x03  
-    #     data[2] = datalength
-    #     data[3] = ID
-    #     data[4] = (speed >> 8) & 0xff
-    #     data[5] = (speed & 0xff)
-        
-    #     crc = self.generate_modbus_crc(data[:-2])   # skip empty CRC bytes
-        
-    #     print("Modbus CRC: 0x", format(crc, '04X'))
-        
-    #     data[datalength + 3] = (crc & 0xff);
-    #     data[datalength + 4] = ((crc >> 8)& 0xff);
-        
-    #     self.print_array_as_hex(data)
-        
-    #     self.send_data(data)
-        
-    #     return
-
-
-    # def restore_defaults(self, ID):
-    #     datalength = 1
-    #     data = self.create_message(datalength)
-        
-    #     data[0] = 0x55
-    #     data[1] = 0x04  # command = 4  
-    #     data[2] = datalength
-    #     data[3] = ID
-        
-    #     crc = self.generate_modbus_crc(data[:-2])   # skip empty CRC bytes
-        
-    #     print("Modbus CRC: 0x", format(crc, '04X'))
-        
-    #     data[datalength + 3] = (crc & 0xff);
-    #     data[datalength + 4] = ((crc >> 8)& 0xff);
-        
-    #     self.print_array_as_hex(data)
-        
-    #     self.send_data(data)
-        
-    #     return
-
     def cmd_GetVersion(self):
         datalength = 0
         data = self.create_message(datalength)

@@ -107,38 +107,19 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
-//	LeftArm_Home();
-//	RightArm_Home();
+	LeftArm_Home();
+	RightArm_Home();
 }
 
 void UpdateSelfTest()
 {
-//	if (Selftest)
-//	{
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
-//	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
-//	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//
-//	  if (Time20Hz == 12 * UPDATE_20HZ)
-//	  {
-//		  RGBLeds_SetColorOff(LeftArm);
-//		  RGBLeds_SetColorOff(RightArm);
-//	  }
-//	}
-
-//	int Vel = 30;
-//	int Acc = 1;
-//
-//	if ((Time20Hz % 300) == 0) 		{ Base_VelocitySetpoint(0, 0, Vel);}
-//	if ((Time20Hz % 300) == 60) 	{ Base_VelocitySetpoint(0, 0, 0);}
-//	if ((Time20Hz % 300) == 120) 	{ Base_VelocitySetpoint(0, 0, -Vel);}
-//	if ((Time20Hz % 300) == 180) 	{ Base_VelocitySetpoint(0, 0, 0);}
+	if (Selftest)
+	{
+		if (Time20Hz == 10 * UPDATE_20HZ)
+		{
+			Selftest = False;
+		}
+	}
 }
 
 void Check_USB_Communication()
@@ -148,7 +129,7 @@ void Check_USB_Communication()
 		int command = Protocol_0x55_GetCommand();
 
 		if (command == CMD_VERSION) 	{ SendVersion();}
-		if (command == CMD_LA_COLOR) 	{ RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_LA_COLOR)	{ RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
@@ -248,32 +229,10 @@ int main(void)
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
-		  RGBLeds_Update10Hz();
 
+		  RGBLeds_Update10Hz();
 		  MotionSensors_Update10Hz();
 		  DistanceSensors_Update10Hz();
-
-		  TempCS += 1;
-
-		  HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(EN2_Distance_J26_GPIO_Port, EN2_Distance_J26_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(EN3_Distance_J26_GPIO_Port, EN3_Distance_J26_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_RESET);
-
-		  if (TempCS == 2)
-		  {
-			  TempCS = 0;
-
-			  Soft_I2C_Write(0x40, 0x5E);
-			  Distance = Soft_I2C_Read(0x40);
-
-			  HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(EN2_Distance_J26_GPIO_Port, EN2_Distance_J26_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(EN3_Distance_J26_GPIO_Port, EN3_Distance_J26_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_RESET);
-
-//			  TracingUpdate();
-		  }
 	  }
 
 	  if (Update_5Hz)
