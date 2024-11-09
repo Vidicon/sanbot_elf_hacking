@@ -238,6 +238,12 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 //	GenericArms_HAL_Brake(False, LeftArm);
 //	GenericArms_HAL_Brake(False, RightArm);
 
+	HAL_TIM_Base_Start(LeftArm_State.TIM );
+	HAL_TIM_PWM_Start(LeftArm_State.TIM , TIM_CHANNEL_1);
+
+	HAL_TIM_Base_Start(RightArm_State.TIM );
+	HAL_TIM_PWM_Start(RightArm_State.TIM , TIM_CHANNEL_2);
+
 	GenericArms_HAL_Direction(LeftArm_State.Direction, LeftArm);
 	GenericArms_HAL_Direction(RightArm_State.Direction, RightArm);
 

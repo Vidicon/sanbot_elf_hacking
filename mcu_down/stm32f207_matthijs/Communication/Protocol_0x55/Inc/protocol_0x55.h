@@ -9,7 +9,7 @@
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
 
-#define FIFO_SIZE			512
+#define FIFO_SIZE			64
 
 #define CMD_VERSION     		0x01
 #define CMD_LA_COLOR    		0x10
@@ -41,6 +41,8 @@ struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer();
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetTxPointer();
 
 void Protocol_0x55_Init();
+
+void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len);
 
 uint8_t Protocol_0x55_CheckFifo();
 

@@ -52,6 +52,10 @@ button5_toggle = 0
 
 
 button_version = []
+
+button_debug1   = []
+button_debug2   = []
+
 button_Motion_Front = []
 button_Motion_Back = []
 
@@ -79,8 +83,8 @@ def SetDistanceButtonBGColor(button, distance):
 # Define the receive callback function
 #===============================================================================
 def my_receive_callback(data, stream_area):
-    hex_values = ' '.join([format(x, '02X') for x in data])
-    print("< " + hex_values)
+    # hex_values = ' '.join([format(x, '02X') for x in data])
+    # print("< " + hex_values)
     
     # Decode
     response = data[1]
@@ -170,6 +174,20 @@ def createBaseCommand(mod_manager, Parameters):
 
     return
 
+
+def createDoubleMoveCommand(mod_manager, Parameters):
+    high = (int(Parameters[1]) >> 8)  & 0xff;
+    low  = (int(Parameters[1]) & 0xff);
+
+    mod_manager.cmd_Generic(Parameters[0], 2, np.array([high, low]))
+
+    high2 = (int(Parameters[1+2]) >> 8)  & 0xff;
+    low2  = (int(Parameters[1+2]) & 0xff);
+
+    mod_manager.cmd_Generic(Parameters[0+2], 2, np.array([high2, low2]))
+
+    return
+
 #===============================================================================
 # Clear logging
 #===============================================================================
@@ -215,6 +233,22 @@ def show_gui(mod_manager):
                                text="Get Version", 
                                command=lambda t=[0]: createCommand(mod_manager, CMD_VERSION, t))
     button_version.grid(row=0, column=0, sticky="w")
+
+    global button_debug1
+    button_debug1 = tk.Button(frame, 
+                               height= 1, 
+                               width=10, 
+                               text="Debug 1", 
+                               command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t))
+    button_debug1.grid(row=0, column=7, sticky="w")
+
+    global button_debug2
+    button_debug2 = tk.Button(frame, 
+                               height= 1, 
+                               width=10, 
+                               text="Debug 2", 
+                               command=lambda t=np.array([CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]): createDoubleMoveCommand(mod_manager, t))
+    button_debug2.grid(row=1, column=7, sticky="w")
 
     global default_bg 
     default_bg = button_version.cget('bg')
@@ -364,7 +398,7 @@ def show_gui(mod_manager):
                               height= 1, 
                               width=10, 
                               text="Left Move 1", 
-                              command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(mod_manager, t))
     button_LA_Move_1.grid(row=1, column=3, sticky="w")
 
     button_LA_Move_2 = tk.Button(frame, 
@@ -378,7 +412,7 @@ def show_gui(mod_manager):
                                 height= 1, 
                                 width=10, 
                                 text="Left  Move 3", 
-                                command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(mod_manager, t))
+                                command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(mod_manager, t))
     button_LA_Move_3.grid(row=3, column=3, sticky="w")
 
     #--------------------------------------------------------------------------------------
@@ -388,7 +422,7 @@ def show_gui(mod_manager):
                               height= 1, 
                               width=10, 
                               text="Right Move 1", 
-                              command=lambda t=np.array([CMD_RA_MOVE, 150]): createMoveCommand(mod_manager, t))
+                              command=lambda t=np.array([CMD_RA_MOVE, 500]): createMoveCommand(mod_manager, t))
     button_RA_Move_1.grid(row=1, column=4, sticky="w")
 
     button_RA_Move_2 = tk.Button(frame, 
@@ -402,7 +436,7 @@ def show_gui(mod_manager):
                                 height= 1, 
                                 width=10, 
                                 text="Right  Move 3", 
-                                command=lambda t=np.array([CMD_RA_MOVE, 500]): createMoveCommand(mod_manager, t))
+                                command=lambda t=np.array([CMD_RA_MOVE, 150]): createMoveCommand(mod_manager, t))
     button_RA_Move_3.grid(row=3, column=4, sticky="w")
     
     #--------------------------------------------------------------------------------------

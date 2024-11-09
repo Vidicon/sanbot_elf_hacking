@@ -7,7 +7,7 @@
 
 #include "DistanceSensors.h"
 #include <main.h>
-#include "Soft_I2C.h"
+#include <Right_Soft_I2C.h>
 #include "protocol_0x55.h"
 
 struct Distance_Sensor_Type DistanceData;
@@ -32,8 +32,8 @@ void DistanceSensors_Init()
 
 void DistanceSensors_Update10Hz()
 {
-	Soft_I2C_Write(0x40, 0x5E);
-	DistanceData.Distance[DistanceData.SelectedSensor] = Soft_I2C_Read(0x40);
+	Right_Soft_I2C_Write(0x40, 0x5E);
+	DistanceData.Distance[DistanceData.SelectedSensor] = Right_Soft_I2C_Read(0x40);
 
 
 	// Last step is to select the next sensor

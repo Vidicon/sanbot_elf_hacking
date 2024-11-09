@@ -31,7 +31,6 @@
 #include "Base.h"
 #include "MotionSensors.h"
 #include "DistanceSensors.h"
-#include "Soft_I2C.h"
 
 /* USER CODE END Includes */
 
@@ -100,7 +99,6 @@ void System_Initialize()
 
 	MotionSensors_Init();
 	DistanceSensors_Init();
-	Soft_I2C_Init();
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
@@ -247,7 +245,14 @@ int main(void)
 		  SendEncoders(Encoders_GetPointer());
 	  }
 
+	  //--------------------------------------------------------
+	  // Limit the check for new data frequency
+	  // When run at full speed (no delay), the USB interrupt and the check will lead
+	  // to lost bytes. Dont know why and dont know how to solve. But delay works fine.
+	  //--------------------------------------------------------
 	  Check_USB_Communication();
+	  HAL_Delay(1);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

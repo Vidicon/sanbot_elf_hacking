@@ -25,6 +25,7 @@
 /* USER CODE BEGIN INCLUDE */
 #include "protocol_0x55.h"
 
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +34,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+struct PROTOCOL_0X55_Data_Type *TmpPointer;
 
 /* USER CODE END PV */
 
@@ -262,15 +264,17 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
 
-	// Copy new data to RxBuffer
-	struct PROTOCOL_0X55_Data_Type *TmpPointer;
-	TmpPointer = Protocol_0x55_GetRxPointer();
+//	// Copy new data to RxBuffer
+//	TmpPointer = Protocol_0x55_GetRxPointer();
+//
+//	// Check how many bytes already in buffer
+//	// Add new bytes to the end
+//	TmpPointer->BytesInBuffer += *Len;
+//	memcpy(&TmpPointer->FIFO_Data[TmpPointer->BytesInBuffer], (char*) Buf, *Len);
+//
+//
+	Protocol_0x55_NewData(Buf, Len);
 
-	// Check how many bytes already in buffer
-	// Add new bytes to the end
-	memcpy(&TmpPointer->FIFO_Data[TmpPointer->BytesInBuffer], (char*) Buf, *Len);
-
-	TmpPointer->BytesInBuffer += *Len;
 
 	// Prepare next receive
 	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);

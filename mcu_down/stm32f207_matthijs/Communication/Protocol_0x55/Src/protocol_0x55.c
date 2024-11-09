@@ -19,6 +19,19 @@ struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetTxPointer()
 	return (&PROTOCOL_0X55_TxData);
 }
 
+void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len)
+{
+	memcpy(&PROTOCOL_0X55_RxData.FIFO_Data[PROTOCOL_0X55_RxData.BytesInBuffer], (char*) Buf, *Len);
+
+	PROTOCOL_0X55_RxData.BytesInBuffer += *Len;
+
+	//--------------------------------------------------------------------------------------------------
+	// **IF** the lost bytes bug returns, then the new data from the USB device, should be stored in
+	// a temp buffer and only be copied inside the Protocol_0x55_CheckFifo() function.
+	// The HAL_DELAY(1) in the main program loop seems to do the trick anyway.
+	//--------------------------------------------------------------------------------------------------
+}
+
 void Protocol_0x55_Init()
 {
 	PROTOCOL_0X55_RxData.BytesInBuffer = 0;
@@ -73,9 +86,6 @@ uint8_t Protocol_0x55_CheckFifo()
 	// Data length according the received message
 	uint8_t datalen = PROTOCOL_0X55_RxData.FIFO_Data[2];
 
-	// Als we uit sync zijn en de start is 0x55 en de datalen is heel groot, moeten we lang wachten.
-	// TO DO: limit datalen to 32? Is een risico.
-
 	// Not all data received yet
 	if (PROTOCOL_0X55_RxData.BytesInBuffer < (3 + datalen + 2))
 	{
@@ -88,7 +98,7 @@ uint8_t Protocol_0x55_CheckFifo()
 
 	if ((Result & 0xff) == PROTOCOL_0X55_RxData.FIFO_Data[datalen+3])
 	{
-		PROTOCOL_0X55_RxData.TotalMsgSize = 3+datalen+2;
+		PROTOCOL_0X55_RxData.TotalMsgSize = 3 + datalen + 2;
 
 		return 1;
 	}
@@ -119,8 +129,6 @@ void Protocol_0x55_MarkProcessed()
 
 	// Update. 1 bytes less in the buffer
 	PROTOCOL_0X55_RxData.BytesInBuffer -= MsgSize;
-
-
 }
 
 int Protocol_0x55_GetCommand()
