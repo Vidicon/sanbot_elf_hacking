@@ -222,6 +222,7 @@ int main(void)
 		  Base_Update20Hz(Encoders_GetPointer());
 		  Arms_Update20Hz(Encoders_GetPointer());
 
+		  DistanceSensors_Update20Hz();
 	  }
 
 	  if (Update_10Hz)
@@ -230,7 +231,6 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 		  MotionSensors_Update10Hz();
-		  DistanceSensors_Update10Hz();
 	  }
 
 	  if (Update_5Hz)

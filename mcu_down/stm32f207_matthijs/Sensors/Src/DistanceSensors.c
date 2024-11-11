@@ -31,7 +31,7 @@ void DistanceSensors_Init()
 	DistanceSensors_Select(DistanceData.SelectedSensor);
 }
 
-void DistanceSensors_Update10Hz()
+void DistanceSensors_Update20Hz()
 {
 	if (DistanceData.SelectedSensor <= 3)
 	{

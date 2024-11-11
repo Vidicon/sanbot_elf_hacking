@@ -39,38 +39,34 @@
 // SDA Input and Output Mode Setup
 // Precalculated values to prevent costly shift operation every time
 //------------------------------------------------------------------------------
-
-//LEFT_I2C_PORT->MODER &= ~(0b11 << (5 * 2)); // Clear the mode bits for pin 5
-//LEFT_I2C_PORT->MODER |= (0b10 << (5 * 2));  // Set mode to Alternate function for pin 5
-
 void Left_Soft_I2C_SDA_Input() {
-	// Reconfigure PB9 to input mode
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = GPIO_PIN_9;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//	GPIO_InitTypeDef GPIO_InitStruct = {0};
+//	GPIO_InitStruct.Pin = GPIO_PIN_9;
+//	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+//	GPIO_InitStruct.Pull = GPIO_PULLUP;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	GPIOB->MODER &= ~(0b11 << (LEFT_SDA_PIN * 2)); // Clear bits 19 and 18 to set PB9 to input mode
 }
 
 void Left_Soft_I2C_SDA_Output() {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = GPIO_PIN_9;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-pull output mode
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//	GPIO_InitTypeDef GPIO_InitStruct = {0};
+//	GPIO_InitStruct.Pin = GPIO_PIN_9;
+//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-pull output mode
+//	GPIO_InitStruct.Pull = GPIO_PULLUP;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+	GPIOB->MODER |= (0b01 << (LEFT_SDA_PIN * 2));  // Set bits 19 and 18 to 01 for output mode
 }
 
 //------------------------------------------------------------------------------
 // Low level read to speed up
 //------------------------------------------------------------------------------
 uint8_t Left_Soft_I2C_Read_SDA() {
-//	return (LEFT_I2C_PORT->IDR & (1 << LEFT_SDA_PIN_POS)) ? 1 : 0;
-	return HAL_GPIO_ReadPin(SDA_Distance_J18_GPIO_Port, SDA_Distance_J18_Pin);
-
-	return 0;
+//	return HAL_GPIO_ReadPin(SDA_Distance_J18_GPIO_Port, SDA_Distance_J18_Pin);
+	return (LEFT_I2C_PORT->IDR & (1 << LEFT_SDA_PIN)) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------
