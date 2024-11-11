@@ -142,8 +142,20 @@ void Error_Handler(void);
 #define BaseGreen_GPIO_Port GPIOG
 #define BaseBlue_Pin GPIO_PIN_15
 #define BaseBlue_GPIO_Port GPIOG
+#define SCL_Distance_J18_Pin GPIO_PIN_8
+#define SCL_Distance_J18_GPIO_Port GPIOB
+#define SDA_Distance_J18_Pin GPIO_PIN_9
+#define SDA_Distance_J18_GPIO_Port GPIOB
 #define LeftArmUp_Pin GPIO_PIN_1
 #define LeftArmUp_GPIO_Port GPIOE
+#define EN1_Distance_J18_Pin GPIO_PIN_4
+#define EN1_Distance_J18_GPIO_Port GPIOI
+#define EN2_Distance_J18_Pin GPIO_PIN_5
+#define EN2_Distance_J18_GPIO_Port GPIOI
+#define EN3_Distance_J18_Pin GPIO_PIN_6
+#define EN3_Distance_J18_GPIO_Port GPIOI
+#define EN4_Distance_J18_Pin GPIO_PIN_7
+#define EN4_Distance_J18_GPIO_Port GPIOI
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

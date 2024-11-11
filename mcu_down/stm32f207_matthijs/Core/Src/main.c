@@ -105,8 +105,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
-	LeftArm_Home();
-	RightArm_Home();
+//	LeftArm_Home();
+//	RightArm_Home();
 }
 
 void UpdateSelfTest()
@@ -537,6 +537,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
@@ -559,6 +560,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SCL_Distance_J18_GPIO_Port, SCL_Distance_J18_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOI, EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin RightArmBrake_Pin LeftArmUp_Pin */
   GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin;
@@ -649,6 +656,26 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SCL_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = SCL_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(SCL_Distance_J18_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDA_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = SDA_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SDA_Distance_J18_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN1_Distance_J18_Pin EN2_Distance_J18_Pin EN3_Distance_J18_Pin EN4_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
 }
 

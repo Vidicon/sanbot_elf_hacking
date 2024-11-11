@@ -298,17 +298,11 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_DISTANCESENSORS, RESPONSE_TRUE);
 
-	Buffer[3] = (DistanceData->Distance[0] >> 8);
-	Buffer[4] = (DistanceData->Distance[0] & 0xff);
-
-	Buffer[5] = (DistanceData->Distance[1] >> 8);
-	Buffer[6] = (DistanceData->Distance[1] & 0xff);
-
-	Buffer[7] = (DistanceData->Distance[2] >> 8);
-	Buffer[8] = (DistanceData->Distance[2] & 0xff);
-
-	Buffer[9] = (DistanceData->Distance[3] >> 8);
-	Buffer[10] = (DistanceData->Distance[3] & 0xff);
+	for (int i=0; i<8; i++)
+	{
+		Buffer[3 + i*2] = (DistanceData->Distance[i] >> 8);
+		Buffer[4 + i*2] = (DistanceData->Distance[i] & 0xff);
+	}
 
 	int payloadLen = 16;
 
