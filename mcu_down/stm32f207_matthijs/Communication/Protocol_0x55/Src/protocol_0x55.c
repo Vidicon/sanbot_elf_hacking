@@ -7,6 +7,9 @@
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
 
+// volatile to indicate this variable can be changed at any time.
+volatile uint8_t RxMutex;
+
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()
 {
@@ -21,8 +24,9 @@ struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetTxPointer()
 
 void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len)
 {
-	memcpy(&PROTOCOL_0X55_RxData.FIFO_Data[PROTOCOL_0X55_RxData.BytesInBuffer], (char*) Buf, *Len);
+	RxMutex = 1;
 
+	memcpy(&PROTOCOL_0X55_RxData.FIFO_Data[PROTOCOL_0X55_RxData.BytesInBuffer], (char*) Buf, *Len);
 	PROTOCOL_0X55_RxData.BytesInBuffer += *Len;
 
 	//--------------------------------------------------------------------------------------------------
@@ -38,12 +42,21 @@ void Protocol_0x55_Init()
 	PROTOCOL_0X55_TxData.BytesInBuffer = 0;
 
 	// Clear the buffers
-//	memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_RXSIZE);
-//	memset(&PROTOCOL_0X55_TxData.FIFO_Data[0], 0, FIFO_RXSIZE);
+	memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_SIZE);
+	memset(&PROTOCOL_0X55_TxData.FIFO_Data[0], 0, FIFO_SIZE);
 }
 
 uint8_t Protocol_0x55_CheckFifo()
 {
+	// Prevent both Protocol_0x55_NewData() and Protocol_0x55_CheckFifo()
+	// from modifying the same data at the same time.
+	//  This seems to lead to lost bytes.
+	if (RxMutex >= 1)
+	{
+		RxMutex = 0;
+		return 0;
+	}
+
 	// No data in buffer
 	if (PROTOCOL_0X55_RxData.BytesInBuffer == 0)
 	{
