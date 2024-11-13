@@ -47,7 +47,7 @@ void Left_Soft_I2C_SDA_Input() {
 //	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 //	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	GPIOB->MODER &= ~(0b11 << (LEFT_SDA_PIN * 2)); // Clear bits 19 and 18 to set PB9 to input mode
+	LEFT_I2C_PORT->MODER &= ~(0b11 << (LEFT_SDA_PIN * 2)); // Clear bits 19 and 18 to set PB9 to input mode
 }
 
 void Left_Soft_I2C_SDA_Output() {
@@ -58,7 +58,7 @@ void Left_Soft_I2C_SDA_Output() {
 //	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 //	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	GPIOB->MODER |= (0b01 << (LEFT_SDA_PIN * 2));  // Set bits 19 and 18 to 01 for output mode
+	LEFT_I2C_PORT->MODER |= (0b01 << (LEFT_SDA_PIN * 2));  // Set bits 19 and 18 to 01 for output mode
 }
 
 //------------------------------------------------------------------------------
