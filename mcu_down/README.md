@@ -179,6 +179,7 @@ Notes Matthijs:
 
 ### IMU Board 1x (J45)
 
+Most WEST pin is 1 (+3.3V)
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|
 |   3.3v  |   GND  |    SDA   |   SCL  |   INT_GYRO  | INT_MAG |
@@ -187,7 +188,7 @@ The external board contains:
  - STMicroelectronics LSM6DSL Gyroscope + accelerometer
  - STMicroelectronics LSM303AH Magnetometer + accelerometer
 
-Most EAST pin is 1 (+3.3V)
+
 
 | IC | Sensor | Write addr | Read addr | Used signals|
 |----------|----------|----------|----------|----------|

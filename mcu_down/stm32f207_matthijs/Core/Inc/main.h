@@ -122,6 +122,10 @@ void Error_Handler(void);
 #define MotionBack_GPIO_Port GPIOG
 #define MotionFront_Pin GPIO_PIN_8
 #define MotionFront_GPIO_Port GPIOG
+#define I2C_SDA_IMU_Pin GPIO_PIN_9
+#define I2C_SDA_IMU_GPIO_Port GPIOC
+#define I2C_SCL_IMU_Pin GPIO_PIN_8
+#define I2C_SCL_IMU_GPIO_Port GPIOA
 #define LeftArmRed_Pin GPIO_PIN_13
 #define LeftArmRed_GPIO_Port GPIOH
 #define LeftArmGreen_Pin GPIO_PIN_14
