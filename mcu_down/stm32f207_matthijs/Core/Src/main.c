@@ -105,8 +105,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
-//	LeftArm_Home();
-//	RightArm_Home();
+	LeftArm_Home();
+	RightArm_Home();
 }
 
 void UpdateSelfTest()
