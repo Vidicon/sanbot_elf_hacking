@@ -593,7 +593,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : SDA_Distance_J26_Pin */
   GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : EN1_Distance_J26_Pin EN2_Distance_J26_Pin */
@@ -667,7 +667,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : SDA_Distance_J18_Pin */
   GPIO_InitStruct.Pin = SDA_Distance_J18_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SDA_Distance_J18_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : EN1_Distance_J18_Pin EN2_Distance_J18_Pin EN3_Distance_J18_Pin EN4_Distance_J18_Pin */

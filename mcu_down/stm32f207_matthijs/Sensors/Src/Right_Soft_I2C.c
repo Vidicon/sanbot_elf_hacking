@@ -6,16 +6,20 @@
 //------------------------------------------------------------------------------
 // Define the GPIO pins used for I2C
 //------------------------------------------------------------------------------
-#define RIGHT_SCL_PIN    SCL_Distance_J26_Pin
-#define RIGHT_SDA_PIN    SDA_Distance_J26_Pin
+//#define RIGHT_SCL_PIN    SCL_Distance_J26_Pin
+//#define RIGHT_SDA_PIN    SDA_Distance_J26_Pin
+//
+
+#define RIGHT_SCL_PIN    0
+#define RIGHT_SDA_PIN    1
 #define RIGHT_I2C_PORT   GPIOC
 
-//------------------------------------------------------------------------------
-// Do some pre-calculations to speed up the I2C cycle.
-//------------------------------------------------------------------------------
-#define RIGHT_SDA_PIN_POS  RIGHT_SDA_PIN >> 1		// Calculate pin position
-#define RIGHT_SDA_PIN_POS_SHIFT_INPUT  (0x03 << (2 * RIGHT_SDA_PIN_POS))
-#define RIGHT_SDA_PIN_POS_SHIFT_OUTPUT (0x01 << (2 * RIGHT_SDA_PIN_POS))
+////------------------------------------------------------------------------------
+//// Do some pre-calculations to speed up the I2C cycle.
+////------------------------------------------------------------------------------
+//#define RIGHT_SDA_PIN_POS  RIGHT_SDA_PIN >> 1		// Calculate pin position
+//#define RIGHT_SDA_PIN_POS_SHIFT_INPUT  (0x03 << (2 * RIGHT_SDA_PIN_POS))
+//#define RIGHT_SDA_PIN_POS_SHIFT_OUTPUT (0x01 << (2 * RIGHT_SDA_PIN_POS))
 
 #define Right_Soft_I2C_DELAY()   Right_Delay_us(1)
 
@@ -23,29 +27,30 @@
 // Fast GPIO macros using BSRR register
 // Is much faster than using the HAL libraries
 //------------------------------------------------------------------------------
-#define Right_Soft_I2C_SCL_High()  (RIGHT_I2C_PORT->BSRR = RIGHT_SCL_PIN)
-#define Right_Soft_I2C_SCL_Low()   (RIGHT_I2C_PORT->BSRR = (RIGHT_SCL_PIN << 16))
-#define Right_Soft_I2C_SDA_High()  (RIGHT_I2C_PORT->BSRR = RIGHT_SDA_PIN)
-#define Right_Soft_I2C_SDA_Low()   (RIGHT_I2C_PORT->BSRR = (RIGHT_SDA_PIN << 16))
+#define Right_Soft_I2C_SCL_High()  (RIGHT_I2C_PORT->BSRR = (1 << RIGHT_SCL_PIN))
+#define Right_Soft_I2C_SCL_Low()   (RIGHT_I2C_PORT->BSRR = ((1 << RIGHT_SCL_PIN) << 16))
+
+#define Right_Soft_I2C_SDA_High()  (RIGHT_I2C_PORT->BSRR = (1 << RIGHT_SDA_PIN))
+#define Right_Soft_I2C_SDA_Low()   (RIGHT_I2C_PORT->BSRR = ((1 << RIGHT_SDA_PIN) << 16))
 
 //------------------------------------------------------------------------------
 // SDA Input and Output Mode Setup
 // Precalculated values to prevent costly shift operation every time
 //------------------------------------------------------------------------------
 void Right_Soft_I2C_SDA_Input() {
-	RIGHT_I2C_PORT->MODER &= ~(RIGHT_SDA_PIN_POS_SHIFT_INPUT);  // Set to input mode
+	RIGHT_I2C_PORT->MODER &= ~(0b11 << (RIGHT_SDA_PIN * 2)); // Clear bits 19 and 18 to set PB9 to input mode
 }
 
 void Right_Soft_I2C_SDA_Output() {
-	RIGHT_I2C_PORT->MODER |= (RIGHT_SDA_PIN_POS_SHIFT_OUTPUT);  // Set to output mode
+	RIGHT_I2C_PORT->MODER |= (0b01 << (RIGHT_SDA_PIN * 2));  // Set bits 19 and 18 to 01 for output mode
 }
 
 //------------------------------------------------------------------------------
 // Low level read to speed up
 //------------------------------------------------------------------------------
 uint8_t Right_Soft_I2C_Read_SDA() {
-	return (RIGHT_I2C_PORT->IDR & (1 << RIGHT_SDA_PIN_POS)) ? 1 : 0;
-//	return HAL_GPIO_ReadPin(SDA_Distance_J26_GPIO_Port, SDA_Distance_J26_Pin);
+	//	return HAL_GPIO_ReadPin(SDA_Distance_J26_GPIO_Port, SDA_Distance_J26_Pin);
+	return (RIGHT_I2C_PORT->IDR & (1 << RIGHT_SDA_PIN)) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------

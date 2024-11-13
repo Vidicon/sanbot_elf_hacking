@@ -6,22 +6,9 @@
 //------------------------------------------------------------------------------
 // Define the GPIO pins used for I2C
 //------------------------------------------------------------------------------
-//#define LEFT_SCL_PIN    SCL_Distance_J18_Pin
-//#define LEFT_SDA_PIN    SDA_Distance_J18_Pin
-//
-//#define LEFT_SCL_PIN    1 << 8		// 0x0100
-//#define LEFT_SDA_PIN    1 << 9		// 0x0200
-
 #define LEFT_SCL_PIN    8		// 0x0100
 #define LEFT_SDA_PIN    9		// 0x0200
 #define LEFT_I2C_PORT   GPIOB
-
-//------------------------------------------------------------------------------
-// Do some pre-calculations to speed up the I2C cycle.
-//------------------------------------------------------------------------------
-//#define LEFT_SDA_PIN_POS  LEFT_SDA_PIN
-//#define LEFT_SDA_PIN_POS_SHIFT_INPUT  (0x0003 << (2 * LEFT_SDA_PIN_POS))
-//#define LEFT_SDA_PIN_POS_SHIFT_OUTPUT (0x0001 << (2 * LEFT_SDA_PIN_POS))
 
 #define Left_Soft_I2C_DELAY()   Left_Delay_us(1)
 
@@ -47,7 +34,7 @@ void Left_Soft_I2C_SDA_Input() {
 //	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 //	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	LEFT_I2C_PORT->MODER &= ~(0b11 << (LEFT_SDA_PIN * 2)); // Clear bits 19 and 18 to set PB9 to input mode
+	LEFT_I2C_PORT->MODER &= ~(0b11 << (LEFT_SDA_PIN * 2));
 }
 
 void Left_Soft_I2C_SDA_Output() {
@@ -58,7 +45,7 @@ void Left_Soft_I2C_SDA_Output() {
 //	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 //	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	LEFT_I2C_PORT->MODER |= (0b01 << (LEFT_SDA_PIN * 2));  // Set bits 19 and 18 to 01 for output mode
+	LEFT_I2C_PORT->MODER |= (0b01 << (LEFT_SDA_PIN * 2));
 }
 
 //------------------------------------------------------------------------------
