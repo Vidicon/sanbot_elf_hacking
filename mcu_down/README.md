@@ -129,13 +129,13 @@ Notes Matthijs:
 * IO pins are correct.
 
 ---
-
+Connector for LEFT sensors has 1 pin less than RIGHT connector has.
 ### Distance sensor 4x (J18)(Left)
 
-|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
-|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |   NC  |
-| IO Pin |   - |  PB8   |-     |  PB9   | -   | PI4  |  PI5   | PI6 |  PI7   | -    | -    | -    |  -   |     -|
+|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |
+| IO Pin |   - |  PB8   |-     |  PB9   | -   | PI4  |  PI5   | PI6 |  PI7   | -    | -    | -    |  -   |
 
 ### Distance sensor 4x (J26)(Right)
 
