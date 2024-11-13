@@ -7,6 +7,9 @@
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
 
+// volatile to indicate this variable can be changed at any time.
+volatile uint8_t RxMutex;
+
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()
 {
@@ -19,18 +22,59 @@ struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetTxPointer()
 	return (&PROTOCOL_0X55_TxData);
 }
 
+void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len)
+{
+	RxMutex = 1;
+
+	memcpy(&PROTOCOL_0X55_RxData.FIFO_Data[PROTOCOL_0X55_RxData.BytesInBuffer], (char*) Buf, *Len);
+	PROTOCOL_0X55_RxData.BytesInBuffer += *Len;
+
+	//--------------------------------------------------------------------------------------------------
+	// **IF** the lost bytes bug returns, then the new data from the USB device, should be stored in
+	// a temp buffer and only be copied inside the Protocol_0x55_CheckFifo() function.
+	// The HAL_DELAY(1) in the main program loop seems to do the trick anyway.
+	//--------------------------------------------------------------------------------------------------
+}
+
 void Protocol_0x55_Init()
 {
 	PROTOCOL_0X55_RxData.BytesInBuffer = 0;
 	PROTOCOL_0X55_TxData.BytesInBuffer = 0;
+
+	// Clear the buffers
+	memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_SIZE);
+	memset(&PROTOCOL_0X55_TxData.FIFO_Data[0], 0, FIFO_SIZE);
 }
 
 uint8_t Protocol_0x55_CheckFifo()
 {
+	// Prevent both Protocol_0x55_NewData() and Protocol_0x55_CheckFifo()
+	// from modifying the same data at the same time.
+	//  This seems to lead to lost bytes.
+	if (RxMutex >= 1)
+	{
+		RxMutex = 0;
+		return 0;
+	}
+
 	// No data in buffer
 	if (PROTOCOL_0X55_RxData.BytesInBuffer == 0)
 	{
 		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
+		PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
+		return 0;
+	}
+
+	//=================================================================================================
+	// When the USB connects the 1st time, there seems to be a bug which makes the last TX message appear (partly) in the RX queue
+	// Always with the 0xd5 start byte. So easy to detect as there is no other data in the RX queue.
+	//=================================================================================================
+	if (PROTOCOL_0X55_RxData.FIFO_Data[0] == (0x55 | RESP_BIT))
+	{
+		PROTOCOL_0X55_RxData.TotalMsgSize = 0;
+		PROTOCOL_0X55_RxData.FIFO_Data[0] = 0;
+		memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_SIZE);
+
 		return 0;
 	}
 
@@ -39,10 +83,10 @@ uint8_t Protocol_0x55_CheckFifo()
 	if (PROTOCOL_0X55_RxData.FIFO_Data[0] != 0x55)
 	{
 		// Shift whole buffer 1 byte.
-		memmove(&PROTOCOL_0X55_RxData.FIFO_Data[0], &PROTOCOL_0X55_RxData.FIFO_Data[1], FIFO_RXSIZE-1);
+		memmove(&PROTOCOL_0X55_RxData.FIFO_Data[0], &PROTOCOL_0X55_RxData.FIFO_Data[1], FIFO_SIZE-1);
 
 		// Clear last byte
-		PROTOCOL_0X55_RxData.FIFO_Data[FIFO_RXSIZE-1] = 0;
+		PROTOCOL_0X55_RxData.FIFO_Data[FIFO_SIZE-1] = 0;
 
 		// Update. 1 bytes less in the buffer
 		PROTOCOL_0X55_RxData.BytesInBuffer -= 1;
@@ -51,6 +95,7 @@ uint8_t Protocol_0x55_CheckFifo()
 		return 0;
 	}
 
+	// When we are here, the current start byte = 0x55
 	// Data length according the received message
 	uint8_t datalen = PROTOCOL_0X55_RxData.FIFO_Data[2];
 
@@ -66,7 +111,7 @@ uint8_t Protocol_0x55_CheckFifo()
 
 	if ((Result & 0xff) == PROTOCOL_0X55_RxData.FIFO_Data[datalen+3])
 	{
-		PROTOCOL_0X55_RxData.TotalMsgSize = 3+datalen+2;
+		PROTOCOL_0X55_RxData.TotalMsgSize = 3 + datalen + 2;
 
 		return 1;
 	}
@@ -90,15 +135,13 @@ void Protocol_0x55_MarkProcessed()
 	int MsgSize = PROTOCOL_0X55_RxData.TotalMsgSize;
 
 	// Shift whole buffer
-	memmove(&PROTOCOL_0X55_RxData.FIFO_Data[0], &PROTOCOL_0X55_RxData.FIFO_Data[MsgSize], FIFO_RXSIZE - MsgSize);
+	memmove(&PROTOCOL_0X55_RxData.FIFO_Data[0], &PROTOCOL_0X55_RxData.FIFO_Data[MsgSize], FIFO_SIZE - MsgSize);
 
 	// Clear last byte
-	PROTOCOL_0X55_RxData.FIFO_Data[FIFO_RXSIZE-1] = 0;
+	PROTOCOL_0X55_RxData.FIFO_Data[FIFO_SIZE-1] = 0;
 
 	// Update. 1 bytes less in the buffer
 	PROTOCOL_0X55_RxData.BytesInBuffer -= MsgSize;
-
-
 }
 
 int Protocol_0x55_GetCommand()
@@ -134,9 +177,10 @@ void Protocol_0x55_SendVersion(char *Buffer)
 
 void Protocol_0x55_PrepareNewMessage(char *Buffer, char Command, char Response)
 {
-	memset((uint8_t*)Buffer, 0, sizeof(Buffer));
+	memset((uint8_t*)Buffer, 0, FIFO_SIZE);
 
-	Buffer[0] = 0x55;
+	// Fix for nasty bug
+	Buffer[0] = 0x55 | 0x80;
 	Buffer[1] = (Command & 0x7f);
 
 	if (Response == 1) {Buffer[1] = Buffer[1] | 0x80;}		// Set high bit
@@ -183,7 +227,8 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 
 void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+	uint8_t Result;
+	Result = CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
 }
 
 signed char Protocol_0x55_GetData(int Index)
@@ -243,4 +288,27 @@ void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type 
 	Protocol_0x55_AddCRC(Buffer, payloadLen);
 	Protocol_0x55_Send(Buffer, payloadLen);
 }
+
+void SendDistanceSensors(struct Distance_Sensor_Type *DistanceData)
+{
+	Protocol_0x55_SendDistanceEvent((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], DistanceData);
+}
+
+void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *DistanceData)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_DISTANCESENSORS, RESPONSE_TRUE);
+
+	for (int i=0; i<8; i++)
+	{
+		Buffer[3 + i*2] = (DistanceData->Distance[i] >> 8);
+		Buffer[4 + i*2] = (DistanceData->Distance[i] & 0xff);
+	}
+
+	int payloadLen = 16;
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}
+
 

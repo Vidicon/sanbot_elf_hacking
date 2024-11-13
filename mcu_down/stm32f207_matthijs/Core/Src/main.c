@@ -23,13 +23,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usbd_cdc_if.h"
 #include "protocol_0x55.h"
 #include "RGBLeds.h"
 #include "RobotGlobals.h"
 #include "Arms.h"
 #include "Base.h"
 #include "MotionSensors.h"
+#include "DistanceSensors.h"
 
 /* USER CODE END Includes */
 
@@ -60,8 +61,9 @@ DMA_HandleTypeDef hdma_usart6_rx;
 int Time20Hz = 0;
 int Time16Hz = 0;
 int Selftest = False;
-int temp = 0;
-
+int TempCS = 0;
+int Distance = 0;
+char TextBuffer[100];
 
 /* USER CODE END PV */
 
@@ -96,6 +98,7 @@ void System_Initialize()
 	Base_Init(&htim9, &htim11, &htim12);
 
 	MotionSensors_Init();
+	DistanceSensors_Init();
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
@@ -108,32 +111,13 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 
 void UpdateSelfTest()
 {
-//	if (Selftest)
-//	{
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { LeftArm_NewSetpoint(300);}
-//	  if (Time20Hz == 4 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//	  if (Time20Hz == 8 * UPDATE_20HZ) { LeftArm_NewSetpoint(100);}
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { LeftArm_NewSetpoint(0);  }
-//
-//	  if (Time20Hz == 1 * UPDATE_20HZ) { RightArm_NewSetpoint(-100); }
-//	  if (Time20Hz == 3 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//	  if (Time20Hz == 7 * UPDATE_20HZ) { RightArm_NewSetpoint(-300); }
-//	  if (Time20Hz == 10 * UPDATE_20HZ) { RightArm_NewSetpoint(0); }
-//
-//	  if (Time20Hz == 12 * UPDATE_20HZ)
-//	  {
-//		  RGBLeds_SetColorOff(LeftArm);
-//		  RGBLeds_SetColorOff(RightArm);
-//	  }
-//	}
-
-//	int Vel = 30;
-//	int Acc = 1;
-//
-//	if ((Time20Hz % 300) == 0) 		{ Base_VelocitySetpoint(0, 0, Vel);}
-//	if ((Time20Hz % 300) == 60) 	{ Base_VelocitySetpoint(0, 0, 0);}
-//	if ((Time20Hz % 300) == 120) 	{ Base_VelocitySetpoint(0, 0, -Vel);}
-//	if ((Time20Hz % 300) == 180) 	{ Base_VelocitySetpoint(0, 0, 0);}
+	if (Selftest)
+	{
+		if (Time20Hz == 10 * UPDATE_20HZ)
+		{
+			Selftest = False;
+		}
+	}
 }
 
 void Check_USB_Communication()
@@ -143,7 +127,7 @@ void Check_USB_Communication()
 		int command = Protocol_0x55_GetCommand();
 
 		if (command == CMD_VERSION) 	{ SendVersion();}
-		if (command == CMD_LA_COLOR) 	{ RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_LA_COLOR)	{ RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
@@ -164,6 +148,14 @@ void Check_USB_Communication()
 
 		Protocol_0x55_MarkProcessed();
 	}
+}
+
+void TracingUpdate()
+{
+	memset(TextBuffer, 0x00, 100);
+
+	sprintf(TextBuffer, "%ld\n",(long)(Distance));
+	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
 }
 
 /* USER CODE END 0 */
@@ -230,21 +222,20 @@ int main(void)
 		  Base_Update20Hz(Encoders_GetPointer());
 		  Arms_Update20Hz(Encoders_GetPointer());
 
-//		  TracingUpdate();
+		  DistanceSensors_Update20Hz();
 	  }
 
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
-		  RGBLeds_Update10Hz();
 
+		  RGBLeds_Update10Hz();
 		  MotionSensors_Update10Hz();
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
-
 	  }
 
 	  if (Update_2Hz)
@@ -254,7 +245,14 @@ int main(void)
 		  SendEncoders(Encoders_GetPointer());
 	  }
 
+	  //--------------------------------------------------------
+	  // Limit the check for new data frequency
+	  // When run at full speed (no delay), the USB interrupt and the check will lead
+	  // to lost bytes. Dont know why and dont know how to solve. But delay works fine.
+	  //--------------------------------------------------------
 	  Check_USB_Communication();
+	  HAL_Delay(1);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -534,11 +532,12 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin, GPIO_PIN_RESET);
@@ -548,6 +547,12 @@ static void MX_GPIO_Init(void)
                           |RightBrake_Pin|RightDir_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, SCL_Distance_J26_Pin|EN1_Distance_J26_Pin|EN2_Distance_J26_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, EN3_Distance_J26_Pin|EN4_Distance_J26_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RightArmRed_Pin|RightArmGreen_Pin|RightArmBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -555,6 +560,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SCL_Distance_J18_GPIO_Port, SCL_Distance_J18_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOI, EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin RightArmBrake_Pin LeftArmUp_Pin */
   GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin;
@@ -571,6 +582,33 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SCL_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = SCL_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(SCL_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDA_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = SDA_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN1_Distance_J26_Pin EN2_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J26_Pin|EN2_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN3_Distance_J26_Pin EN4_Distance_J26_Pin */
+  GPIO_InitStruct.Pin = EN3_Distance_J26_Pin|EN4_Distance_J26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PF13_Pin PF14_Pin PF15_Pin */
   GPIO_InitStruct.Pin = PF13_Pin|PF14_Pin|PF15_Pin;
@@ -618,6 +656,26 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SCL_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = SCL_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(SCL_Distance_J18_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDA_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = SDA_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(SDA_Distance_J18_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EN1_Distance_J18_Pin EN2_Distance_J18_Pin EN3_Distance_J18_Pin EN4_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
 }
 
