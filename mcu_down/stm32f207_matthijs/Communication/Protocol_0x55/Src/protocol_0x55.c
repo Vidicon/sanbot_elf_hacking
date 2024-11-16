@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "usbd_cdc_if.h"
+#include "DistanceSensors.h"
+#include "Compass.h"
 
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
@@ -269,6 +271,9 @@ void Protocol_0x55_SendEncoders(char *Buffer, struct Encoders_Data_Type *Encoder
 	Protocol_0x55_Send(Buffer, payloadLen);
 }
 
+//----------------------------------------------------------------
+// Motion sensors
+//----------------------------------------------------------------
 void SendMotionSensors(struct MotionSensors_Data_Type *MotionSensors_State)
 {
 	Protocol_0x55_SendMotionEvent((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], MotionSensors_State);
@@ -289,6 +294,9 @@ void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type 
 	Protocol_0x55_Send(Buffer, payloadLen);
 }
 
+//----------------------------------------------------------------
+// Distance sensors
+//----------------------------------------------------------------
 void SendDistanceSensors(struct Distance_Sensor_Type *DistanceData)
 {
 	Protocol_0x55_SendDistanceEvent((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], DistanceData);
@@ -311,4 +319,30 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 	Protocol_0x55_Send(Buffer, payloadLen);
 }
 
+//----------------------------------------------------------------
+// Raw compass data
+//----------------------------------------------------------------
+void SendCompass(struct Compass_Sensor_Type *CompassData)
+{
+	Protocol_0x55_SendCompass((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], CompassData);
+}
 
+void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *CompassData)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_COMPASS, RESPONSE_TRUE);
+
+	int payloadLen = 6;
+
+	Buffer[3 + 0] = (CompassData->Raw[1]);
+	Buffer[3 + 1] = (CompassData->Raw[0]);
+
+	Buffer[3 + 2] = (CompassData->Raw[3]);
+	Buffer[3 + 3] = (CompassData->Raw[2]);
+
+	Buffer[3 + 4] = (CompassData->Raw[5]);
+	Buffer[3 + 5] = (CompassData->Raw[4]);
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}

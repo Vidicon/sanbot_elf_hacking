@@ -5,6 +5,7 @@
 #include "Encoders.h"
 #include "MotionSensors.h"
 #include "DistanceSensors.h"
+#include "Compass.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -19,8 +20,8 @@
 
 #define CMD_GET_ENCODERS		0x20
 #define CMD_GET_MOTIONSENSORS  	0x21
-
 #define CMD_GET_DISTANCESENSORS 0x22
+#define CMD_GET_COMPASS 	    0x23
 
 
 #define CMD_LA_MOVE		 		0x30
@@ -83,5 +84,10 @@ void Protocol_0x55_SendMotionEvent(char *Buffer, struct MotionSensors_Data_Type 
 void SendDistanceSensors(struct Distance_Sensor_Type *DistanceData);
 
 void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *DistanceData);
+
+
+void SendCompass(struct Compass_Sensor_Type *CompassData);
+
+void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *CompassData);
 
 #endif

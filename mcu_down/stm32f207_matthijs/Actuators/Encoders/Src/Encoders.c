@@ -26,7 +26,6 @@ void Encoders_Init(UART_HandleTypeDef *huart)
 	memset(&Encoder_Raw_Buffer[0], 0, ENCODER_RX_BUFFER_SIZE);
 	HAL_UART_Receive_DMA(huart, Encoder_Raw_Buffer, ENCODER_RX_BUFFER_SIZE);
 
-
 	EncoderData.Encoder[0] = 0;
 	EncoderData.Encoder[1] = 0;
 	EncoderData.Encoder[2] = 0;
