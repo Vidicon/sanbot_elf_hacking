@@ -8,6 +8,7 @@ import pygame
 from ModManager import ModManager
 import numpy as np
 import platform
+import math
 
 RESP_BIT = 0x80
 
@@ -51,7 +52,6 @@ axis5 = 0
 button4_toggle = 0
 button5_toggle = 0
 
-
 button_version = []
 
 button_debug1 = []
@@ -69,6 +69,11 @@ distance6_Front = []
 distance7_Front = []
 distance8_Front = []
 
+compass_button = []
+
+canvas = []
+arrow_angle = 0
+
 
 def SetDistanceButtonBGColor(button, distance):
     button.config(text=str(distance))
@@ -81,12 +86,29 @@ def SetDistanceButtonBGColor(button, distance):
         button.config(bg="lime")
 
 
+# Function to calculate the angle
+def calculate_angle(x, y):
+    # atan2(y, x) returns the angle in radians
+    angle_radians = math.atan2(y, x)
+    # Convert radians to degrees (optional)
+    angle_degrees = math.degrees(angle_radians)
+
+    #  convert to compass angles
+
+    compass_degree = -1 * angle_degrees
+
+    if compass_degree < 0:
+        compass_degree += 360
+
+    return compass_degree, angle_degrees
+
+
 # ===============================================================================
 # Define the receive callback function
 # ===============================================================================
 def my_receive_callback(data, stream_area):
-    hex_values = " ".join([format(x, "02X") for x in data])
-    print("< " + hex_values)
+    # hex_values = " ".join([format(x, "02X") for x in data])
+    # print("< " + hex_values)
 
     # Decode
     response = data[1]
@@ -101,10 +123,10 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-        # stream_area.insert(
-        #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
-        # )
-        # stream_area.yview_moveto(1)  # Scrolling to the bottom
+        stream_area.insert(
+            tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
+        )
+        stream_area.yview_moveto(1)  # Scrolling to the bottom
 
     if response == (CMD_GET_COMPASS | RESP_BIT):
         new_byte_array = data[3:-2]
@@ -117,6 +139,13 @@ def my_receive_callback(data, stream_area):
             )
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
+            compass_angle, angle_degrees = calculate_angle(
+                int16_array_5[0], int16_array_5[1]
+            )
+
+            draw_arrow(angle_degrees + 90)
+
+            compass_button.config(text=f"{compass_angle:.0f} Deg")
         except:
             print("Compass bytes error")
 
@@ -147,8 +176,8 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         uint8_array = np.frombuffer(new_byte_array, dtype=">u1")
 
-        # stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
-        # stream_area.yview_moveto(1)  # Scrolling to the bottom
+        stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
+        stream_area.yview_moveto(1)  # Scrolling to the bottom
 
         # --------------------------------------------------------------------------
         combined1_int = int.from_bytes(
@@ -275,10 +304,6 @@ def show_gui(mod_manager):
     frame = tk.Frame(root)
     frame.pack(padx=20, pady=20)  # Adding padding for demonstration
 
-    # default_font = font.nametofont("TkDefaultFont")  # Get the default font
-    # default_font.configure(family="courier", size=10)  # Change family and size
-    # font.nametofont("TkHeadingFont").configure(family="Ubuntu", size=10)  # Change heading font
-
     # --------------------------------------------------------------------------------------
     # Left arm
     # --------------------------------------------------------------------------------------
@@ -292,7 +317,7 @@ def show_gui(mod_manager):
             [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
         ): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug1.grid(row=0, column=7, sticky="w")
+    button_debug1.grid(row=0, column=8, sticky="w")
 
     global button_debug2
     button_debug2 = tk.Button(
@@ -304,7 +329,7 @@ def show_gui(mod_manager):
             [CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]
         ): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug2.grid(row=1, column=7, sticky="w")
+    button_debug2.grid(row=1, column=8, sticky="w")
 
     button_LA_White = tk.Button(
         frame,
@@ -656,11 +681,23 @@ def show_gui(mod_manager):
     )
     button_clear.grid(row=11, column=0, columnspan=1, sticky="w")
 
-    # #--------------------------------------------------------------------------------------
-    # # event data area
-    # #--------------------------------------------------------------------------------------
-    # text_area = scrolledtext.ScrolledText(frame, width = 200, height=20, wrap="word")
-    # text_area.grid(row=9, column=0, columnspan=10, sticky="w")
+    # --------------------------------------------------------------------------------------
+    # Canvas for the rotating arrow
+    # --------------------------------------------------------------------------------------
+    canvas_width = 100
+    canvas_height = 100
+    canvas = tk.Canvas(
+        frame, width=canvas_width, height=canvas_height, bg="white"
+    )
+    canvas.grid(
+        row=0, rowspan=3, column=7, sticky="w"
+    )  # Place the canvas in the grid
+
+    arrow_center = (canvas_width // 2, canvas_height // 2)
+
+    global compass_button
+    compass_button = tk.Button(frame, height=1, width=10, text="inf")
+    compass_button.grid(row=3, column=7, sticky="w")
 
     # --------------------------------------------------------------------------------------
     # streaming data area
@@ -670,7 +707,38 @@ def show_gui(mod_manager):
     )
     stream_area.grid(row=10, column=0, columnspan=10, sticky="w")
 
-    return root, stream_area
+    return root, stream_area, canvas
+
+
+# Draw the rotating arrow
+def draw_arrow(angle):
+    global canvas
+
+    canvas.delete("arrow")
+
+    x, y = (50, 50)
+    radians = math.radians(angle)
+    x_end = x + 30 * math.cos(radians)
+    y_end = y - 30 * math.sin(
+        radians
+    )  # Negative because canvas y-coordinates increase downwards
+    canvas.create_line(
+        x,
+        y,
+        x_end,
+        y_end,
+        arrow=tk.LAST,
+        fill="blue",
+        width=2,
+        tags="arrow",
+    )
+
+
+# def rotate_arrow():
+#     global arrow_angle
+#     arrow_angle = (arrow_angle + 5) % 360
+#     draw_arrow(arrow_angle)
+#     root.after(50, rotate_arrow)
 
 
 # Function to handle pygame events
@@ -856,6 +924,7 @@ def main():
     global root
     # global text_area
     global stream_area
+    global canvas
 
     if "LINUX" in platform.system().upper():
         print("Linux detected!")
@@ -865,7 +934,7 @@ def main():
     else:
         mod_manager = ModManager(port="COM9", baudrate=115200)
 
-    root, stream_area = show_gui(mod_manager)
+    root, stream_area, canvas = show_gui(mod_manager)
 
     # Set the receive callback
     mod_manager.open_port()

@@ -231,6 +231,24 @@ Most likely configured during startup.
 * Maybe not need when using polling?
 * Maybe default values are good enough?
 
+|Registers| Value|
+|-----|----|
+|CFG_REG_A_M (60h)          | 0b00000000|
+|OFFSET_X_REG_L_M (45h)     | 0|
+|OFFSET_X_REG_H_M (46h)     | 0|
+|OFFSET_Y_REG_L_M (47h)     | 0|
+|OFFSET_Y_REG_H_M (48h)     | 0|
+|OFFSET_Z_REG_L_M (49h)     | 0|
+|OFFSET_Z_REG_H_M (4Ah)     | 0|
+
+The offset cancellation feature is controlled through the CFG_REG_B_M register (for the magnetometer) on the LSM303AH.
+Set the OFFSET_CANC bit to 1 in the CFG_REG_B_M register. This will enable automatic offset cancellation.
+To ensure continuous offset cancellation, set the SET_FREQ bit to 1 in the same CFG_REG_B_M register.
+
+|Registers| Value|
+|-----|----|
+|CFG_REG_B_M (61h)|           0b00000111|
+
 ---
 
 ### Battery + Charger (J46)
