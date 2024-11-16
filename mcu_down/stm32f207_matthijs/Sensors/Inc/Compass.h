@@ -15,6 +15,8 @@ struct Compass_Sensor_Type {
 	int16_t Z;
 };
 
+struct Compass_Sensor_Type *Compass_GetPointer();
+
 void Compass_Init(I2C_HandleTypeDef *hI2C);
 
 void Compass_Update();

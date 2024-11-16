@@ -7,12 +7,21 @@
 #include "stm32f2xx_hal.h"
 #include "Compass.h"
 #include <string.h>
+#include "protocol_0x55.h"
 
 struct Compass_Sensor_Type CompassData;
 
 I2C_HandleTypeDef *Compass_I2C;
 uint8_t Compass_Address = 0x3c;
 HAL_StatusTypeDef status;
+
+//----------------------------------------------------------------
+// Return pointer instead of copy
+//----------------------------------------------------------------
+struct Compass_Sensor_Type *Compass_GetPointer()
+{
+	return &CompassData;
+}
 
 //----------------------------------------------------------------
 // Return pointer instead of copy
@@ -86,5 +95,8 @@ void Compass_Update()
 
 
 	HAL_Delay(1);
+
+	SendCompass(Compass_GetPointer());
+
 }
 

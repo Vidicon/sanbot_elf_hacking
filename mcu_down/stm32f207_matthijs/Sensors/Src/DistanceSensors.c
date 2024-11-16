@@ -21,7 +21,6 @@ struct Distance_Sensor_Type *DistanceSensors_GetPointer()
 	return &DistanceData;
 }
 
-
 //------------------------------------------------------------------------------
 // Functions to call from outside this file
 //------------------------------------------------------------------------------
