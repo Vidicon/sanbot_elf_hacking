@@ -33,30 +33,28 @@ void Compass_Init(I2C_HandleTypeDef *hI2C)
 	__HAL_RCC_GPIOC_CLK_ENABLE();  // Assuming I2C3 is on GPIOC pins
 	__HAL_RCC_I2C3_CLK_ENABLE();
 
-	// FUNC_CTRL_A (3Fh)
-	// Module on
-	uint8_t cmd;
-	cmd = 0b00100000;
-
-	cmd = 0b00000000;  // ???
-//	status = HAL_I2C_Mem_Write(Compass_I2C, Compass_Address, 0x3f, I2C_MEMADD_SIZE_8BIT, &cmd, 1, HAL_MAX_DELAY);
-
-
+	//----------------------------------------------------------------------------
 	// CFG_REG_A_M (60h)
+	//----------------------------------------------------------------------------
 	cmd = 0b00000000;
 	status = HAL_I2C_Mem_Write(Compass_I2C, Compass_Address, 0x60, I2C_MEMADD_SIZE_8BIT, &cmd, 1, HAL_MAX_DELAY);
 
+	//----------------------------------------------------------------------------
 	// Hard iron offset
-	//	OFFSET_X_REG_L_M (45h) and OFFSET_X_REG_H_M (46h)
-
+	// OFFSET_X_REG_L_M (45h) and OFFSET_X_REG_H_M (46h)
+	//----------------------------------------------------------------------------
 	uint8_t zeros[6];
 	memset(zeros, 0, 6);
-
 	status = HAL_I2C_Mem_Write(Compass_I2C, Compass_Address, 0x45, I2C_MEMADD_SIZE_8BIT, &zeros[0], 6, HAL_MAX_DELAY);
 
-
-
-//	(Compass_I2C, 0x3C, 0x60, I2C_MEMADD_SIZE_8BIT, data1, 6, HAL_MAX_DELAY);
+	//----------------------------------------------------------------------------
+	//	The offset cancellation feature is controlled through the CFG_REG_B_M register (for the magnetometer) on the LSM303AH.
+	//	Set the OFFSET_CANC bit to 1 in the CFG_REG_B_M register. This will enable automatic offset cancellation.
+	//	To ensure continuous offset cancellation, set the SET_FREQ bit to 1 in the same CFG_REG_B_M register.
+	//  CFG_REG_B_M (61h)
+	//----------------------------------------------------------------------------
+	cmd = 0b00000111;
+	status = HAL_I2C_Mem_Write(Compass_I2C, Compass_Address, 0x61, I2C_MEMADD_SIZE_8BIT, &cmd, 1, HAL_MAX_DELAY);
 }
 
 
