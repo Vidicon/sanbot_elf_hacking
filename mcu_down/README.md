@@ -14,16 +14,77 @@
 
 ### Motors (J8 J9 J10 J14 J15)
 
-|      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 |
-|----------|----------|----------|----------|----------|----------|----------|----------|
-|                |   encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  |
-|  Motor Left    |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   |
-|  Motor Center  |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |
-|  Motor Right   |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   |
+|      | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | TIMER|
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+|             |         encoder_A  |   Enable  |   PWM  |   encoder_B  |   Dir  |   GND  |   12v  | |
+|  Motor Left       |  -  |   PF2  |   PB15  |  -  |  PF3   |  -   |  -   | | 
+|  Motor Center     |  -  |   PF0  |   PF7   |  -  |  PF1   |  -   |  -   |TIM11| 
+|  Motor Right      |  -  |   PF4  |   PB14  |  -  |  PF5   |  -   |  -   || 
+|  Motor Left Arm   |  -  |   PE2  |   PE5   |  -  |  PE1   |  -   |  -   |TIM9| 
+|  Motor Right Arm  |  -  |   PE4  |   PE6   |  -  |  PE3   |  -   |  -   |TIM9| 
 
- - PWM is at 10Khz 3.3v 50% duty cycle is 100% speed, 
- - Enable is active high 3.3v
- - DIR pull down to reverse motor direction 3.3v
+**Notes Matthijs:**
+ - IO pins are correct.
+ - Enable is active high 3.3v (= Brake disable)
+ - In the new firmware **Enable** is called **Brake** as the motor feels locked when this IO pin is **LOW**
+ - Left arm motor runs opposite direction of Right arm
+ 
+ **PWM generator for the motors**
+ - TIM12 is used for the **Left** and **Right** base motors
+
+- TIM12 - Channel 1 = right base
+- TIM12 - Channel 2 = left base
+ .
+ - TIM11 is used for the **Center** base motor
+- TIM11 - Channel 1 = center
+. 
+ - TIM9 is used to for the **Arm** motors.
+ - TIM9 - Channel 1 = left arm
+ - TIM9 - Channel 2 = right arm 
+ .
+ - Prescaler 15 (+1) = 16 --> 16 MHz / 16 = 1 MHz)
+ - Period = 100 count --> 10 kHz duty cycle (should be 99?)  
+- PWM 100% = 0 speed.
+- PWM 50% = 50% speed.
+- PWM 0% = 100% speed.
+- ALL motors have **internal speed controller**. The PWM is the setpoint.
+
+**Brakes**
+- All brakes work and pins are correct.
+
+---
+### Encoder counter
+- The "small" STM32F103 on the "down" board counts the pulses from the 5 encoders.
+- When an encoder changes, a message is send to the main STM32F2.
+- UART settings 115200, 8n1. Only TX from the 2nd IC. No TX from main STM32F2.
+- Max update rate = 16.6 (17) Hz.
+- Pulses counted since last message are send. Not the total pulse count.
+
+**Protocol:**
+- Message size = 15 bytes
+- Bytes 0, 1, 2, 3 are fixed (?) or not relevant [0xff 0x01 0x01 0x00]
+- Bytes 4, 6, 8, 10, 12 are the delta counts since last message
+- Bytes 5, 7, 9, 11, 13 have value 0x80 when the delta value is **negative**. 0x00 when **positive**. 
+- Byte 14 seems to be a CRC value. Not investigated which algoritm is used.
+---
+
+### Limit switches arms (J29 J32)
+
+|**LEFT**  | Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
+|----------|----------|----------|----------|----------|----------|
+|Color     | White    | Black    | Black    |  Black   | Black    |
+|Left      | Arm full up| 1.1V   |  Arm full back|  1.1 1V|  GND   |
+|IO Pins   | PG11      |     -    | PG10      |      -   | -        |
+
+| **RIGHT**| Pin 1    | Pin 2    | Pin 3    | Pin 4    | Pin 5    |
+|----------|----------|----------|----------|----------|----------|
+|Color     | White    | Black    | Black    |  Black   | Black    |
+|Right     | Arm full back| 1.1 V   | Arm full up|  1.1 V   |   GND   |
+|IO Pins   |  PG0     |     -    |  PG1     |      -   | -        |
+
+Notes Matthijs:
+* IO pins are correct.
+
 
 ---
 
@@ -36,6 +97,10 @@
 | Wing Left  |     |   PH13  |   PH14  |   PH15  |
 | Wing Right |     |   PD10  |   PD14  |   PD15  |
 | Bottom     |     |   PG12  |   PG13  |   PG15  |
+
+Notes Matthijs:
+* IO pins are correct.
+* Pull pins **DOWN** to turn LED **ON**
 
 ---
 
@@ -52,37 +117,54 @@ STM32F2 connections:
 
 ---
 
-### Pir Sensors (J35 J44)
+### PIR Sensors (J35 J44)
 
-| Pin 1 | Pin 2 | Pin 3 |
-|----------|----------|----------|
-|   signal  |   GND  |   5v  |
+|     | Pin 1 | Pin 2 | Pin 3 |
+|----------|----------|----------|----------|
+| Signals |   Motion |   GND  |   5v  |
+| Front sensor|   PG8 |   -  |   -  |
+| Back sensor|   PG7 |   -  |   -  |
+
+Notes Matthijs:
+* IO pins are correct.
 
 ---
+Connector for LEFT sensors has 1 pin less than RIGHT connector has.
+### Distance sensor 4x (J18)(Left)
 
-### Distence sensor 4x (J26)
-
-| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
+|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-|   3.3v  |   CLK  |   GND  |   Data  |   CS1  |   CS2  |   CS3  |   CS4  |   NC  |   NC  |   NC  |   NC  |   NC  |   NC  |
+| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |
+| IO Pin |   - |  PB8   |-     |  PB9   | -   | PI4  |  PI5   | PI6 |  PI7   | -    | -    | -    |  -   |
+
+### Distance sensor 4x (J26)(Right)
+
+|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |   NC  |
+| IO Pin |   - |  PC0   |-     | PC1    | -   |  PC2 |  PC3   | PA1 | PA2    | -    | -    | -    |  -   |     -|
+
+Notes Matthijs:
+* IO pins are correct.
+* Soft I2C created as fast as possible. But pin mode switching in slow.
 
 ---
 
-### Distence sensor 4x (7x) (J19)
+### Distance sensor 4x (7x) (J19)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 |   3.3v  |   SCL  |   GND  |   SDA  |   GND  |   EN1  |   EN2  |   EN3  |   EN4  |   EN5  |   EN6  |   EN7  |
 |     |   PD7  |     |   PD6  |     |   PD5  |   PD4  |   PD3  |   PD2  |   PD1  |   PD0  |   PC12  |
 
- - uses the sharp [GP2Y0E03](https://nl.mouser.com/ProductDetail/Sharp-Microelectronics/GP2Y0E03?qs=2FIyTMJ0hNk7Anrxo3D7Gw%3D%3D)
- - sensors are connected in parallel to the 3.3v, GND, SCL, and SDA and each sensor has a ENable line
+ - Uses the sharp [GP2Y0E03](https://nl.mouser.com/ProductDetail/Sharp-Microelectronics/GP2Y0E03?qs=2FIyTMJ0hNk7Anrxo3D7Gw%3D%3D)
+ - Sensors are connected in parallel to the 3.3v, GND, SCL, and SDA and each sensor has a ENable line
  - Enable line is set to high, after >500us the distance can be read over I2c
- - the sensor I2c is not connected to I2c peripheral in the stm32, a software implementation needs to be used. 
+ - The sensor I2c is not connected to I2c peripheral in the stm32, a software implementation needs to be used. 
 
 ---
 
-### Distence sensor 1x (J21 J24 J28)
+### Distance sensor 1x (J21 J24 J28)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|
@@ -97,6 +179,7 @@ STM32F2 connections:
 
 ### IMU Board 1x (J45)
 
+Most WEST pin is 1 (+3.3V)
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|
 |   3.3v  |   GND  |    SDA   |   SCL  |   INT_GYRO  | INT_MAG |
@@ -105,7 +188,7 @@ The external board contains:
  - STMicroelectronics LSM6DSL Gyroscope + accelerometer
  - STMicroelectronics LSM303AH Magnetometer + accelerometer
 
-Most EAST pin is 1 (+3.3V)
+
 
 | IC | Sensor | Write addr | Read addr | Used signals|
 |----------|----------|----------|----------|----------|
@@ -147,6 +230,24 @@ Interrupts are triggered when a certain threshold is exceeded.
 Most likely configured during startup. 
 * Maybe not need when using polling?
 * Maybe default values are good enough?
+
+|Registers| Value|
+|-----|----|
+|CFG_REG_A_M (60h)          | 0b00000000|
+|OFFSET_X_REG_L_M (45h)     | 0|
+|OFFSET_X_REG_H_M (46h)     | 0|
+|OFFSET_Y_REG_L_M (47h)     | 0|
+|OFFSET_Y_REG_H_M (48h)     | 0|
+|OFFSET_Z_REG_L_M (49h)     | 0|
+|OFFSET_Z_REG_H_M (4Ah)     | 0|
+
+The offset cancellation feature is controlled through the CFG_REG_B_M register (for the magnetometer) on the LSM303AH.
+Set the OFFSET_CANC bit to 1 in the CFG_REG_B_M register. This will enable automatic offset cancellation.
+To ensure continuous offset cancellation, set the SET_FREQ bit to 1 in the same CFG_REG_B_M register.
+
+|Registers| Value|
+|-----|----|
+|CFG_REG_B_M (61h)|           0b00000111|
 
 ---
 

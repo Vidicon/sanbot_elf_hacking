@@ -1,6 +1,0 @@
-RGBLeds.c:14:6:RGBLeds_Init	8	static
-RGBLeds.c:21:6:RGBLeds_SetColorOn	16	static
-RGBLeds.c:63:6:RGBLeds_SetColorOff	16	static
-RGBLeds.c:87:6:RGBLeds_BlinkColor	16	static
-RGBLeds.c:94:6:RGBLeds_Update10Hz	16	static
-RGBLeds.c:140:6:RGBLeds_SelfTest	16	static

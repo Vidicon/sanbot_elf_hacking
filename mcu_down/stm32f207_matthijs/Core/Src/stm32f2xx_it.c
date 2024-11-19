@@ -28,6 +28,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
+extern int Update_20Hz;
+extern int Update_16Hz;
 extern int Update_10Hz;
 extern int Update_5Hz;
 extern int Update_2Hz;
@@ -62,7 +64,9 @@ int TIM14_Counter = 0;
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+extern I2C_HandleTypeDef hi2c3;
 extern TIM_HandleTypeDef htim14;
+extern DMA_HandleTypeDef hdma_usart6_rx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -221,6 +225,11 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 		TIM14_Counter = 0;
 	}
 
+	if ((TIM14_Counter % 5) == 0)
+	{
+		Update_20Hz = 1;
+	}
+
 	if ((TIM14_Counter % 10) == 0)
 	{
 		Update_10Hz = 1;
@@ -236,11 +245,31 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 		Update_2Hz = 1;
 	}
 
+	if ((TIM14_Counter % 6) == 0)
+	{
+		Update_16Hz = 1;
+	}
+
+
   /* USER CODE END TIM8_TRG_COM_TIM14_IRQn 0 */
   HAL_TIM_IRQHandler(&htim14);
   /* USER CODE BEGIN TIM8_TRG_COM_TIM14_IRQn 1 */
 
   /* USER CODE END TIM8_TRG_COM_TIM14_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA2 Stream1 global interrupt.
+  */
+void DMA2_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart6_rx);
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 1 */
 }
 
 /**
@@ -255,6 +284,20 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
 
   /* USER CODE END OTG_FS_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C3 event interrupt.
+  */
+void I2C3_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C3_EV_IRQn 0 */
+
+  /* USER CODE END I2C3_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c3);
+  /* USER CODE BEGIN I2C3_EV_IRQn 1 */
+
+  /* USER CODE END I2C3_EV_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
