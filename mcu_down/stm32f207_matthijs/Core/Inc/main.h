@@ -43,6 +43,7 @@ int Update_16Hz;
 int Update_10Hz;
 int Update_5Hz;
 int Update_2Hz;
+int Update_1Hz;
 
 /* USER CODE END ET */
 

@@ -22,6 +22,7 @@ CMD_GET_ENCODERS = 0x20
 CMD_GET_MOTIONSENSORS = 0x21
 CMD_GET_DISTANCESENSORS = 0x22
 CMD_GET_COMPASS = 0x23
+CMD_GET_BATTERY = 0x24
 
 CMD_LA_MOVE = 0x30
 CMD_RA_MOVE = 0x31
@@ -70,6 +71,10 @@ distance7_Front = []
 distance8_Front = []
 
 compass_button = []
+
+button_battery_state = []
+button_battery_voltage = []
+button_battery_current = []
 
 canvas = []
 arrow_angle = 0
@@ -123,9 +128,9 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-        stream_area.insert(
-            tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
-        )
+        # stream_area.insert(
+        #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
+        # )
         stream_area.yview_moveto(1)  # Scrolling to the bottom
 
     if response == (CMD_GET_COMPASS | RESP_BIT):
@@ -134,9 +139,9 @@ def my_receive_callback(data, stream_area):
         try:
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-            stream_area.insert(
-                tk.END, "< Compass    : " + str(int16_array_5) + "\n"
-            )
+            # stream_area.insert(
+            #     tk.END, "< Compass    : " + str(int16_array_5) + "\n"
+            # )
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
             compass_angle, angle_degrees = calculate_angle(
@@ -155,9 +160,9 @@ def my_receive_callback(data, stream_area):
         try:
             int8_array = np.frombuffer(new_byte_array, dtype=">i1")
 
-            stream_area.insert(
-                tk.END, "< Motion     : " + str(int8_array) + "\n"
-            )
+            # stream_area.insert(
+            #     tk.END, "< Motion     : " + str(int8_array) + "\n"
+            # )
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
             if int8_array[0] == 1:
@@ -176,7 +181,7 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         uint8_array = np.frombuffer(new_byte_array, dtype=">u1")
 
-        stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
+        # stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
         stream_area.yview_moveto(1)  # Scrolling to the bottom
 
         # --------------------------------------------------------------------------
@@ -226,6 +231,54 @@ def my_receive_callback(data, stream_area):
             new_byte_array[14:16], byteorder="big"
         )  # 'big' for big-endian, 'little' for little-endian
         SetDistanceButtonBGColor(distance8_Front, combined8_int)
+
+    if response == (CMD_GET_BATTERY | RESP_BIT):
+        # 4x uint16_t
+        # 3x int16_t
+        new_byte_array_uint16 = data[3 : 3 + 4 * 2]
+        new_byte_array_int16 = data[3 + (4 * 2) : -2]
+
+        hex_values = " ".join(
+            [format(x, "02X") for x in new_byte_array_uint16]
+        )
+        print("< " + hex_values)
+
+        hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
+        print("< " + hex_values)
+
+        try:
+            unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
+
+            DeviceType = unt16_array[0]
+            FW_Version = unt16_array[1]
+            HW_Version = unt16_array[2]
+            BatteryState = unt16_array[3]
+
+            int16_array = np.frombuffer(new_byte_array_int16, dtype=">i2")
+
+            Temperature = int16_array[0]  # First 16-bit integer
+            Current = int16_array[1]  # Third 16-bit integer
+            Voltage = int16_array[2]  # Second 16-bit integer
+
+            txt = "< Battery : Voltage {} mV, Current {} mA\n".format(
+                Voltage, Current
+            )
+
+            if (BatteryState & 0x0500) == 0x0100:
+                print("Discharge")
+                button_battery_state.config(bg="yellow", text="Discharging")
+
+            if (BatteryState & 0x0500) == 0x0500:
+                print("Charge")
+                button_battery_state.config(bg="lime", text="Charging")
+
+            button_battery_voltage.config(text=str(Voltage) + " mV")
+            button_battery_current.config(text=str(Current) + " mA")
+
+            stream_area.insert(tk.END, txt)
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Battery bytes error")
 
 
 def createCommand(mod_manager, InputCommmand, Parameters):
@@ -317,7 +370,7 @@ def show_gui(mod_manager):
             [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
         ): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug1.grid(row=0, column=8, sticky="w")
+    button_debug1.grid(row=0, column=9, sticky="w")
 
     global button_debug2
     button_debug2 = tk.Button(
@@ -329,7 +382,7 @@ def show_gui(mod_manager):
             [CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]
         ): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug2.grid(row=1, column=8, sticky="w")
+    button_debug2.grid(row=1, column=9, sticky="w")
 
     button_LA_White = tk.Button(
         frame,
@@ -698,6 +751,45 @@ def show_gui(mod_manager):
     global compass_button
     compass_button = tk.Button(frame, height=1, width=10, text="inf")
     compass_button.grid(row=3, column=7, sticky="w")
+
+    # --------------------------------------------------------------------------------------
+    # streaming data area
+    # --------------------------------------------------------------------------------------
+    global button_battery_state
+    button_battery_state = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array(
+            [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
+        ): createDoubleMoveCommand(mod_manager, t),
+    )
+    button_battery_state.grid(row=0, column=8, sticky="w")
+
+    global button_battery_voltage
+    button_battery_voltage = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array(
+            [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
+        ): createDoubleMoveCommand(mod_manager, t),
+    )
+    button_battery_voltage.grid(row=1, column=8, sticky="w")
+
+    global button_battery_current
+    button_battery_current = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array(
+            [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
+        ): createDoubleMoveCommand(mod_manager, t),
+    )
+    button_battery_current.grid(row=2, column=8, sticky="w")
 
     # --------------------------------------------------------------------------------------
     # streaming data area
