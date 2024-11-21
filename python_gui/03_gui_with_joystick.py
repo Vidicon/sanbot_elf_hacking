@@ -1024,7 +1024,7 @@ def main():
             port1="/dev/ttyACM0", port2="/dev/ttyACM1", baudrate=115200
         )
     else:
-        mod_manager = ModManager(port="COM9", baudrate=115200)
+        mod_manager = ModManager(port1="COM7", port2="COM10", baudrate=115200)
 
     root, stream_area, canvas = show_gui(mod_manager)
 
