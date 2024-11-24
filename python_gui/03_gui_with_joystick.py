@@ -27,7 +27,7 @@ CMD_GET_BATTERY = 0x24
 CMD_LA_MOVE = 0x30
 CMD_RA_MOVE = 0x31
 CMD_BASE_MOVE = 0x32
-
+CMD_COMP_MOVE = 0x33
 
 CMD_RED = 1
 CMD_GREEN = 2
@@ -119,19 +119,24 @@ def my_receive_callback(data, stream_area):
     response = data[1]
 
     if response == (CMD_VERSION | RESP_BIT):
-
-        string_from_bytearray = data[3:-2].decode("utf-8")
-        stream_area.insert(tk.END, "< " + string_from_bytearray + "\n")
-        stream_area.yview_moveto(1)  # Scrolling to the bottom
+        try:
+            string_from_bytearray = data[3:-2].decode("utf-8")
+            stream_area.insert(tk.END, "< " + string_from_bytearray + "\n")
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Version bytes error")
 
     if response == (CMD_GET_ENCODERS | RESP_BIT):
-        new_byte_array = data[3:-2]
-        int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
+        try:
+            new_byte_array = data[3:-2]
+            int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-        # stream_area.insert(
-        #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
-        # )
-        stream_area.yview_moveto(1)  # Scrolling to the bottom
+            # stream_area.insert(
+            #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
+            # )
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Encoders bytes error")
 
     if response == (CMD_GET_COMPASS | RESP_BIT):
         new_byte_array = data[3:-2]
@@ -649,7 +654,7 @@ def show_gui(mod_manager):
             mod_manager, t
         ),
     )
-    button_RA_Move_1.grid(row=0, column=4, sticky="w")
+    button_RA_Move_1.grid(row=3, column=3, sticky="w")
 
     button_RA_Move_2 = tk.Button(
         frame,
@@ -660,7 +665,7 @@ def show_gui(mod_manager):
             mod_manager, t
         ),
     )
-    button_RA_Move_2.grid(row=1, column=4, sticky="w")
+    button_RA_Move_2.grid(row=4, column=3, sticky="w")
 
     button_RA_Move_3 = tk.Button(
         frame,
@@ -671,7 +676,54 @@ def show_gui(mod_manager):
             mod_manager, t
         ),
     )
-    button_RA_Move_3.grid(row=2, column=4, sticky="w")
+    button_RA_Move_3.grid(row=5, column=3, sticky="w")
+
+    # --------------------------------------------------------------------------------------
+    # Rotate using compass
+    # --------------------------------------------------------------------------------------
+    button_rotate_North = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="North",
+        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createMoveCommand(
+            mod_manager, t
+        ),
+    )
+    button_rotate_North.grid(row=0, column=4, sticky="w")
+
+    button_rotate_East = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="East",
+        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createMoveCommand(
+            mod_manager, t
+        ),
+    )
+    button_rotate_East.grid(row=1, column=4, sticky="w")
+
+    button_rotate_South = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="South",
+        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createMoveCommand(
+            mod_manager, t
+        ),
+    )
+    button_rotate_South.grid(row=2, column=4, sticky="w")
+
+    button_rotate_West = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="West",
+        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createMoveCommand(
+            mod_manager, t
+        ),
+    )
+    button_rotate_West.grid(row=3, column=4, sticky="w")
 
     # --------------------------------------------------------------------------------------
     # Motion sensors front & back

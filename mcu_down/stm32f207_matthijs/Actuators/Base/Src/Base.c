@@ -8,21 +8,24 @@
 #include <string.h>		// For tracing
 #include <stdio.h>
 #include "usbd_cdc_if.h"
+#include "Compass.h"
+
 
 struct Base_State_Type LeftBaseMotor_State;
 struct Base_State_Type RightBaseMotor_State;
 struct Base_State_Type CenterBaseMotor_State;
 
-//char TextBuffer[100];
+double Compass_Target;
+double Compass_Error;
+int Compass_MoveState;
+int Compass_MoveSpeed;
+
 
 void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
 {
 	//------------------------------------------------------------------
 	LeftBaseMotor_State.TIM = htim12;
 	LeftBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_2;
-
-	LeftBaseMotor_State.MotionState = Base_Motion_Disabled;
-	LeftBaseMotor_State.MainState = 0;
 
 	HAL_TIM_Base_Start(htim12);
 	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_2);
@@ -31,18 +34,12 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTy
 	CenterBaseMotor_State.TIM = htim11;
 	CenterBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_1;
 
-	CenterBaseMotor_State.MotionState = Base_Motion_Disabled;
-	CenterBaseMotor_State.MainState = 0;
-
 	HAL_TIM_Base_Start(htim11);
 	HAL_TIM_PWM_Start(htim11, TIM_CHANNEL_1);
 
 	//------------------------------------------------------------------
 	RightBaseMotor_State.TIM = htim12;
 	RightBaseMotor_State.TIM_CHANNEL = TIM_CHANNEL_1;
-
-	RightBaseMotor_State.MotionState = Base_Motion_Disabled;
-	RightBaseMotor_State.MainState = 0;
 
 	HAL_TIM_Base_Start(htim12);
 	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_1);
@@ -151,14 +148,78 @@ void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 	}
 }
 
-//void TracingUpdate()
-//{
-//	memset(TextBuffer, 0x00, 100);
-//
-//	sprintf(TextBuffer, "%ld,%d,%ld\n",
-//												(long)(LeftBaseMotor_State.ActualPosition),
-//												(long)(CenterBaseMotor_State.ActualPosition),
-//												(long)(RightBaseMotor_State.ActualPosition));
-//	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
-//}
+void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
+{
+	// 0 = disabled
+	// 1 = start new move
+	// 2 = rotate CW
+	// 3 = rotate CCW
+	Compass_MoveSpeed = 40;
+
+	Compass_Error = Compass_Target - CompassData->RzAngle;
+
+	if (Compass_MoveState == 1)
+	{
+		// Rotation in opposite direction is shortest.
+		if (Compass_Error < -180 )
+		{
+			Compass_MoveState = 2;
+		}
+		else if (Compass_Error > +180)
+		{
+			Compass_MoveState = 3;
+		}
+		else if (Compass_Error < 0)
+		{
+			Compass_MoveState = 3;
+		}
+		else if (Compass_Error > 0)
+		{
+			Compass_MoveState = 2;
+		}
+		else
+		{
+			Compass_MoveState = 0;
+		}
+	}
+
+
+	if (abs(Compass_Error) < 10)
+	{
+		Compass_MoveSpeed = Compass_MoveSpeed / 2;
+	}
+
+	if (Compass_MoveState == 2)
+	{
+		Base_VelocitySetpoint(0, 0, -Compass_MoveSpeed);
+	}
+
+	if (Compass_MoveState == 3)
+	{
+		Base_VelocitySetpoint(0, 0, Compass_MoveSpeed);
+	}
+
+	if (abs(Compass_Error) < 5)
+	{
+		Compass_MoveState = 0;
+		Base_VelocitySetpoint(0, 0, 0);
+
+		HAL_Delay(1);
+
+		GenericBase_HAL_Brake(True, LeftBaseMotor);
+		GenericBase_HAL_Brake(True, CenterBaseMotor);
+		GenericBase_HAL_Brake(True, RightBaseMotor);
+	}
+}
+
+void Base_NewCompassRotation(char HighByte, char LowByte)
+{
+	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
+
+	if (Compass_MoveState == 0)
+	{
+		Compass_MoveState = 1;
+		Compass_Target = (float)combined;
+	}
+}
 

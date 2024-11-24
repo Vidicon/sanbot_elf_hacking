@@ -158,6 +158,12 @@ void Check_USB_Communication()
 		}
 
 
+		if (command == CMD_COMP_MOVE)
+		{
+			Base_NewCompassRotation(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
+
 		Protocol_0x55_MarkProcessed();
 	}
 }
@@ -245,13 +251,14 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 		  MotionSensors_Update10Hz();
+
+		  Compass_Update();
+		  Base_MotionControl(Compass_GetPointer());
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
-
-		  Compass_Update();
 	  }
 
 	  if (Update_2Hz)
@@ -259,6 +266,7 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
+		  SendCompass(Compass_GetPointer());
 	  }
 
 	  if (Update_1Hz)

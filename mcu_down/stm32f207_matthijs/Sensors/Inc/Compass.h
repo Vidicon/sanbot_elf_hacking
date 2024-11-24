@@ -13,6 +13,7 @@ struct Compass_Sensor_Type {
 	int16_t X;
 	int16_t Y;
 	int16_t Z;
+	double RzAngle;
 };
 
 struct Compass_Sensor_Type *Compass_GetPointer();
