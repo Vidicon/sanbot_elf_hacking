@@ -81,7 +81,7 @@ void Compass_Update()
 
 	status = HAL_I2C_Mem_Read(Compass_I2C, 0x3C, 0x68, I2C_MEMADD_SIZE_8BIT, &CompassData.Raw[0], 6, HAL_MAX_DELAY);
 
-	if (status == 0)
+//	if (status == 0)
 	{
 		CompassData.X = (int)(CompassData.Raw[0] + (CompassData.Raw[1] << 8));
 		CompassData.Y = (int)(CompassData.Raw[2] + (CompassData.Raw[3] << 8));

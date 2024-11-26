@@ -199,7 +199,7 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		Base_VelocitySetpoint(0, 0, Compass_MoveSpeed);
 	}
 
-	if (abs(Compass_Error) < 5)
+	if ((Compass_MoveState > 0) && abs(Compass_Error) < 5)
 	{
 		Compass_MoveState = 0;
 		Base_VelocitySetpoint(0, 0, 0);

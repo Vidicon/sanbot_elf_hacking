@@ -1026,13 +1026,13 @@ def handle_pygame_events():
     if axis2_event == True:
         print(f"Axis 2 : {-1*axis2:.2f}")
         createMoveCommand(
-            mod_manager, np.array([CMD_LA_MOVE, int(axis2 + 1) * -200])
+            mod_manager, np.array([CMD_LA_MOVE, int(axis2 + 1) * -150 - 150])
         )
 
     if axis5_event == True:
         print(f"Axis 5 : {-1*axis5:.2f}")
         createMoveCommand(
-            mod_manager, np.array([CMD_RA_MOVE, int(axis5 + 1) * 200])
+            mod_manager, np.array([CMD_RA_MOVE, int(axis5 + 1) * 150 + 150])
         )
 
     # Schedule the function to run again after 100 milliseconds
