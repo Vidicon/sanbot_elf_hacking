@@ -3,8 +3,10 @@ import platform
 import numpy as np
 from Common.mod_manager import ModManager
 
-
 body_parts_names = ["left_arm", "right_arm", "base", "head", "body"]
+
+RESP_BIT = 0x80
+CMD_VERSION = 0x01
 
 
 def bodypart_to_string(bodypart):
@@ -43,14 +45,35 @@ class SaraRobot:
         else:
             print("Windows detected")
 
-            self.mod_manager = ModManager(port1=self.windows1, port2=self.windows1, baudrate=115200)
+            self.mod_manager = ModManager(port1=self.windows1, port2=self.windows2, baudrate=115200)
 
+        self.mod_manager.set_receive_callback(self.my_receive_callback)
         self.mod_manager.open_port()
 
         return
 
     def stop(self):
         self.mod_manager.close_port()
+
+    def getversion(self):
+        self.mod_manager.cmd_Generic(CMD_VERSION, 0, 0)
+        return
+
+    def my_receive_callback(self, data):
+        # hex_values = " ".join([format(x, "02X") for x in data])
+        # print("< " + hex_values)
+
+        # Decode
+        response = data[1]
+
+        if response == (CMD_VERSION | RESP_BIT):
+            try:
+                string_from_bytearray = data[3:-2].decode("utf-8")
+                print("Software version : " + string_from_bytearray)
+            except:
+                print("Version bytes error")
+
+            print("-" * 80)
 
 
 class RobotArm:
