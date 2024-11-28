@@ -35,6 +35,7 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 struct PROTOCOL_0X55_Data_Type *TmpPointer;
+static uint8_t lineCoding[7];
 
 /* USER CODE END PV */
 
@@ -221,9 +222,6 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /*                                        4 - Space                            */
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
-    static uint8_t lineCoding[7] // 115200bps, 1stop, no parity, 8bit
-        = { 0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x08 };
-
     case CDC_SET_LINE_CODING:
     	memcpy(lineCoding, pbuf, sizeof(lineCoding));
 	break;
@@ -266,18 +264,7 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-
-//	// Copy new data to RxBuffer
-//	TmpPointer = Protocol_0x55_GetRxPointer();
-//
-//	// Check how many bytes already in buffer
-//	// Add new bytes to the end
-//	TmpPointer->BytesInBuffer += *Len;
-//	memcpy(&TmpPointer->FIFO_Data[TmpPointer->BytesInBuffer], (char*) Buf, *Len);
-//
-//
 	Protocol_0x55_NewData(Buf, Len);
-
 
 	// Prepare next receive
 	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
