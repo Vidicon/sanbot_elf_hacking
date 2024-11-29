@@ -17,6 +17,7 @@ CMD_LA_COLOR = 0x10
 CMD_RA_COLOR = 0x11
 CMD_BASE_COLOR = 0x12
 CMD_BA_COLOR = 0x13
+CMD_LARA_COLOR = 0x14
 
 CMD_GET_ENCODERS = 0x20
 CMD_GET_MOTIONSENSORS = 0x21
@@ -29,11 +30,12 @@ CMD_RA_MOVE = 0x31
 CMD_BASE_MOVE = 0x32
 CMD_COMP_MOVE = 0x33
 
+CMD_COLOR_NONE = 0
 CMD_RED = 1
 CMD_GREEN = 2
 CMD_BLUE = 3
 CMD_WHITE = 4
-CMD_ALL = 5
+CMD_REDGREEN = 5
 
 CMD_LED_NONE = 0
 CMD_LED_OFF = 1
@@ -57,6 +59,7 @@ button_version = []
 
 button_debug1 = []
 button_debug2 = []
+button_kerst = []
 
 button_Motion_Front = []
 button_Motion_Back = []
@@ -379,6 +382,16 @@ def show_gui(mod_manager):
     )
     button_debug2.grid(row=1, column=9, sticky="w")
 
+    global button_kerst
+    button_kerst = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Kerst 1",
+        command=lambda t=np.array([CMD_LARA_COLOR, CMD_REDGREEN, CMD_LED_BLINK_FAST]): createLedCommand(mod_manager, t),
+    )
+    button_kerst.grid(row=2, column=9, sticky="w")
+
     button_LA_White = tk.Button(
         frame,
         height=1,
@@ -420,7 +433,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Off",
-        command=lambda t=np.array([CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_LA_Off.grid(row=4, column=0, sticky="w")
 
@@ -490,7 +503,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Off",
-        command=lambda t=np.array([CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_RA_Off.grid(row=4, column=1, sticky="w")
 
@@ -547,7 +560,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Off",
-        command=lambda t=np.array([CMD_BASE_COLOR, CMD_ALL, CMD_LED_OFF]): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_Base_Blue.grid(row=4, column=2, sticky="w")
 
