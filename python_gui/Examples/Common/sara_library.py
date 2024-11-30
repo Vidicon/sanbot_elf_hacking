@@ -3,10 +3,27 @@ import platform
 import numpy as np
 from Common.mod_manager import ModManager
 
-body_parts_names = ["left_arm", "right_arm", "base", "head", "body"]
+body_parts_names = ["left_arm", "right_arm", "base", "head", "body", "battery"]
 
 RESP_BIT = 0x80
+
 CMD_VERSION = 0x01
+CMD_LA_COLOR = 0x10
+CMD_RA_COLOR = 0x11
+CMD_BASE_COLOR = 0x12
+CMD_BA_COLOR = 0x13
+CMD_LARA_COLOR = 0x14
+
+CMD_GET_ENCODERS = 0x20
+CMD_GET_MOTIONSENSORS = 0x21
+CMD_GET_DISTANCESENSORS = 0x22
+CMD_GET_COMPASS = 0x23
+CMD_GET_BATTERY = 0x24
+
+CMD_LA_MOVE = 0x30
+CMD_RA_MOVE = 0x31
+CMD_BASE_MOVE = 0x32
+CMD_COMP_MOVE = 0x33
 
 
 def bodypart_to_string(bodypart):
@@ -19,6 +36,7 @@ class SaraRobot:
     BASE = 2
     HEAD = 3
     BODY = 4
+    BATTERY = 5
 
     def __init__(self, com_windows1, com_windows2, com_linux1, com_linux2):
         print("-" * 80)
@@ -32,6 +50,7 @@ class SaraRobot:
         self.left_arm = RobotArm(self.mod_manager, SaraRobot.LEFTARM)
         self.right_arm = RobotArm(self.mod_manager, SaraRobot.RIGHTARM)
         self.base = RobotArm(self.mod_manager, SaraRobot.BASE)
+        self.battery = Battery(self.mod_manager, SaraRobot.BATTERY)
         print("-" * 80)
 
     def start(self):
@@ -63,7 +82,6 @@ class SaraRobot:
         # hex_values = " ".join([format(x, "02X") for x in data])
         # print("< " + hex_values)
 
-        # Decode
         response = data[1]
 
         if response == (CMD_VERSION | RESP_BIT):
@@ -75,9 +93,87 @@ class SaraRobot:
 
             print("-" * 80)
 
+        if response == (CMD_GET_BATTERY | RESP_BIT):
+            self.battery.newdata(data)
+
+
+class Battery:
+    EMPTY = 0
+    ERROR = 1
+    DISCHARGE = 2
+    CHARGE = 3
+
+    state_names = ["Empty", "Error", "Discharging", "Charging"]
+
+    def __init__(self, mod_manager, bodypart):
+        self.mod_manager = mod_manager
+        self.full_bodypart_name = bodypart_to_string(bodypart)
+        print("Adding " + self.full_bodypart_name)
+        self.firstpass = True
+
+        self.batterystate = Battery.ERROR
+        self.oldstate = Battery.ERROR
+        self.Voltage = 0
+        self.Current = 0
+
+    def printstate(self):
+        txt = "Battery : Voltage {} mV, Current {} mA, State : ".format(self.Voltage, self.Current)
+        txt += Battery.state_names[self.batterystate]
+        print(txt)
+
+    def getstate(self):
+        self.printstate()
+        return self.batterystate
+
+    def newdata(self, data):
+        try:
+            new_byte_array_uint16 = data[3 : 3 + 4 * 2]
+            new_byte_array_int16 = data[3 + (4 * 2) : -2]
+
+            # hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
+            # print("< " + hex_values)
+
+            # hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
+            # print("< " + hex_values)
+
+            unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
+
+            DeviceType = unt16_array[0]
+            FW_Version = unt16_array[1]
+            HW_Version = unt16_array[2]
+            BatteryState = unt16_array[3]
+
+            # print(format(BatteryState, "02X"))
+
+            int16_array = np.frombuffer(new_byte_array_int16, dtype=">i2")
+
+            self.Temperature = int16_array[0]  # First 16-bit integer
+            self.Current = int16_array[1]  # Third 16-bit integer
+            self.Voltage = int16_array[2]  # Second 16-bit integer
+
+            if (BatteryState & 0x0C00) == 0x0100:
+                self.batterystate = Battery.DISCHARGE
+
+            if (BatteryState & 0x0C00) == 0x0500:
+                self.batterystate = Battery.CHARGE
+
+            if (BatteryState & 0x0C00) == 0x0C00:
+                self.batterystate = Battery.EMPTY
+
+            if self.batterystate != self.oldstate:
+                self.printstate()
+
+            self.oldstate = self.batterystate
+
+            if self.firstpass:
+                self.firstpass = False
+                self.printstate()
+
+        except:
+            print("Battery processing error")
+
 
 class RobotArm:
-
     UP = 500
     FORWARD = 350
     DOWN = 100
@@ -87,7 +183,7 @@ class RobotArm:
         self.bodypart = bodypart
         self.led = ColorLed(self.mod_manager, self.bodypart)
         self.motor = Motor(self.mod_manager, self.bodypart)
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".arm"
+        self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + self.full_bodypart_name)
 
 
@@ -127,11 +223,12 @@ class Motor:
 
 
 class ColorLed:
+    NOCOLOR = 0
     RED = 1
     GREEN = 2
     BLUE = 3
     WHITE = 4
-    ALL = 5
+    REDGREEN = 5
 
     LED_NONE = 0
     LED_OFF = 1
