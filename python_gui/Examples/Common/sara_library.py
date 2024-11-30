@@ -102,8 +102,9 @@ class Battery:
     ERROR = 1
     DISCHARGE = 2
     CHARGE = 3
+    UNKNOWN = 4
 
-    state_names = ["Empty", "Error", "Discharging", "Charging"]
+    state_names = ["Empty", "Error", "Discharging", "Charging", "Unknown"]
 
     def __init__(self, mod_manager, bodypart):
         self.mod_manager = mod_manager
@@ -117,7 +118,7 @@ class Battery:
         self.Current = 0
 
     def printstate(self):
-        txt = "Battery : Voltage {} mV, Current {} mA, State : ".format(self.Voltage, self.Current)
+        txt = "Battery : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
         txt += Battery.state_names[self.batterystate]
         print(txt)
 
@@ -150,6 +151,9 @@ class Battery:
             self.Temperature = int16_array[0]  # First 16-bit integer
             self.Current = int16_array[1]  # Third 16-bit integer
             self.Voltage = int16_array[2]  # Second 16-bit integer
+
+            # First set to unknown because not all bits are implemented.
+            self.batterystate = Battery.UNKNOWN
 
             if (BatteryState & 0x0C00) == 0x0100:
                 self.batterystate = Battery.DISCHARGE
