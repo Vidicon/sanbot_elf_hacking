@@ -4,7 +4,6 @@
 #include "RobotGlobals.h"
 #include "stm32f2xx_hal.h"
 #include "Encoders.h"
-#include "Compass.h"
 
 enum ENUM_BaseHomeState {
 	Base_NotHomed,
@@ -25,6 +24,7 @@ enum ENUM_BaseMotionState {
 };
 
 struct Base_State_Type {
+	enum ENUM_BaseMotionState MotionState;
 	enum ENUM_BaseDirection Direction;
 	TIM_HandleTypeDef *TIM;
 	int PrevError;
@@ -36,7 +36,9 @@ struct Base_State_Type {
 
 	int Integral;
 	int Differential;
-//	int MainState;
+
+
+	int MainState;
 
 	// Velocity controller
 	int TargetVelocity;
@@ -59,6 +61,9 @@ struct Base_State_Type {
 
 	int PWM_Output;
 
+	int Logging1;
+	int Logging2;
+
 	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
 	};
@@ -75,10 +80,9 @@ void GenericBase_HAL_Direction(enum ENUM_BaseMotionState Direction, enum ENUM_Bo
 
 void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart);
 
-void Base_MotionControl(struct Compass_Sensor_Type *CompassData);
+void Temp(int speed);
 
-void Base_NewCompassRotation(char HighByte, char LowByte);
-
+void TracingUpdate();
 
 #endif
 

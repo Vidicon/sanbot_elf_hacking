@@ -150,7 +150,7 @@ Notes Matthijs:
 
 ---
 
-### Distance sensor 4x (7x) (J19)(Arm Left & Right???)
+### Distance sensor 4x (7x) (J19)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
@@ -164,23 +164,17 @@ Notes Matthijs:
 
 ---
 
-### Distance sensors mid front 1x (J21 J24 J28)
+### Distance sensor 1x (J21 J24 J28)
 
-|  | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
-|----------|----------|----------|----------|----------|----------|----------|
-| Signal |   3.3v  |   CLK  |    3.3v   |   CS  |   GND  |   Data  |
-| J21    |   -  |   PI0 |    -   |   PI2  |   -  |   PI1  |
-| J24    |   -  |   PI0 |    -   |   PI3  |   -  |   PI1  |
-| J28    |   -  |   PI0 |    -   |   PA15  |   -  |   PI1  |
+| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
+|----------|----------|----------|----------|----------|----------|
+|   3.3v  |   CLK  |    3.3v   |   CS  |   GND  |   Data  |
 
  - CLK of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - Data of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - CLK and Data have 2K2 pullups to 3.3v
  - Clk @ 121 Khz 
 
-Notes Matthijs:
-* IO pins are correct.
-* Soft I2C created as fast as possible. But pin mode switching in slow.
 ---
 
 ### IMU Board 1x (J45)
@@ -261,14 +255,14 @@ To ensure continuous offset cancellation, set the SET_FREQ bit to 1 in the same 
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 |
 |----------|----------|----------|----------|----------|
-|   SCL  |   SDA  |   GND?  |   charging_complete? |   Charger inserted  |
+|   SCL  |   SDA  |   GND?  |   charging_complete? |   Charging  |
 
 The external board contains:
  - 5 wires down to Charger board
  - 3 wires to Battery BMS (SCL, SDA, GND)
  - Battery has the TI BQ3055 battery manager IC
- - Charging_complete is pulled to GND when the battery is full
  - Charging line is pulled to GND during charging, when not charging its at 3.3v
+ - charging_complete is pulled to GND when the battery is full
 
 ---
 

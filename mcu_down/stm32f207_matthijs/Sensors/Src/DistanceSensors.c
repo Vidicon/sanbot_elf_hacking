@@ -9,7 +9,6 @@
 #include <main.h>
 #include <Left_Soft_I2C.h>
 #include <Right_Soft_I2C.h>
-#include <Mid_Soft_I2C.h>
 #include "protocol_0x55.h"
 
 struct Distance_Sensor_Type DistanceData;
@@ -33,29 +32,22 @@ void DistanceSensors_Init()
 
 void DistanceSensors_Update20Hz()
 {
-	// Left
 	if (DistanceData.SelectedSensor <= 3)
 	{
 
 		Left_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Left_Soft_I2C_Read(0x40);
 	}
-	// Right
-	else if (DistanceData.SelectedSensor <= 3+4)
+	else
 	{
 		Right_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Right_Soft_I2C_Read(0x40);
 	}
-	// Center
-	else
-	{
-		Mid_Soft_I2C_Write(0x40, 0x5E);
-		DistanceData.Distance[DistanceData.SelectedSensor] = Mid_Soft_I2C_Read(0x40);
-	}
+
 
 	// Last step is to select the next sensor
 	DistanceData.SelectedSensor += 1;
-	if (DistanceData.SelectedSensor > 10)
+	if (DistanceData.SelectedSensor >= 8)
 	{
 		DistanceData.SelectedSensor = 0;
 
@@ -70,7 +62,7 @@ void DistanceSensors_Update20Hz()
 void DistanceSensors_Select(int SensorID)
 {
 	//-----------------------------------------------------------------------------------------------
-	// 4 Left side sensors
+	// Left side sensors
 	//-----------------------------------------------------------------------------------------------
 	if (SensorID == 0) { HAL_GPIO_WritePin(EN1_Distance_J18_GPIO_Port, EN1_Distance_J18_Pin, GPIO_PIN_SET);}
 	else { HAL_GPIO_WritePin(EN1_Distance_J18_GPIO_Port, EN1_Distance_J18_Pin, GPIO_PIN_RESET); }
@@ -85,7 +77,7 @@ void DistanceSensors_Select(int SensorID)
 	else { HAL_GPIO_WritePin(EN4_Distance_J18_GPIO_Port, EN4_Distance_J18_Pin, GPIO_PIN_RESET); }
 
 	//-----------------------------------------------------------------------------------------------
-	// 4 Right side sensors
+	// Right side sensors
 	//-----------------------------------------------------------------------------------------------
 	if (SensorID == 4) { HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_SET);}
 	else { HAL_GPIO_WritePin(EN1_Distance_J26_GPIO_Port, EN1_Distance_J26_Pin, GPIO_PIN_RESET); }
@@ -98,17 +90,5 @@ void DistanceSensors_Select(int SensorID)
 
 	if (SensorID == 7) { HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_SET);}
 	else { HAL_GPIO_WritePin(EN4_Distance_J26_GPIO_Port, EN4_Distance_J26_Pin, GPIO_PIN_RESET); }
-
-	//-----------------------------------------------------------------------------------------------
-	// 3 Center sensors
-	//-----------------------------------------------------------------------------------------------
-	if (SensorID == 8) { HAL_GPIO_WritePin(EN1_Distance_J21_GPIO_Port, EN1_Distance_J21_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J21_GPIO_Port, EN1_Distance_J21_Pin, GPIO_PIN_RESET); }
-
-	if (SensorID == 9) { HAL_GPIO_WritePin(EN1_Distance_J24_GPIO_Port, EN1_Distance_J24_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J24_GPIO_Port, EN1_Distance_J24_Pin, GPIO_PIN_RESET); }
-
-	if (SensorID == 10) { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_RESET); }
 }
 

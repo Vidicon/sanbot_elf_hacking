@@ -8,7 +8,6 @@
 #include "Compass.h"
 #include <string.h>
 #include "protocol_0x55.h"
-#include <math.h>
 
 struct Compass_Sensor_Type CompassData;
 
@@ -83,16 +82,19 @@ void Compass_Update()
 
 //	if (status == 0)
 	{
+//		CompassData.X = (int)(CompassData.Raw[0] + (CompassData.Raw[1] << 8));
+//		CompassData.Y = (int)(CompassData.Raw[2] + (CompassData.Raw[3] << 8));
+//		CompassData.Z = CompassData.Raw[4] + (CompassData.Raw[5] << 8);
+
 		CompassData.X = (int)(CompassData.Raw[0] + (CompassData.Raw[1] << 8));
 		CompassData.Y = (int)(CompassData.Raw[2] + (CompassData.Raw[3] << 8));
 		CompassData.Z = (int)(CompassData.Raw[4] + (CompassData.Raw[5] << 8));
-
-		CompassData.RzAngle = -1 * (180/3.14159) * atan2((double)(CompassData.Y), (double)(CompassData.X));
-		if (CompassData.RzAngle  < 0)
-		{
-			CompassData.RzAngle += 360;
-		}
-
 	}
+
+
+	HAL_Delay(1);
+
+	SendCompass(Compass_GetPointer());
+
 }
 

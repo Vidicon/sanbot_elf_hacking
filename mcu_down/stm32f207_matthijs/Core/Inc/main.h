@@ -43,7 +43,6 @@ int Update_16Hz;
 int Update_10Hz;
 int Update_5Hz;
 int Update_2Hz;
-int Update_1Hz;
 
 /* USER CODE END ET */
 
@@ -133,16 +132,6 @@ void Error_Handler(void);
 #define LeftArmGreen_GPIO_Port GPIOH
 #define LeftArmBlue_Pin GPIO_PIN_15
 #define LeftArmBlue_GPIO_Port GPIOH
-#define SCL_Distance_MID_Pin GPIO_PIN_0
-#define SCL_Distance_MID_GPIO_Port GPIOI
-#define SDA_Distance_MID_Pin GPIO_PIN_1
-#define SDA_Distance_MID_GPIO_Port GPIOI
-#define EN1_Distance_J21_Pin GPIO_PIN_2
-#define EN1_Distance_J21_GPIO_Port GPIOI
-#define EN1_Distance_J24_Pin GPIO_PIN_3
-#define EN1_Distance_J24_GPIO_Port GPIOI
-#define EN1_Distance_J28_Pin GPIO_PIN_15
-#define EN1_Distance_J28_GPIO_Port GPIOA
 #define PD6_Pin GPIO_PIN_6
 #define PD6_GPIO_Port GPIOD
 #define PD7_Pin GPIO_PIN_7

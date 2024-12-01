@@ -5,7 +5,6 @@
 #include "usbd_cdc_if.h"
 #include "DistanceSensors.h"
 #include "Compass.h"
-#include "Battery.h"
 
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
@@ -166,7 +165,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-BODY by Matthijs Hajer");
+	sprintf(&Buffer[3], "STM32F207 - Sanbot - Matthijs ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -230,7 +229,8 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 
 void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+	uint8_t Result;
+	Result = CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
 }
 
 signed char Protocol_0x55_GetData(int Index)
@@ -306,13 +306,13 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_DISTANCESENSORS, RESPONSE_TRUE);
 
-	for (int i = 0; i < 11; i++)
+	for (int i=0; i<8; i++)
 	{
 		Buffer[3 + i*2] = (DistanceData->Distance[i] >> 8);
 		Buffer[4 + i*2] = (DistanceData->Distance[i] & 0xff);
 	}
 
-	int payloadLen = 11*2;
+	int payloadLen = 16;
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);
@@ -341,55 +341,6 @@ void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *Compass
 
 	Buffer[3 + 4] = (CompassData->Raw[5]);
 	Buffer[3 + 5] = (CompassData->Raw[4]);
-
-	Protocol_0x55_SetLength(Buffer, payloadLen);
-	Protocol_0x55_AddCRC(Buffer, payloadLen);
-	Protocol_0x55_Send(Buffer, payloadLen);
-}
-
-//----------------------------------------------------------------
-// Raw compass data
-//----------------------------------------------------------------
-void SendBattery(struct Battery_Sensor_Type *BatteryData)
-{
-	Protocol_0x55_SendBattery((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], BatteryData);
-}
-
-void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *BatteryData)
-{
-	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_BATTERY, RESPONSE_TRUE);
-
-	int payloadLen = 14;
-
-	// 	uint16_t DeviceType;
-	//	uint16_t FW_Version;
-	//	uint16_t HW_Version;
-	//	uint16_t Temperature;
-	//	int16_t Current;
-	//	uint16_t Voltage;
-	//	uint16_t BatteryState;
-
-	Buffer[3 + 0] = (BatteryData->DeviceType >> 8 );
-	Buffer[3 + 1] = (BatteryData->DeviceType & 0xff);
-
-	Buffer[3 + 2] = (BatteryData->FW_Version >> 8 );
-	Buffer[3 + 3] = (BatteryData->FW_Version & 0xff);
-
-	Buffer[3 + 4] = (BatteryData->HW_Version >> 8 );
-	Buffer[3 + 5] = (BatteryData->HW_Version & 0xff);
-
-	Buffer[3 + 6] = (BatteryData->BatteryState >> 8 );
-	Buffer[3 + 7] = (BatteryData->BatteryState & 0xff);
-
-	Buffer[3 + 8] = (BatteryData->Temperature >> 8 );
-	Buffer[3 + 9] = (BatteryData->Temperature & 0xff);
-
-	Buffer[3 + 10] = (BatteryData->Current >> 8 );
-	Buffer[3 + 11] = (BatteryData->Current & 0xff);
-
-	Buffer[3 + 12] = (BatteryData->Voltage >> 8 );
-	Buffer[3 + 13] = (BatteryData->Voltage & 0xff);
-
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);

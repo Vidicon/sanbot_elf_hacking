@@ -143,17 +143,8 @@ void RGBLeds_Update10Hz()
 
 		if (RGBLeds_State[i].Blink == LED_Blink_Fast)
 		{
-			// Special XMAS version
-			if (RGBLeds_State[i].Color == RedGreen)
-			{
-				if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), Green);}
-				if (RGBLeds_State[i].Counter == 3) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), Red);}
-			}
-			else
-			{
-				if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), RGBLeds_State[i].Color);}
-				if (RGBLeds_State[i].Counter == 3) { RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));}
-			}
+			if (RGBLeds_State[i].Counter == 0) { RGBLeds_SetColorOn ((enum ENUM_BodyParts)(i), RGBLeds_State[i].Color);}
+			if (RGBLeds_State[i].Counter == 3) { RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));}
 
 			RGBLeds_State[i].Counter += 1;
 			if (RGBLeds_State[i].Counter >= 6) {RGBLeds_State[i].Counter = 0;}
