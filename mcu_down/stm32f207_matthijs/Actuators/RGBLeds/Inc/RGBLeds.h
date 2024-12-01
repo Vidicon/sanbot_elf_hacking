@@ -15,8 +15,7 @@ enum ENUM_RGBLeds_Color {
 	Red,
     Green,
     Blue,
-	White,
-	RedGreen
+	White
 };
 
 enum ENUM_RGBLeds_Command {

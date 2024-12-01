@@ -32,8 +32,6 @@
 #include "MotionSensors.h"
 #include "DistanceSensors.h"
 #include "Compass.h"
-#include "Battery.h"
-
 
 /* USER CODE END Includes */
 
@@ -52,7 +50,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c3;
 
 TIM_HandleTypeDef htim9;
@@ -83,7 +80,6 @@ static void MX_USART6_UART_Init(void);
 static void MX_TIM11_Init(void);
 static void MX_TIM12_Init(void);
 static void MX_I2C3_Init(void);
-static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -109,8 +105,6 @@ void System_Initialize()
 	DistanceSensors_Init();
 
 	Compass_Init(&hi2c3);
-
-	Battery_Init(&hi2c1);
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)
@@ -143,13 +137,6 @@ void Check_USB_Communication()
 		if (command == CMD_RA_COLOR) 	{ RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 		if (command == CMD_BASE_COLOR) 	{ RGBLeds_SetAllColors(Base, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
-		if (command == CMD_LARA_COLOR)
-		{
-			RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
-			RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
-		}
-
-
 		if (command == CMD_BA_COLOR)
 		{
 			RGBLeds_SetAllColors(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
@@ -162,12 +149,6 @@ void Check_USB_Communication()
 		if (command == CMD_BASE_MOVE)
 		{
 			Base_VelocitySetpoint(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4), Protocol_0x55_GetData(5));
-		}
-
-
-		if (command == CMD_COMP_MOVE)
-		{
-			Base_NewCompassRotation(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
 
@@ -221,7 +202,6 @@ int main(void)
   MX_TIM11_Init();
   MX_TIM12_Init();
   MX_I2C3_Init();
-  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
@@ -258,14 +238,13 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 		  MotionSensors_Update10Hz();
-
-		  Compass_Update();
-		  Base_MotionControl(Compass_GetPointer());
 	  }
 
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
+
+		  Compass_Update();
 	  }
 
 	  if (Update_2Hz)
@@ -273,14 +252,6 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
-		  SendCompass(Compass_GetPointer());
-	  }
-
-	  if (Update_1Hz)
-	  {
-		  Update_1Hz = 0;
-
-		  Battery_Update();
 	  }
 
 	  //--------------------------------------------------------
@@ -337,40 +308,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-/**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C1_Init(void)
-{
-
-  /* USER CODE BEGIN I2C1_Init 0 */
-
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 10000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN I2C1_Init 2 */
-
-  /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
