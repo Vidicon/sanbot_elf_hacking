@@ -653,7 +653,7 @@ static void MX_GPIO_Init(void)
                           |RightBrake_Pin|RightDir_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, SCL_Distance_J26_Pin|EN1_Distance_J26_Pin|EN2_Distance_J26_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, SCL_Distance_J26_Pin|EN1_Distance_J26_Pin|EN2_Distance_J26_Pin|EN1_Distance_J28_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, EN3_Distance_J26_Pin|EN4_Distance_J26_Pin, GPIO_PIN_RESET);
@@ -665,13 +665,14 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOH, LeftArmRed_Pin|LeftArmGreen_Pin|LeftArmBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOI, EN1_Distance_J21_Pin|EN1_Distance_J24_Pin|EN1_Distance_J18_Pin|EN2_Distance_J18_Pin
+                          |EN3_Distance_J18_Pin|EN4_Distance_J18_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BaseRed_Pin|BaseGreen_Pin|BaseBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(SCL_Distance_J18_GPIO_Port, SCL_Distance_J18_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOI, EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LeftArmBrake_Pin RightArmUp_Pin RightArmBrake_Pin LeftArmUp_Pin */
   GPIO_InitStruct.Pin = LeftArmBrake_Pin|RightArmUp_Pin|RightArmBrake_Pin|LeftArmUp_Pin;
@@ -702,8 +703,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SDA_Distance_J26_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EN1_Distance_J26_Pin EN2_Distance_J26_Pin */
-  GPIO_InitStruct.Pin = EN1_Distance_J26_Pin|EN2_Distance_J26_Pin;
+  /*Configure GPIO pins : EN1_Distance_J26_Pin EN2_Distance_J26_Pin EN1_Distance_J28_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J26_Pin|EN2_Distance_J26_Pin|EN1_Distance_J28_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -750,6 +751,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : EN1_Distance_J21_Pin EN1_Distance_J24_Pin EN1_Distance_J18_Pin EN2_Distance_J18_Pin
+                           EN3_Distance_J18_Pin EN4_Distance_J18_Pin */
+  GPIO_InitStruct.Pin = EN1_Distance_J21_Pin|EN1_Distance_J24_Pin|EN1_Distance_J18_Pin|EN2_Distance_J18_Pin
+                          |EN3_Distance_J18_Pin|EN4_Distance_J18_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PD6_Pin PD7_Pin */
   GPIO_InitStruct.Pin = PD6_Pin|PD7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -775,13 +785,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SDA_Distance_J18_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : EN1_Distance_J18_Pin EN2_Distance_J18_Pin EN3_Distance_J18_Pin EN4_Distance_J18_Pin */
-  GPIO_InitStruct.Pin = EN1_Distance_J18_Pin|EN2_Distance_J18_Pin|EN3_Distance_J18_Pin|EN4_Distance_J18_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
 }
 

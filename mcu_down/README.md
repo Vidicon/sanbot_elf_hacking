@@ -150,7 +150,7 @@ Notes Matthijs:
 
 ---
 
-### Distance sensor 4x (7x) (J19)
+### Distance sensor 4x (7x) (J19)(Arm Left & Right???)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
@@ -164,7 +164,7 @@ Notes Matthijs:
 
 ---
 
-### Distance sensor 1x (J21 J24 J28)
+### Distance sensors mid front 1x (J21 J24 J28)
 
 | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
 |----------|----------|----------|----------|----------|----------|

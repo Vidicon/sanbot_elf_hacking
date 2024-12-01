@@ -9,7 +9,7 @@
 #define INC_DISTANCESENSORS_H_
 
 struct Distance_Sensor_Type {
-	int Distance[8];
+	int Distance[11];
 	int SelectedSensor;
 };
 

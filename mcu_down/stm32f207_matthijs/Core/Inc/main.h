@@ -133,6 +133,12 @@ void Error_Handler(void);
 #define LeftArmGreen_GPIO_Port GPIOH
 #define LeftArmBlue_Pin GPIO_PIN_15
 #define LeftArmBlue_GPIO_Port GPIOH
+#define EN1_Distance_J21_Pin GPIO_PIN_2
+#define EN1_Distance_J21_GPIO_Port GPIOI
+#define EN1_Distance_J24_Pin GPIO_PIN_3
+#define EN1_Distance_J24_GPIO_Port GPIOI
+#define EN1_Distance_J28_Pin GPIO_PIN_10
+#define EN1_Distance_J28_GPIO_Port GPIOC
 #define PD6_Pin GPIO_PIN_6
 #define PD6_GPIO_Port GPIOD
 #define PD7_Pin GPIO_PIN_7
