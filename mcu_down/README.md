@@ -166,15 +166,21 @@ Notes Matthijs:
 
 ### Distance sensors mid front 1x (J21 J24 J28)
 
-| Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
-|----------|----------|----------|----------|----------|----------|
-|   3.3v  |   CLK  |    3.3v   |   CS  |   GND  |   Data  |
+|  | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 |
+|----------|----------|----------|----------|----------|----------|----------|
+| Signal |   3.3v  |   CLK  |    3.3v   |   CS  |   GND  |   Data  |
+| J21    |   -  |   PI0 |    -   |   PI2  |   -  |   PI1  |
+| J24    |   -  |   PI0 |    -   |   PI3  |   -  |   PI1  |
+| J28    |   -  |   PI0 |    -   |   PA15  |   -  |   PI1  |
 
  - CLK of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - Data of J21 J24 J28 are connected in parrelel with a 22R resistor per connector
  - CLK and Data have 2K2 pullups to 3.3v
  - Clk @ 121 Khz 
 
+Notes Matthijs:
+* IO pins are correct.
+* Soft I2C created as fast as possible. But pin mode switching in slow.
 ---
 
 ### IMU Board 1x (J45)

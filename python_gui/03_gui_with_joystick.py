@@ -72,6 +72,9 @@ distance5_Front = []
 distance6_Front = []
 distance7_Front = []
 distance8_Front = []
+distance9_Front = []
+distance10_Front = []
+distance11_Front = []
 
 compass_button = []
 
@@ -237,6 +240,24 @@ def my_receive_callback(data, stream_area):
             new_byte_array[14:16], byteorder="big"
         )  # 'big' for big-endian, 'little' for little-endian
         SetDistanceButtonBGColor(distance8_Front, combined8_int)
+
+        # --------------------------------------------------------------------------
+        combined9_int = int.from_bytes(
+            new_byte_array[16:18], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance9_Front, combined9_int)
+
+        # --------------------------------------------------------------------------
+        combined10_int = int.from_bytes(
+            new_byte_array[18:20], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance10_Front, combined10_int)
+
+        # --------------------------------------------------------------------------
+        combined11_int = int.from_bytes(
+            new_byte_array[20:22], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance11_Front, combined11_int)
 
     if response == (CMD_GET_BATTERY | RESP_BIT):
         # 4x uint16_t
@@ -718,6 +739,18 @@ def show_gui(mod_manager):
     distance8_Front = tk.Button(frame, height=1, width=10, text="inf")
     distance8_Front.grid(row=7, column=6, sticky="w")
 
+    # Mid sensors
+    global distance9_Front
+    distance9_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance9_Front.grid(row=3, column=5, sticky="w")
+
+    global distance10_Front
+    distance10_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance10_Front.grid(row=4, column=5, sticky="w")
+
+    global distance11_Front
+    distance11_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance11_Front.grid(row=5, column=5, sticky="w")
     # --------------------------------------------------------------------------------------
     # Generic buttons
     # --------------------------------------------------------------------------------------

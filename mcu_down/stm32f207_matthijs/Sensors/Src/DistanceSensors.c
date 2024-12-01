@@ -9,6 +9,7 @@
 #include <main.h>
 #include <Left_Soft_I2C.h>
 #include <Right_Soft_I2C.h>
+#include <Mid_Soft_I2C.h>
 #include "protocol_0x55.h"
 
 struct Distance_Sensor_Type DistanceData;
@@ -48,7 +49,8 @@ void DistanceSensors_Update20Hz()
 	// Center
 	else
 	{
-
+		Mid_Soft_I2C_Write(0x40, 0x5E);
+		DistanceData.Distance[DistanceData.SelectedSensor] = Mid_Soft_I2C_Read(0x40);
 	}
 
 	// Last step is to select the next sensor
@@ -100,13 +102,13 @@ void DistanceSensors_Select(int SensorID)
 	//-----------------------------------------------------------------------------------------------
 	// 3 Center sensors
 	//-----------------------------------------------------------------------------------------------
-	if (SensorID == 8) { HAL_GPIO_WritePin(EN1_Distance_J21_Port, EN1_Distance_J21_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J21_Port, EN1_Distance_J21_Pin, GPIO_PIN_RESET); }
+	if (SensorID == 8) { HAL_GPIO_WritePin(EN1_Distance_J21_GPIO_Port, EN1_Distance_J21_Pin, GPIO_PIN_SET);}
+	else { HAL_GPIO_WritePin(EN1_Distance_J21_GPIO_Port, EN1_Distance_J21_Pin, GPIO_PIN_RESET); }
 
-	if (SensorID == 9) { HAL_GPIO_WritePin(EN1_Distance_J24_Port, EN1_Distance_J24_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J24_Port, EN1_Distance_J24_Pin, GPIO_PIN_RESET); }
+	if (SensorID == 9) { HAL_GPIO_WritePin(EN1_Distance_J24_GPIO_Port, EN1_Distance_J24_Pin, GPIO_PIN_SET);}
+	else { HAL_GPIO_WritePin(EN1_Distance_J24_GPIO_Port, EN1_Distance_J24_Pin, GPIO_PIN_RESET); }
 
-	if (SensorID == 10) { HAL_GPIO_WritePin(EN1_Distance_J28_Port, EN1_Distance_J28_Pin, GPIO_PIN_SET);}
-	else { HAL_GPIO_WritePin(EN1_Distance_J28_Port, EN1_Distance_J28_Pin, GPIO_PIN_RESET); }
+	if (SensorID == 10) { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_SET);}
+	else { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_RESET); }
 }
 
