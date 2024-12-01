@@ -265,11 +265,11 @@ def my_receive_callback(data, stream_area):
         new_byte_array_uint16 = data[3 : 3 + 4 * 2]
         new_byte_array_int16 = data[3 + (4 * 2) : -2]
 
-        hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
-        print("< " + hex_values)
+        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
+        # print("< " + hex_values)
 
-        hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
-        print("< " + hex_values)
+        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
+        # print("< " + hex_values)
 
         try:
             unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
@@ -287,13 +287,17 @@ def my_receive_callback(data, stream_area):
 
             txt = "< Battery : Voltage {} mV, Current {} mA\n".format(Voltage, Current)
 
-            if (BatteryState & 0x0500) == 0x0100:
-                print("Discharge")
+            if (BatteryState & 0x0F00) == 0x0100:
+                # print("Discharge")
                 button_battery_state.config(bg="yellow", text="Discharging")
 
-            if (BatteryState & 0x0500) == 0x0500:
-                print("Charge")
+            if (BatteryState & 0x0F00) == 0x0500:
+                # print("Charge")
                 button_battery_state.config(bg="lime", text="Charging")
+
+            if (BatteryState & 0x0F00) == 0x0C00:
+                # print("Empty")
+                button_battery_state.config(bg="red", text="Empty")
 
             button_battery_voltage.config(text=str(Voltage) + " mV")
             button_battery_current.config(text=str(Current) + " mA")
