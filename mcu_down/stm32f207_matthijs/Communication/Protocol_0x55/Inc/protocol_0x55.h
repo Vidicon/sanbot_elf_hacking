@@ -6,6 +6,7 @@
 #include "MotionSensors.h"
 #include "DistanceSensors.h"
 #include "Compass.h"
+#include "Battery.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -17,16 +18,19 @@
 #define CMD_RA_COLOR    		0x11
 #define CMD_BASE_COLOR  		0x12
 #define CMD_BA_COLOR    		0x13
+#define CMD_LARA_COLOR			0x14
 
 #define CMD_GET_ENCODERS		0x20
 #define CMD_GET_MOTIONSENSORS  	0x21
 #define CMD_GET_DISTANCESENSORS 0x22
 #define CMD_GET_COMPASS 	    0x23
+#define CMD_GET_BATTERY 	    0x24
 
 
 #define CMD_LA_MOVE		 		0x30
 #define CMD_RA_MOVE		 		0x31
 #define CMD_BASE_MOVE	 		0x32
+#define CMD_COMP_MOVE			0x33
 
 #define RESP_BIT 				0x80
 
@@ -89,5 +93,10 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 void SendCompass(struct Compass_Sensor_Type *CompassData);
 
 void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *CompassData);
+
+
+void SendBattery(struct Battery_Sensor_Type *BatteryData);
+
+void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *BatteryData);
 
 #endif

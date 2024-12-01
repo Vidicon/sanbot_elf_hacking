@@ -17,22 +17,25 @@ CMD_LA_COLOR = 0x10
 CMD_RA_COLOR = 0x11
 CMD_BASE_COLOR = 0x12
 CMD_BA_COLOR = 0x13
+CMD_LARA_COLOR = 0x14
 
 CMD_GET_ENCODERS = 0x20
 CMD_GET_MOTIONSENSORS = 0x21
 CMD_GET_DISTANCESENSORS = 0x22
 CMD_GET_COMPASS = 0x23
+CMD_GET_BATTERY = 0x24
 
 CMD_LA_MOVE = 0x30
 CMD_RA_MOVE = 0x31
 CMD_BASE_MOVE = 0x32
+CMD_COMP_MOVE = 0x33
 
-
+CMD_COLOR_NONE = 0
 CMD_RED = 1
 CMD_GREEN = 2
 CMD_BLUE = 3
 CMD_WHITE = 4
-CMD_ALL = 5
+CMD_REDGREEN = 5
 
 CMD_LED_NONE = 0
 CMD_LED_OFF = 1
@@ -56,6 +59,7 @@ button_version = []
 
 button_debug1 = []
 button_debug2 = []
+button_kerst = []
 
 button_Motion_Front = []
 button_Motion_Back = []
@@ -68,8 +72,15 @@ distance5_Front = []
 distance6_Front = []
 distance7_Front = []
 distance8_Front = []
+distance9_Front = []
+distance10_Front = []
+distance11_Front = []
 
 compass_button = []
+
+button_battery_state = []
+button_battery_voltage = []
+button_battery_current = []
 
 canvas = []
 arrow_angle = 0
@@ -114,19 +125,24 @@ def my_receive_callback(data, stream_area):
     response = data[1]
 
     if response == (CMD_VERSION | RESP_BIT):
-
-        string_from_bytearray = data[3:-2].decode("utf-8")
-        stream_area.insert(tk.END, "< " + string_from_bytearray + "\n")
-        stream_area.yview_moveto(1)  # Scrolling to the bottom
+        try:
+            string_from_bytearray = data[3:-2].decode("utf-8")
+            stream_area.insert(tk.END, "< " + string_from_bytearray + "\n")
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Version bytes error")
 
     if response == (CMD_GET_ENCODERS | RESP_BIT):
-        new_byte_array = data[3:-2]
-        int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
+        try:
+            new_byte_array = data[3:-2]
+            int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-        stream_area.insert(
-            tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
-        )
-        stream_area.yview_moveto(1)  # Scrolling to the bottom
+            # stream_area.insert(
+            #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
+            # )
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Encoders bytes error")
 
     if response == (CMD_GET_COMPASS | RESP_BIT):
         new_byte_array = data[3:-2]
@@ -134,14 +150,12 @@ def my_receive_callback(data, stream_area):
         try:
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-            stream_area.insert(
-                tk.END, "< Compass    : " + str(int16_array_5) + "\n"
-            )
+            # stream_area.insert(
+            #     tk.END, "< Compass    : " + str(int16_array_5) + "\n"
+            # )
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
-            compass_angle, angle_degrees = calculate_angle(
-                int16_array_5[0], int16_array_5[1]
-            )
+            compass_angle, angle_degrees = calculate_angle(int16_array_5[0], int16_array_5[1])
 
             draw_arrow(angle_degrees + 90)
 
@@ -155,9 +169,9 @@ def my_receive_callback(data, stream_area):
         try:
             int8_array = np.frombuffer(new_byte_array, dtype=">i1")
 
-            stream_area.insert(
-                tk.END, "< Motion     : " + str(int8_array) + "\n"
-            )
+            # stream_area.insert(
+            #     tk.END, "< Motion     : " + str(int8_array) + "\n"
+            # )
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
             if int8_array[0] == 1:
@@ -176,7 +190,7 @@ def my_receive_callback(data, stream_area):
         new_byte_array = data[3:-2]
         uint8_array = np.frombuffer(new_byte_array, dtype=">u1")
 
-        stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
+        # stream_area.insert(tk.END, "< Distance   : " + str(uint8_array) + "\n")
         stream_area.yview_moveto(1)  # Scrolling to the bottom
 
         # --------------------------------------------------------------------------
@@ -226,6 +240,68 @@ def my_receive_callback(data, stream_area):
             new_byte_array[14:16], byteorder="big"
         )  # 'big' for big-endian, 'little' for little-endian
         SetDistanceButtonBGColor(distance8_Front, combined8_int)
+
+        # --------------------------------------------------------------------------
+        combined9_int = int.from_bytes(
+            new_byte_array[16:18], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance9_Front, combined9_int)
+
+        # --------------------------------------------------------------------------
+        combined10_int = int.from_bytes(
+            new_byte_array[18:20], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance10_Front, combined10_int)
+
+        # --------------------------------------------------------------------------
+        combined11_int = int.from_bytes(
+            new_byte_array[20:22], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetDistanceButtonBGColor(distance11_Front, combined11_int)
+
+    if response == (CMD_GET_BATTERY | RESP_BIT):
+        # 4x uint16_t
+        # 3x int16_t
+        new_byte_array_uint16 = data[3 : 3 + 4 * 2]
+        new_byte_array_int16 = data[3 + (4 * 2) : -2]
+
+        hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
+        print("< " + hex_values)
+
+        hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
+        print("< " + hex_values)
+
+        try:
+            unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
+
+            DeviceType = unt16_array[0]
+            FW_Version = unt16_array[1]
+            HW_Version = unt16_array[2]
+            BatteryState = unt16_array[3]
+
+            int16_array = np.frombuffer(new_byte_array_int16, dtype=">i2")
+
+            Temperature = int16_array[0]  # First 16-bit integer
+            Current = int16_array[1]  # Third 16-bit integer
+            Voltage = int16_array[2]  # Second 16-bit integer
+
+            txt = "< Battery : Voltage {} mV, Current {} mA\n".format(Voltage, Current)
+
+            if (BatteryState & 0x0500) == 0x0100:
+                print("Discharge")
+                button_battery_state.config(bg="yellow", text="Discharging")
+
+            if (BatteryState & 0x0500) == 0x0500:
+                print("Charge")
+                button_battery_state.config(bg="lime", text="Charging")
+
+            button_battery_voltage.config(text=str(Voltage) + " mV")
+            button_battery_current.config(text=str(Current) + " mA")
+
+            stream_area.insert(tk.END, txt)
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Battery bytes error")
 
 
 def createCommand(mod_manager, InputCommmand, Parameters):
@@ -313,11 +389,9 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Debug 1",
-        command=lambda t=np.array(
-            [CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]
-        ): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug1.grid(row=0, column=8, sticky="w")
+    button_debug1.grid(row=0, column=9, sticky="w")
 
     global button_debug2
     button_debug2 = tk.Button(
@@ -325,20 +399,26 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Debug 2",
-        command=lambda t=np.array(
-            [CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]
-        ): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]): createDoubleMoveCommand(mod_manager, t),
     )
-    button_debug2.grid(row=1, column=8, sticky="w")
+    button_debug2.grid(row=1, column=9, sticky="w")
+
+    global button_kerst
+    button_kerst = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Kerst 1",
+        command=lambda t=np.array([CMD_LARA_COLOR, CMD_REDGREEN, CMD_LED_BLINK_FAST]): createLedCommand(mod_manager, t),
+    )
+    button_kerst.grid(row=2, column=9, sticky="w")
 
     button_LA_White = tk.Button(
         frame,
         height=1,
         width=10,
         text="Left White",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_WHITE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_LA_White.grid(row=0, column=0, sticky="w")
 
@@ -347,9 +427,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Red",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_RED, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_RED, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_LA_Red.grid(row=1, column=0, sticky="w")
 
@@ -358,9 +436,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Green",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_GREEN, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_GREEN, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_LA_Green.grid(row=2, column=0, sticky="w")
 
@@ -369,9 +445,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Blue",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_BLUE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_BLUE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_LA_Blue.grid(row=3, column=0, sticky="w")
 
@@ -380,9 +454,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Off",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_ALL, CMD_LED_OFF]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_LA_Off.grid(row=4, column=0, sticky="w")
 
@@ -391,9 +463,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Blue Blink",
-        command=lambda t=np.array(
-            [CMD_LA_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t),
     )
     button_LA_Blue_Blink.grid(row=5, column=0, sticky="w")
 
@@ -418,9 +488,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right White",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_WHITE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_RA_White.grid(row=0, column=1, sticky="w")
 
@@ -429,9 +497,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Red",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_RED, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_RED, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_RA_Red.grid(row=1, column=1, sticky="w")
 
@@ -440,9 +506,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Green",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_GREEN, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_GREEN, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_RA_Green.grid(row=2, column=1, sticky="w")
 
@@ -451,9 +515,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Blue",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_BLUE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_BLUE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_RA_Blue.grid(row=3, column=1, sticky="w")
 
@@ -462,9 +524,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Off",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_ALL, CMD_LED_OFF]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_RA_Off.grid(row=4, column=1, sticky="w")
 
@@ -473,9 +533,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Blue Blink",
-        command=lambda t=np.array(
-            [CMD_RA_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RA_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t),
     )
     button_RA_Blue_Blink.grid(row=5, column=1, sticky="w")
 
@@ -487,9 +545,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base White",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_WHITE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_Base_Off.grid(row=0, column=2, sticky="w")
 
@@ -498,9 +554,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Red",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_RED, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_RED, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_Base_Red.grid(row=1, column=2, sticky="w")
 
@@ -509,9 +563,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Green",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_GREEN, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_GREEN, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_Base_Green.grid(row=2, column=2, sticky="w")
 
@@ -520,9 +572,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Blue",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_BLUE, CMD_LED_ON]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_BLUE, CMD_LED_ON]): createLedCommand(mod_manager, t),
     )
     button_Base_Blue.grid(row=3, column=2, sticky="w")
 
@@ -531,9 +581,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Off",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_ALL, CMD_LED_OFF]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_Base_Blue.grid(row=4, column=2, sticky="w")
 
@@ -542,9 +590,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Base Blue Blink",
-        command=lambda t=np.array(
-            [CMD_BASE_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]
-        ): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_BASE_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t),
     )
     button_Base_Blue_Blink.grid(row=5, column=2, sticky="w")
 
@@ -556,9 +602,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Move 1",
-        command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_1.grid(row=0, column=3, sticky="w")
 
@@ -567,9 +611,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Move 2",
-        command=lambda t=np.array([CMD_LA_MOVE, -350]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_LA_MOVE, -350]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_2.grid(row=1, column=3, sticky="w")
 
@@ -578,9 +620,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left  Move 3",
-        command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_3.grid(row=2, column=3, sticky="w")
 
@@ -592,47 +632,76 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Right Move 1",
-        command=lambda t=np.array([CMD_RA_MOVE, 500]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_RA_MOVE, 500]): createMoveCommand(mod_manager, t),
     )
-    button_RA_Move_1.grid(row=0, column=4, sticky="w")
+    button_RA_Move_1.grid(row=3, column=3, sticky="w")
 
     button_RA_Move_2 = tk.Button(
         frame,
         height=1,
         width=10,
         text="Right Move 2",
-        command=lambda t=np.array([CMD_RA_MOVE, 350]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_RA_MOVE, 350]): createMoveCommand(mod_manager, t),
     )
-    button_RA_Move_2.grid(row=1, column=4, sticky="w")
+    button_RA_Move_2.grid(row=4, column=3, sticky="w")
 
     button_RA_Move_3 = tk.Button(
         frame,
         height=1,
         width=10,
         text="Right  Move 3",
-        command=lambda t=np.array([CMD_RA_MOVE, 150]): createMoveCommand(
-            mod_manager, t
-        ),
+        command=lambda t=np.array([CMD_RA_MOVE, 150]): createMoveCommand(mod_manager, t),
     )
-    button_RA_Move_3.grid(row=2, column=4, sticky="w")
+    button_RA_Move_3.grid(row=5, column=3, sticky="w")
+
+    # --------------------------------------------------------------------------------------
+    # Rotate using compass
+    # --------------------------------------------------------------------------------------
+    button_rotate_North = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="North",
+        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createMoveCommand(mod_manager, t),
+    )
+    button_rotate_North.grid(row=0, column=4, sticky="w")
+
+    button_rotate_East = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="East",
+        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createMoveCommand(mod_manager, t),
+    )
+    button_rotate_East.grid(row=1, column=4, sticky="w")
+
+    button_rotate_South = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="South",
+        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createMoveCommand(mod_manager, t),
+    )
+    button_rotate_South.grid(row=2, column=4, sticky="w")
+
+    button_rotate_West = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="West",
+        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createMoveCommand(mod_manager, t),
+    )
+    button_rotate_West.grid(row=3, column=4, sticky="w")
 
     # --------------------------------------------------------------------------------------
     # Motion sensors front & back
     # --------------------------------------------------------------------------------------
     global button_Motion_Front
-    button_Motion_Front = tk.Button(
-        frame, height=1, width=10, text="Motion Front"
-    )
+    button_Motion_Front = tk.Button(frame, height=1, width=10, text="Motion Front")
     button_Motion_Front.grid(row=0, column=5, sticky="w")
 
     global button_Motion_Back
-    button_Motion_Back = tk.Button(
-        frame, height=1, width=10, text="Motion Back"
-    )
+    button_Motion_Back = tk.Button(frame, height=1, width=10, text="Motion Back")
     button_Motion_Back.grid(row=1, column=5, sticky="w")
 
     # --------------------------------------------------------------------------------------
@@ -670,6 +739,18 @@ def show_gui(mod_manager):
     distance8_Front = tk.Button(frame, height=1, width=10, text="inf")
     distance8_Front.grid(row=7, column=6, sticky="w")
 
+    # Mid sensors
+    global distance9_Front
+    distance9_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance9_Front.grid(row=3, column=5, sticky="w")
+
+    global distance10_Front
+    distance10_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance10_Front.grid(row=4, column=5, sticky="w")
+
+    global distance11_Front
+    distance11_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance11_Front.grid(row=5, column=5, sticky="w")
     # --------------------------------------------------------------------------------------
     # Generic buttons
     # --------------------------------------------------------------------------------------
@@ -686,12 +767,8 @@ def show_gui(mod_manager):
     # --------------------------------------------------------------------------------------
     canvas_width = 100
     canvas_height = 100
-    canvas = tk.Canvas(
-        frame, width=canvas_width, height=canvas_height, bg="white"
-    )
-    canvas.grid(
-        row=0, rowspan=3, column=7, sticky="w"
-    )  # Place the canvas in the grid
+    canvas = tk.Canvas(frame, width=canvas_width, height=canvas_height, bg="white")
+    canvas.grid(row=0, rowspan=3, column=7, sticky="w")  # Place the canvas in the grid
 
     arrow_center = (canvas_width // 2, canvas_height // 2)
 
@@ -702,9 +779,40 @@ def show_gui(mod_manager):
     # --------------------------------------------------------------------------------------
     # streaming data area
     # --------------------------------------------------------------------------------------
-    stream_area = scrolledtext.ScrolledText(
-        frame, width=200, height=20, wrap="word"
+    global button_battery_state
+    button_battery_state = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
     )
+    button_battery_state.grid(row=0, column=8, sticky="w")
+
+    global button_battery_voltage
+    button_battery_voltage = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+    )
+    button_battery_voltage.grid(row=1, column=8, sticky="w")
+
+    global button_battery_current
+    button_battery_current = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Battery",
+        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+    )
+    button_battery_current.grid(row=2, column=8, sticky="w")
+
+    # --------------------------------------------------------------------------------------
+    # streaming data area
+    # --------------------------------------------------------------------------------------
+    stream_area = scrolledtext.ScrolledText(frame, width=200, height=20, wrap="word")
     stream_area.grid(row=10, column=0, columnspan=10, sticky="w")
 
     return root, stream_area, canvas
@@ -719,9 +827,7 @@ def draw_arrow(angle):
     x, y = (50, 50)
     radians = math.radians(angle)
     x_end = x + 30 * math.cos(radians)
-    y_end = y - 30 * math.sin(
-        radians
-    )  # Negative because canvas y-coordinates increase downwards
+    y_end = y - 30 * math.sin(radians)  # Negative because canvas y-coordinates increase downwards
     canvas.create_line(
         x,
         y,
@@ -771,19 +877,13 @@ def handle_pygame_events():
                 )
 
             if event.button == 1:
-                createLedCommand(
-                    mod_manager, np.array([CMD_BA_COLOR, CMD_RED, CMD_LED_ON])
-                )
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_RED, CMD_LED_ON]))
 
             if event.button == 2:
-                createLedCommand(
-                    mod_manager, np.array([CMD_BA_COLOR, CMD_BLUE, CMD_LED_ON])
-                )
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_BLUE, CMD_LED_ON]))
 
             if event.button == 3:
-                createLedCommand(
-                    mod_manager, np.array([CMD_BA_COLOR, CMD_ALL, CMD_LED_OFF])
-                )
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_ALL, CMD_LED_OFF]))
 
             # Left forward
             if event.button == 4:
@@ -791,14 +891,10 @@ def handle_pygame_events():
                 button4_toggle = button4_toggle & 1
 
                 if button4_toggle == 1:
-                    createMoveCommand(
-                        mod_manager, np.array([CMD_LA_MOVE, -400])
-                    )
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -400]))
 
                 if button4_toggle == 0:
-                    createMoveCommand(
-                        mod_manager, np.array([CMD_LA_MOVE, -200])
-                    )
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -200]))
 
             # Left forward
             if event.button == 5:
@@ -806,14 +902,10 @@ def handle_pygame_events():
                 button5_toggle = button5_toggle & 1
 
                 if button5_toggle == 1:
-                    createMoveCommand(
-                        mod_manager, np.array([CMD_RA_MOVE, 400])
-                    )
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 400]))
 
                 if button5_toggle == 0:
-                    createMoveCommand(
-                        mod_manager, np.array([CMD_RA_MOVE, 200])
-                    )
+                    createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, 200]))
 
             # if (event.button == 5):
             #     createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, -100]))
@@ -864,9 +956,7 @@ def handle_pygame_events():
                 axis5 = event.value
 
     if (axis0_event == True) or (axis1_event == True) or (axis3_event == True):
-        print(
-            f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 3 : {-1*axis3:.2f}"
-        )
+        print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 3 : {-1*axis3:.2f}")
         createBaseCommand(
             mod_manager,
             np.array(
@@ -881,15 +971,11 @@ def handle_pygame_events():
 
     if axis2_event == True:
         print(f"Axis 2 : {-1*axis2:.2f}")
-        createMoveCommand(
-            mod_manager, np.array([CMD_LA_MOVE, int(axis2 + 1) * -200])
-        )
+        createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, int(axis2 + 1) * -150 - 150]))
 
     if axis5_event == True:
         print(f"Axis 5 : {-1*axis5:.2f}")
-        createMoveCommand(
-            mod_manager, np.array([CMD_RA_MOVE, int(axis5 + 1) * 200])
-        )
+        createMoveCommand(mod_manager, np.array([CMD_RA_MOVE, int(axis5 + 1) * 150 + 150]))
 
     # Schedule the function to run again after 100 milliseconds
     root.after(100, handle_pygame_events)
@@ -928,11 +1014,9 @@ def main():
 
     if "LINUX" in platform.system().upper():
         print("Linux detected!")
-        mod_manager = ModManager(
-            port1="/dev/ttyACM0", port2="/dev/ttyACM1", baudrate=115200
-        )
+        mod_manager = ModManager(port1="/dev/ttyACM0", port2="/dev/ttyACM1", baudrate=115200)
     else:
-        mod_manager = ModManager(port="COM9", baudrate=115200)
+        mod_manager = ModManager(port1="COM7", port2="COM10", baudrate=115200)
 
     root, stream_area, canvas = show_gui(mod_manager)
 
