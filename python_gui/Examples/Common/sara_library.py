@@ -155,13 +155,13 @@ class Battery:
             # First set to unknown because not all bits are implemented.
             self.batterystate = Battery.UNKNOWN
 
-            if (BatteryState & 0x0C00) == 0x0100:
+            if (BatteryState & 0x0F00) == 0x0100:
                 self.batterystate = Battery.DISCHARGE
 
-            if (BatteryState & 0x0C00) == 0x0500:
+            if (BatteryState & 0x0F00) == 0x0500:
                 self.batterystate = Battery.CHARGE
 
-            if (BatteryState & 0x0C00) == 0x0C00:
+            if (BatteryState & 0x0F00) == 0x0C00:
                 self.batterystate = Battery.EMPTY
 
             if self.batterystate != self.oldstate:
