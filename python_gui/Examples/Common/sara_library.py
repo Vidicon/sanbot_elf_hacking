@@ -100,17 +100,19 @@ class SaraRobot:
 class Battery:
     EMPTY = 0
     ERROR = 1
-    DISCHARGE = 2
-    CHARGE = 3
-    UNKNOWN = 4
+    UNKNOWN = 2
+    DISCHARGE = 3
+    CHARGE = 4
 
-    state_names = ["Empty", "Error", "Discharging", "Charging", "Unknown"]
+    # BMS switches off at 12000 mV (4 * 3.00 V)
+    # That is very low. If stored in that state for a longer time, it will die
+    # Set SW limits to 3.25 * 4 = 13000 mV
+    state_names = ["Empty", "Error", "Unknown", "Discharging", "Charging"]
 
     def __init__(self, mod_manager, bodypart):
         self.mod_manager = mod_manager
         self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + self.full_bodypart_name)
-        self.firstpass = True
 
         self.batterystate = Battery.ERROR
         self.oldstate = Battery.ERROR
@@ -122,9 +124,10 @@ class Battery:
         txt += Battery.state_names[self.batterystate]
         print(txt)
 
-    def getstate(self):
-        self.printstate()
-        return self.batterystate
+    def checkNotEmpty(self):
+        batteryFullEnough = self.batterystate >= Battery.DISCHARGE
+        batteryFullEnough = batteryFullEnough and (self.Voltage >= 13000)
+        return batteryFullEnough
 
     def newdata(self, data):
         try:
@@ -139,9 +142,9 @@ class Battery:
 
             unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
 
-            DeviceType = unt16_array[0]
-            FW_Version = unt16_array[1]
-            HW_Version = unt16_array[2]
+            # DeviceType = unt16_array[0]
+            # FW_Version = unt16_array[1]
+            # HW_Version = unt16_array[2]
             BatteryState = unt16_array[3]
 
             # print(format(BatteryState, "02X"))
@@ -169,12 +172,11 @@ class Battery:
 
             self.oldstate = self.batterystate
 
-            if self.firstpass:
-                self.firstpass = False
-                self.printstate()
+            if not self.checkNotEmpty():
+                print("WARNING : Battery is almost empty, recharge first.")
 
         except:
-            print("Battery processing error")
+            print("Battery data processing error")
 
 
 class RobotArm:
