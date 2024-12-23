@@ -2,8 +2,8 @@ import os
 import platform
 import numpy as np
 from Common.mod_manager import ModManager
-
-body_parts_names = ["left_arm", "right_arm", "base", "head", "body", "battery"]
+from Common.dist_sensors import DistanceSensors
+from Common.sara_common import *
 
 RESP_BIT = 0x80
 
@@ -26,17 +26,14 @@ CMD_BASE_MOVE = 0x32
 CMD_COMP_MOVE = 0x33
 
 
-def bodypart_to_string(bodypart):
-    return body_parts_names[bodypart]
-
-
 class SaraRobot:
-    LEFTARM = 0
-    RIGHTARM = 1
-    BASE = 2
-    HEAD = 3
-    BODY = 4
-    BATTERY = 5
+    # LEFTARM = 0
+    # RIGHTARM = 1
+    # BASE = 2
+    # HEAD = 3
+    # BODY = 4
+    # BATTERY = 5
+    # BODYDISTANCESENSORS = 6
 
     def __init__(self, com_windows1, com_windows2, com_linux1, com_linux2):
         print("-" * 80)
@@ -47,10 +44,12 @@ class SaraRobot:
 
         self.start()
 
-        self.left_arm = RobotArm(self.mod_manager, SaraRobot.LEFTARM)
-        self.right_arm = RobotArm(self.mod_manager, SaraRobot.RIGHTARM)
-        self.base = RobotArm(self.mod_manager, SaraRobot.BASE)
-        self.battery = Battery(self.mod_manager, SaraRobot.BATTERY)
+        self.left_arm = RobotArm(self.mod_manager, SaraRobotPartNames.LEFTARM)
+        self.right_arm = RobotArm(self.mod_manager, SaraRobotPartNames.RIGHTARM)
+        self.base = RobotArm(self.mod_manager, SaraRobotPartNames.BASE)
+        self.battery = Battery(self.mod_manager, SaraRobotPartNames.BATTERY)
+        self.body = Body(self.mod_manager, SaraRobotPartNames.BODY)
+
         print("-" * 80)
 
     def start(self):
@@ -94,7 +93,18 @@ class SaraRobot:
             print("-" * 80)
 
         if response == (CMD_GET_BATTERY | RESP_BIT):
-            self.battery.newdata(data)
+            self.battery.new_data(data)
+
+        if response == (CMD_GET_DISTANCESENSORS | RESP_BIT):
+            self.body.distancesensors.new_data(data)
+
+
+class Body:
+    def __init__(self, mod_manager, bodypart):
+        self.mod_manager = mod_manager
+        self.full_bodypart_name = bodypart_to_string(bodypart)
+        print("Adding " + self.full_bodypart_name)
+        self.distancesensors = DistanceSensors(self.mod_manager, bodypart)
 
 
 class Battery:
@@ -119,17 +129,17 @@ class Battery:
         self.Voltage = 0
         self.Current = 0
 
-    def printstate(self):
+    def print_state(self):
         txt = "Battery : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
         txt += Battery.state_names[self.batterystate]
         print(txt)
 
-    def checkNotEmpty(self):
+    def check_not_empty(self):
         batteryFullEnough = self.batterystate >= Battery.DISCHARGE
         batteryFullEnough = batteryFullEnough and (self.Voltage >= 13000)
         return batteryFullEnough
 
-    def newdata(self, data):
+    def new_data(self, data):
         try:
             new_byte_array_uint16 = data[3 : 3 + 4 * 2]
             new_byte_array_int16 = data[3 + (4 * 2) : -2]
@@ -168,11 +178,11 @@ class Battery:
                 self.batterystate = Battery.EMPTY
 
             if self.batterystate != self.oldstate:
-                self.printstate()
+                self.print_state()
 
             self.oldstate = self.batterystate
 
-            if not self.checkNotEmpty():
+            if not self.check_not_empty():
                 print("WARNING : Battery is almost empty, recharge first.")
 
         except:
