@@ -3,12 +3,12 @@
 #include <main.h>
 #include "Encoders.h"
 #include "RGBLeds.h"
-#include <stdlib.h>  // For abs()
-
-#include <string.h>		// For tracing
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include "usbd_cdc_if.h"
 #include "Compass.h"
+#include "protocol_0x55.h"
 
 
 struct Base_State_Type LeftBaseMotor_State;
@@ -183,7 +183,6 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		}
 	}
 
-
 	if (abs(Compass_Error) < 10)
 	{
 		Compass_MoveSpeed = Compass_MoveSpeed / 2;
@@ -199,6 +198,7 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		Base_VelocitySetpoint(0, 0, Compass_MoveSpeed);
 	}
 
+	// Compass rotation move = DONE
 	if ((Compass_MoveState > 0) && abs(Compass_Error) < 5)
 	{
 		Compass_MoveState = 0;
@@ -209,6 +209,8 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		GenericBase_HAL_Brake(True, LeftBaseMotor);
 		GenericBase_HAL_Brake(True, CenterBaseMotor);
 		GenericBase_HAL_Brake(True, RightBaseMotor);
+
+		SendCompassMoveDone(True);
 	}
 }
 
@@ -216,10 +218,23 @@ void Base_NewCompassRotation(char HighByte, char LowByte)
 {
 	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
 
-	if (Compass_MoveState == 0)
+	// Limit moves to 1 turn
+	if ((combined >= 0) && (combined < 360))
 	{
-		Compass_MoveState = 1;
-		Compass_Target = (float)combined;
+		if (Compass_MoveState == 0)
+		{
+			Compass_MoveState = 1;
+			Compass_Target = (float)combined;
+
+		}
+		else
+		{
+			SendCompassMoveDone(False);
+		}
+	}
+	else
+	{
+		SendCompassMoveDone(False);
 	}
 }
 

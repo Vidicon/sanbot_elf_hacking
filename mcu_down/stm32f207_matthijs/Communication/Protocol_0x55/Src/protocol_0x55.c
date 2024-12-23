@@ -166,7 +166,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-BODY by Matthijs ");
+	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -348,7 +348,7 @@ void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *Compass
 }
 
 //----------------------------------------------------------------
-// Raw compass data
+// Battery data
 //----------------------------------------------------------------
 void SendBattery(struct Battery_Sensor_Type *BatteryData)
 {
@@ -390,6 +390,27 @@ void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *Battery
 	Buffer[3 + 12] = (BatteryData->Voltage >> 8 );
 	Buffer[3 + 13] = (BatteryData->Voltage & 0xff);
 
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}
+
+//----------------------------------------------------------------
+// Raw compass data
+//----------------------------------------------------------------
+void SendCompassMoveDone(uint8_t Succes)
+{
+	Protocol_0x55_SendCompassMoveDone((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], Succes);
+}
+
+void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_COMP_MOVE, RESPONSE_TRUE);
+
+	int payloadLen = 1;
+
+	Buffer[3 + 0] = Succes;
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);

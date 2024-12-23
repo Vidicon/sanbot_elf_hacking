@@ -15,6 +15,7 @@ class DistanceSensors:
 
         self.sensors = np.ones(11) * 65295
         self.valid_data = False
+        self.error_counter = 0
 
         print("Adding " + self.full_bodypart_name)
 
@@ -31,15 +32,27 @@ class DistanceSensors:
                 self.sensors[i] = float(combined_int)
 
             self.valid_data = True
+            self.error_counter = 0
         except:
-            print("Body distance sensors data processing error")
-            self.valid_data = False
+            print("Distance sensors data processing error")
+
+            self.error_counter += 1
+
+            if self.error_counter > 3:
+                self.valid_data = False
 
     def sensor_warning(self, threshold=25000):
-        return np.any(self.sensors < threshold)
+
+        if self.valid_data == False:
+            return False
+        else:
+            return np.any(self.sensors < threshold)
 
     def sensor_collision(self, threshold=15000):
-        return np.any(self.sensors < threshold)
+        if self.valid_data == False:
+            return False
+        else:
+            return np.any(self.sensors < threshold)
 
     def print_values(self):
         print(self.sensors)

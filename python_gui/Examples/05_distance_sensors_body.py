@@ -1,9 +1,5 @@
-import sys
-import os
 import time
-import keyboard
-
-from Common.sara_library import *
+from Common.sara_library import SaraRobot
 
 
 def main():
@@ -28,7 +24,7 @@ def main():
 
             # 5 Hz update
             print(".")
-            time.sleep(0.2)
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
         print("Stopping")

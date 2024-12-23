@@ -887,7 +887,7 @@ def handle_pygame_events():
                 createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_BLUE, CMD_LED_ON]))
 
             if event.button == 3:
-                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]))
 
             # Left forward
             if event.button == 4:

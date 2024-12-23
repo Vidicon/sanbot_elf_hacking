@@ -3,27 +3,8 @@ import platform
 import numpy as np
 from Common.mod_manager import ModManager
 from Common.dist_sensors import DistanceSensors
+from Common.compass import Compass
 from Common.sara_common import *
-
-RESP_BIT = 0x80
-
-CMD_VERSION = 0x01
-CMD_LA_COLOR = 0x10
-CMD_RA_COLOR = 0x11
-CMD_BASE_COLOR = 0x12
-CMD_BA_COLOR = 0x13
-CMD_LARA_COLOR = 0x14
-
-CMD_GET_ENCODERS = 0x20
-CMD_GET_MOTIONSENSORS = 0x21
-CMD_GET_DISTANCESENSORS = 0x22
-CMD_GET_COMPASS = 0x23
-CMD_GET_BATTERY = 0x24
-
-CMD_LA_MOVE = 0x30
-CMD_RA_MOVE = 0x31
-CMD_BASE_MOVE = 0x32
-CMD_COMP_MOVE = 0x33
 
 
 class SaraRobot:
@@ -74,7 +55,7 @@ class SaraRobot:
         self.mod_manager.close_port()
 
     def getversion(self):
-        self.mod_manager.cmd_Generic(CMD_VERSION, 0, 0)
+        self.mod_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0)
         return
 
     def my_receive_callback(self, data):
@@ -83,7 +64,7 @@ class SaraRobot:
 
         response = data[1]
 
-        if response == (CMD_VERSION | RESP_BIT):
+        if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
             try:
                 string_from_bytearray = data[3:-2].decode("utf-8")
                 print("Software version : " + string_from_bytearray)
@@ -92,11 +73,17 @@ class SaraRobot:
 
             print("-" * 80)
 
-        if response == (CMD_GET_BATTERY | RESP_BIT):
+        if response == (SaraRobotCommands.CMD_GET_BATTERY | SaraRobotCommands.RESP_BIT):
             self.battery.new_data(data)
 
-        if response == (CMD_GET_DISTANCESENSORS | RESP_BIT):
+        if response == (SaraRobotCommands.CMD_GET_DISTANCESENSORS | SaraRobotCommands.RESP_BIT):
             self.body.distancesensors.new_data(data)
+
+        if response == (SaraRobotCommands.CMD_GET_COMPASS | SaraRobotCommands.RESP_BIT):
+            self.body.compass.new_data(data)
+
+        if response == (SaraRobotCommands.CMD_COMP_MOVE | SaraRobotCommands.RESP_BIT):
+            self.body.compass.rotate_absolute_ready(data)
 
 
 class Body:
@@ -105,6 +92,8 @@ class Body:
         self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + self.full_bodypart_name)
         self.distancesensors = DistanceSensors(self.mod_manager, bodypart)
+
+        self.compass = Compass(self.mod_manager, bodypart)
 
 
 class Battery:

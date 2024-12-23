@@ -99,4 +99,10 @@ void SendBattery(struct Battery_Sensor_Type *BatteryData);
 
 void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *BatteryData);
 
+//------------------------------------------------------------------------------------------
+void SendCompassMoveDone(uint8_t Succes);
+
+void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes);
+
+
 #endif
