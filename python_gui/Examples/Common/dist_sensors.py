@@ -9,6 +9,20 @@ from Common.sara_common import SaraRobotPartNames
 
 
 class DistanceSensors:
+
+    sensor_angles = np.array(
+        [
+            [-90, -75],
+            [-65, -50],
+            [-40, -25],
+            [-15, 0],
+            [0, 15],
+            [25, 40],
+            [50, 65],
+            [75, 90],
+        ]
+    )
+
     def __init__(self, mod_manager, bodypart):
         self.mod_manager = mod_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".distancesensors"
@@ -56,3 +70,6 @@ class DistanceSensors:
 
     def print_values(self):
         print(self.sensors)
+
+    def get_all_values(self):
+        return self.sensors
