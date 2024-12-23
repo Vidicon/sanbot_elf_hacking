@@ -22,7 +22,7 @@ def main():
     print(f"{angle:.1f} Deg")
     robot.body.compass.rotate_absolute(angle + 90, wait_for_finish=True)
 
-    robot.body.compass.rotate_absolute(145, wait_for_finish=True)
+    robot.body.compass.rotate_absolute(-160, wait_for_finish=True)
 
     # time.sleep(10)
 
