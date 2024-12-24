@@ -44,7 +44,7 @@ class SaraRobot:
         else:
             print("Windows detected")
 
-            self.mod_manager = ModManager(port1=self.windows1, port2=self.windows2, baudrate=115200)
+            self.mod_manager = ModManager(port1=self.com_windows1, port2=self.com_windows2, baudrate=115200)
 
         self.mod_manager.set_receive_callback(self.my_receive_callback)
         self.mod_manager.open_port()

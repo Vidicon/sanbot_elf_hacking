@@ -22,7 +22,6 @@ def main():
                     print("Distance sensors: Getting close!")
                     robot.body.distancesensors.print_values()
 
-            # 5 Hz update
             print(".")
             time.sleep(0.5)
 

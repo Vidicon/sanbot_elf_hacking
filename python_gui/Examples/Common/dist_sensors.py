@@ -10,16 +10,39 @@ from Common.sara_common import SaraRobotPartNames
 
 class DistanceSensors:
 
-    sensor_angles = np.array(
+    # sensor_angles = np.array(
+    #     [
+    #         [-90, -75],
+    #         [-65, -50],
+    #         [-40, -25],
+    #         [-15, 0],
+    #         [0, 15],
+    #         [25, 40],
+    #         [50, 65],
+    #         [75, 90],
+    #     ]
+    # )
+
+    hoek_bottom = 22.5
+    sensor_angles_bottom = np.array(
         [
-            [-90, -75],
-            [-65, -50],
-            [-40, -25],
-            [-15, 0],
-            [0, 15],
-            [25, 40],
-            [50, 65],
-            [75, 90],
+            [-4 * hoek_bottom, -3 * hoek_bottom],
+            [-3 * hoek_bottom, -2 * hoek_bottom],
+            [-2 * hoek_bottom, -1 * hoek_bottom],
+            [-1 * hoek_bottom, -0 * hoek_bottom],
+            [0 * hoek_bottom, 1 * hoek_bottom],
+            [1 * hoek_bottom, 2 * hoek_bottom],
+            [2 * hoek_bottom, 3 * hoek_bottom],
+            [3 * hoek_bottom, 4 * hoek_bottom],
+        ]
+    )
+
+    hoek_mid = 22.5
+    sensor_angles_mid = np.array(
+        [
+            [-0.5 * hoek_mid, 0.5 * hoek_mid],
+            [-1.5 * hoek_mid, -0.5 * hoek_mid],
+            [0.5 * hoek_mid, 1.5 * hoek_mid],
         ]
     )
 
@@ -30,6 +53,7 @@ class DistanceSensors:
         self.sensors = np.ones(11) * 65295
         self.valid_data = False
         self.error_counter = 0
+        self.rx_counter = 0
 
         print("Adding " + self.full_bodypart_name)
 
@@ -47,6 +71,7 @@ class DistanceSensors:
 
             self.valid_data = True
             self.error_counter = 0
+            self.rx_counter += 1
         except:
             print("Distance sensors data processing error")
 
@@ -73,3 +98,6 @@ class DistanceSensors:
 
     def get_all_values(self):
         return self.sensors
+
+    def get_rx_counter(self):
+        return self.rx_counter
