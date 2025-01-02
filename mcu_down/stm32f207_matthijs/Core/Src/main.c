@@ -164,6 +164,10 @@ void Check_USB_Communication()
 			Base_VelocitySetpoint(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4), Protocol_0x55_GetData(5));
 		}
 
+		if (command == CMD_BASE_BRAKE)
+		{
+			Base_Brake(Protocol_0x55_GetData(3));
+		}
 
 		if (command == CMD_COMP_MOVE)
 		{
@@ -239,6 +243,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (Update_25Hz)
+	  {
+		  Update_25Hz = 0;
+		  DistanceSensors_Update();
+	  }
+
 	  if (Update_20Hz)
 	  {
 		  Update_20Hz = 0;
@@ -248,8 +258,6 @@ int main(void)
 
 		  Base_Update20Hz(Encoders_GetPointer());
 		  Arms_Update20Hz(Encoders_GetPointer());
-
-		  DistanceSensors_Update20Hz();
 	  }
 
 	  if (Update_10Hz)

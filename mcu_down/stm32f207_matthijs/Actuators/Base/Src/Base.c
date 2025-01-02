@@ -61,6 +61,12 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	// PhiDot = rotational velocity around Rz.
 	//-------------------------------------------------------------------------------------------------
 
+	// Sanity check on the setpoints
+
+	if (abs(Vx) > 100) { return;}
+	if (abs(Vy) > 100) { return;}
+	if (abs(PhiDot) > 100) { return;}
+
 	long M1 = 0;
 	long M2 = 0;
 	long M3 = 0;
@@ -148,6 +154,9 @@ void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 	}
 }
 
+//------------------------------------------------------------------------------
+// Only used for feedback controlled compass rotations
+//------------------------------------------------------------------------------
 void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 {
 	// 0 = disabled
@@ -235,6 +244,22 @@ void Base_NewCompassRotation(char HighByte, char LowByte)
 	else
 	{
 		SendCompassMoveDone(False);
+	}
+}
+
+void Base_Brake(int ApplyBrake)
+{
+	if (ApplyBrake == 1)
+	{
+		GenericBase_HAL_Brake(True, LeftBaseMotor);
+		GenericBase_HAL_Brake(True, CenterBaseMotor);
+		GenericBase_HAL_Brake(True, RightBaseMotor);
+	}
+	else
+	{
+		GenericBase_HAL_Brake(False, LeftBaseMotor);
+		GenericBase_HAL_Brake(False, CenterBaseMotor);
+		GenericBase_HAL_Brake(False, RightBaseMotor);
 	}
 }
 

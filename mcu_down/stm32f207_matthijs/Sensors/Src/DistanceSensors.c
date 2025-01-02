@@ -31,7 +31,7 @@ void DistanceSensors_Init()
 	DistanceSensors_Select(DistanceData.SelectedSensor);
 }
 
-void DistanceSensors_Update20Hz()
+void DistanceSensors_Update()
 {
 	// Left
 	if (DistanceData.SelectedSensor <= 3)
@@ -54,8 +54,9 @@ void DistanceSensors_Update20Hz()
 	}
 
 	// Last step is to select the next sensor
+	// 11 sensors (8 low front, 2 mid height front, 1 top height front
 	DistanceData.SelectedSensor += 1;
-	if (DistanceData.SelectedSensor > 10)
+	if (DistanceData.SelectedSensor >= 11)
 	{
 		DistanceData.SelectedSensor = 0;
 

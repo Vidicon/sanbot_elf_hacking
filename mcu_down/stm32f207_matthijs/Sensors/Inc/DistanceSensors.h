@@ -17,7 +17,7 @@ struct Distance_Sensor_Type *DistanceSensors_GetPointer();
 
 void DistanceSensors_Init();
 
-void DistanceSensors_Update20Hz();
+void DistanceSensors_Update();
 
 void DistanceSensors_Select(int SensorID);
 
