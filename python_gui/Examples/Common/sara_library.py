@@ -11,6 +11,7 @@ from Common.robot_base import RobotBase
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
 from Common.sara_common import SaraRobotCommands
+from Common.sara_common import RobotArmPositions
 
 
 class SaraRobot:
@@ -40,7 +41,6 @@ class SaraRobot:
         print("-" * 80)
 
     def start(self):
-
         print("Starting robot communication")
 
         if "LINUX" in platform.system().upper():
@@ -104,10 +104,6 @@ class Body:
 
 
 class RobotArm:
-    UP = 500
-    FORWARD = 350
-    DOWN = 100
-
     def __init__(self, mod_manager, bodypart):
         self.mod_manager = mod_manager
         self.bodypart = bodypart
@@ -139,13 +135,13 @@ class RobotArmMotor:
             print(self.full_bodypart_name + " : Error --> Position > 500")
             return
 
-        if self.bodypart == SaraRobot.LEFTARM:
+        if self.bodypart == SaraRobotPartNames.LEFTARM:
             position *= -1
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
             self.mod_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))
 
-        if self.bodypart == SaraRobot.RIGHTARM:
+        if self.bodypart == SaraRobotPartNames.RIGHTARM:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 

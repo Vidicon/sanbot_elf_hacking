@@ -1,6 +1,9 @@
 import time
 from Common.sara_library import SaraRobot
 from Common.colorled import ColorLed
+from Common.sara_common import RobotArmPositions
+
+last_front_move = 0
 
 
 def drive_normal(robot):
@@ -13,46 +16,85 @@ def drive_slow(robot):
     return
 
 
-def rotate_on_collision(robot, FL, FR, F, L, R):
+def plot_sensors(robot, FL, FR, F, L, R):
+    # Initialize a dynamic array of characters
+    myarray = list("--------")
+
+    if L:
+        myarray[0] = "X"
+        myarray[1] = "X"
+
+    if FL:
+        myarray[2] = "X"
+
+    if F:
+        myarray[3] = "X"
+        myarray[4] = "X"
+
+    if FR:
+        myarray[5] = "X"
+
+    if R:
+        myarray[6] = "X"
+        myarray[7] = "X"
+
+    print(" ".join(myarray) + " ==> ", end="")
+    return
+
+
+def rotate_on_collision(robot, L, FL, F, FR, R):
     # Check where the collision is first
+    global last_front_move
 
     angle = robot.body.compass.read_abs_angle()
 
     if F:
         if FL and not FR:
-            print("Front + FL")
+            print("F + FL")
             robot.body.compass.rotate_absolute((angle + 60) % 360, wait_for_finish=True)
 
         if not FL and FR:
-            print("Front + FR")
+            print("F + FR")
             robot.body.compass.rotate_absolute((angle - 60) % 360, wait_for_finish=True)
 
         if FL and FR:
-            print("Front + FL + FR")
-            robot.body.compass.rotate_absolute((angle - 120) % 360, wait_for_finish=True)
+            print("F + FL + FR")
+
+            if last_front_move == 0:
+                robot.body.compass.rotate_absolute((angle - 120) % 360, wait_for_finish=True)
+            else:
+                robot.body.compass.rotate_absolute((angle + 120) % 360, wait_for_finish=True)
+
+            last_front_move = (last_front_move + 1) % 2
 
         if not FL and not FR:
-            print("Front")
-            robot.body.compass.rotate_absolute((angle - 60) % 360, wait_for_finish=True)
+            print("F")
+
+            if last_front_move == 0:
+                robot.body.compass.rotate_absolute((angle - 60) % 360, wait_for_finish=True)
+            else:
+                robot.body.compass.rotate_absolute((angle + 60) % 360, wait_for_finish=True)
+
+            last_front_move = (last_front_move + 1) % 2
 
         drive_normal(robot)
 
     elif L:
         if FL:
             robot.body.compass.rotate_absolute((angle + 60) % 360, wait_for_finish=True)
-            print("Left + FL")
+            print("L + FL")
         else:
-            print("Left")
+            print("L")
             robot.body.compass.rotate_absolute((angle + 45) % 360, wait_for_finish=True)
 
         drive_normal(robot)
 
     elif R:
         if FR:
-            print("Right + FR")
+            print("R + FR")
             robot.body.compass.rotate_absolute((angle - 60) % 360, wait_for_finish=True)
         else:
-            print("Right")
+            print("R")
             robot.body.compass.rotate_absolute((angle - 45) % 360, wait_for_finish=True)
 
         drive_normal(robot)
@@ -68,15 +110,13 @@ def rotate_on_collision(robot, FL, FR, F, L, R):
         drive_normal(robot)
 
     else:
-        print("????")
+        print("Something very wrong")
         time.sleep(10)
 
-    # time.sleep(1)
     return
 
 
-def update_leds(robot, FL, FR, F, L, R):
-
+def update_leds(robot, L, FL, F, FR, R):
     robot.base.led.setcolor(color=ColorLed.Red, blink=ColorLed.LED_BLINK_FAST)
 
     return
@@ -94,31 +134,39 @@ def main():
 
     try:
         while True:
-
-            # distance_warning = robot.body.distancesensors.sensor_warning()
-            # distance_collision = robot.body.distancesensors.sensor_collision()
-
+            L = robot.body.distancesensors.is_collision_left()
             FL = robot.body.distancesensors.is_collision_frontleft()
-            FR = robot.body.distancesensors.is_collision_frontright()
             F = robot.body.distancesensors.is_collision_front()
-            L = robot.body.distancesensors.is_collision_left(threshold=15000)
-            R = robot.body.distancesensors.is_collision_right(threshold=15000)
+            FR = robot.body.distancesensors.is_collision_frontright()
+            R = robot.body.distancesensors.is_collision_right()
 
-            if FL or FR or F or L or R:
-                print("Distance sensors: Collision!")
-
+            if L or FL or F or FR or R:
+                # Distance sensors: Collision!
+                robot.base.move_stop()
                 robot.base.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_BLINK_FAST)
 
-                robot.body.distancesensors.print_values()
-                robot.base.move_stop()
-                rotate_on_collision(robot, FL, FR, F, L, R)
+                plot_sensors(robot, L, FL, F, FR, R)
 
+                robot.left_arm.motor.move(position=RobotArmPositions.DOWN)
+                robot.right_arm.motor.move(position=RobotArmPositions.DOWN)
+
+                # robot.body.distancesensors.print_values()
+                rotate_on_collision(robot, L, FL, F, FR, R)
             else:
                 # all fine
                 robot.base.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_ON)
                 pass
 
-            # print(".")
+            # Detect motion with the IR sensor
+
+            # Play some music
+
+            # Move some arms
+
+            # Some colors
+
+            # Move the head
+
             time.sleep(0.25)
 
     except KeyboardInterrupt:

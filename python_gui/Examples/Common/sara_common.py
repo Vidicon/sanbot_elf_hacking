@@ -36,3 +36,9 @@ class SaraRobotPartNames:
     BODY = 4
     BATTERY = 5
     BODYDISTANCESENSORS = 6
+
+
+class RobotArmPositions:
+    UP = 500
+    FORWARD = 350
+    DOWN = 150
