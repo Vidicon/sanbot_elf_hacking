@@ -9,20 +9,6 @@ from Common.sara_common import SaraRobotPartNames
 
 
 class DistanceSensors:
-
-    # sensor_angles = np.array(
-    #     [
-    #         [-90, -75],
-    #         [-65, -50],
-    #         [-40, -25],
-    #         [-15, 0],
-    #         [0, 15],
-    #         [25, 40],
-    #         [50, 65],
-    #         [75, 90],
-    #     ]
-    # )
-
     hoek_bottom = 22.5
     sensor_angles_bottom = np.array(
         [
@@ -80,14 +66,14 @@ class DistanceSensors:
             if self.error_counter > 3:
                 self.valid_data = False
 
-    def sensor_warning(self, threshold=25000):
+    def sensor_warning(self, threshold=30000):
 
         if self.valid_data == False:
             return False
         else:
             return np.any(self.sensors < threshold)
 
-    def sensor_collision(self, threshold=15000):
+    def sensor_collision(self, threshold=20000):
         if self.valid_data == False:
             return False
         else:
@@ -101,3 +87,42 @@ class DistanceSensors:
 
     def get_rx_counter(self):
         return self.rx_counter
+
+    # --------------------------------------------------------------------------------
+    # Basic checks where collision is
+    # --------------------------------------------------------------------------------
+    def is_collision_left(self, threshold=20000):
+        if self.valid_data == False:
+            return False
+        else:
+            return (self.sensors[0] < threshold) or (self.sensors[1] < threshold)
+
+    def is_collision_frontleft(self, threshold=20000):
+        if self.valid_data == False:
+            return False
+        else:
+            return self.sensors[2] < threshold
+
+    def is_collision_front(self, threshold=20000):
+        if self.valid_data == False:
+            return False
+        else:
+            return (
+                (self.sensors[3] < threshold)
+                or (self.sensors[4] < threshold)
+                or (self.sensors[8] < threshold)
+                or (self.sensors[9] < threshold)
+                or (self.sensors[10] < threshold)
+            )
+
+    def is_collision_frontright(self, threshold=20000):
+        if self.valid_data == False:
+            return False
+        else:
+            return self.sensors[5] < threshold
+
+    def is_collision_right(self, threshold=20000):
+        if self.valid_data == False:
+            return False
+        else:
+            return (self.sensors[6] < threshold) or (self.sensors[7] < threshold)

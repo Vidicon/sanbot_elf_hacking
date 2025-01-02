@@ -33,10 +33,10 @@ def update_sensor_plot(frame, ax1, ax2, robot):
         stop_angle = sensor_angles_bottom[i, 1] / 180 * math.pi
 
         my_color = "lightgrey"
-        if raw_values[i] < (25000.0 / 65536.0):
+        if raw_values[i] < (30000.0 / 65536.0):
             my_color = "yellow"
 
-        if raw_values[i] < (15000.0 / 65536.0):
+        if raw_values[i] < (20000.0 / 65536.0):
             my_color = "red"
 
         # ax.fill_between([start_angle, stop_angle], [raw_values[i], raw_values[i]], color=my_color)
@@ -53,10 +53,10 @@ def update_sensor_plot(frame, ax1, ax2, robot):
         stop_angle = sensor_angles_mid[i, 1] / 180 * math.pi
 
         my_color = "lightgrey"
-        if raw_values[i + 8] < (25000.0 / 65536.0):
+        if raw_values[i + 8] < (30000.0 / 65536.0):
             my_color = "yellow"
 
-        if raw_values[i + 8] < (15000.0 / 65536.0):
+        if raw_values[i + 8] < (20000.0 / 65536.0):
             my_color = "red"
 
         # ax.fill_between([start_angle, stop_angle], [raw_values[i], raw_values[i]], color=my_color)
