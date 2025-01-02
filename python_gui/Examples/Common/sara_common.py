@@ -21,6 +21,7 @@ class SaraRobotCommands:
     CMD_RA_MOVE = 0x31
     CMD_BASE_MOVE = 0x32
     CMD_COMP_MOVE = 0x33
+    CMD_BASE_BRAKE = 0x34
 
 
 def bodypart_to_string(bodypart):

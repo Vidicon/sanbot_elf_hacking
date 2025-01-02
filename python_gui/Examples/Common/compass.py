@@ -70,7 +70,7 @@ class Compass:
         return compass_degree, angle_degrees
 
     # Rotate to an absolute angle using the compass
-    def rotate_absolute(self, abs_rotation_angle, wait_for_finish=True, rotation_tmo_threshold=100):
+    def rotate_absolute(self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=100):
         assert abs_rotation_angle < 360, "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
         assert abs_rotation_angle >= 0, "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
 
