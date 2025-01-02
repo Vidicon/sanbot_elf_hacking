@@ -12,6 +12,7 @@ from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
 from Common.sara_common import SaraRobotCommands
 
+
 class SaraRobot:
     # LEFTARM = 0
     # RIGHTARM = 1
@@ -57,6 +58,7 @@ class SaraRobot:
         return
 
     def stop(self):
+        self.base.brake(ApplyBrake=False)
         self.mod_manager.close_port()
 
     def getversion(self):

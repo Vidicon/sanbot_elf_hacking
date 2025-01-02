@@ -19,6 +19,7 @@ double Compass_Target;
 double Compass_Error;
 int Compass_MoveState;
 int Compass_MoveSpeed;
+int Apply_Brake;
 
 
 void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
@@ -43,6 +44,8 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTy
 
 	HAL_TIM_Base_Start(htim12);
 	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_1);
+
+	Apply_Brake = False;
 }
 
 void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
@@ -82,6 +85,8 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	M2 = M2 / 200;
 	M3 = M3 / 200;
 
+	// For motors: "100" is standstil. Smaller 100, is moving.
+
 	if (M1 > 0) { RightBaseMotor_State.Direction = Base_Motion_Negative;} else {RightBaseMotor_State.Direction = Base_Motion_Positive;}
 	RightBaseMotor_State.PWM_Output = (100 - abs(M1));
 
@@ -91,9 +96,7 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	if (M3 > 0) { CenterBaseMotor_State.Direction = Base_Motion_Negative;} else {CenterBaseMotor_State.Direction = Base_Motion_Positive;}
 	CenterBaseMotor_State.PWM_Output = (100 - abs(M3));
 
-	GenericBase_HAL_Brake(False, LeftBaseMotor);
-	GenericBase_HAL_Brake(False, CenterBaseMotor);
-	GenericBase_HAL_Brake(False, RightBaseMotor);
+	Apply_Brake = False;
 }
 
 void Base_Update20Hz(struct Encoders_Data_Type *EncoderData)
@@ -102,13 +105,26 @@ void Base_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	CenterBaseMotor_State.ActualPosition = EncoderData->Encoder[1];
 	RightBaseMotor_State.ActualPosition = EncoderData->Encoder[2];
 
-	GenericBase_HAL_Brake(False, LeftBaseMotor);
-	GenericBase_HAL_Brake(False, CenterBaseMotor);
-	GenericBase_HAL_Brake(False, RightBaseMotor);
+	if (Apply_Brake == True)
+	{
+		GenericBase_HAL_Brake(True, LeftBaseMotor);
+		GenericBase_HAL_Brake(True, CenterBaseMotor);
+		GenericBase_HAL_Brake(True, RightBaseMotor);
 
-	GenericBase_HAL_Direction(LeftBaseMotor_State.Direction, LeftBaseMotor);
-	GenericBase_HAL_Direction(CenterBaseMotor_State.Direction, CenterBaseMotor);
-	GenericBase_HAL_Direction(RightBaseMotor_State.Direction, RightBaseMotor);
+		RightBaseMotor_State.PWM_Output = 100;
+		LeftBaseMotor_State.PWM_Output = 100;
+		CenterBaseMotor_State.PWM_Output = 100;
+	}
+	else
+	{
+		GenericBase_HAL_Brake(False, LeftBaseMotor);
+		GenericBase_HAL_Brake(False, CenterBaseMotor);
+		GenericBase_HAL_Brake(False, RightBaseMotor);
+
+		GenericBase_HAL_Direction(LeftBaseMotor_State.Direction, LeftBaseMotor);
+		GenericBase_HAL_Direction(CenterBaseMotor_State.Direction, CenterBaseMotor);
+		GenericBase_HAL_Direction(RightBaseMotor_State.Direction, RightBaseMotor);
+	}
 
 	GenericBase_HAL_PWM(LeftBaseMotor_State.PWM_Output, LeftBaseMotor);
 	GenericBase_HAL_PWM(CenterBaseMotor_State.PWM_Output, CenterBaseMotor);
@@ -213,12 +229,6 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		Compass_MoveState = 0;
 		Base_VelocitySetpoint(0, 0, 0);
 
-		HAL_Delay(1);
-
-		GenericBase_HAL_Brake(True, LeftBaseMotor);
-		GenericBase_HAL_Brake(True, CenterBaseMotor);
-		GenericBase_HAL_Brake(True, RightBaseMotor);
-
 		SendCompassMoveDone(True);
 	}
 }
@@ -232,6 +242,7 @@ void Base_NewCompassRotation(char HighByte, char LowByte)
 	{
 		if (Compass_MoveState == 0)
 		{
+			Apply_Brake = False;
 			Compass_MoveState = 1;
 			Compass_Target = (float)combined;
 
@@ -247,19 +258,8 @@ void Base_NewCompassRotation(char HighByte, char LowByte)
 	}
 }
 
-void Base_Brake(int ApplyBrake)
+void Base_Brake(int inApplyBrake)
 {
-	if (ApplyBrake == 1)
-	{
-		GenericBase_HAL_Brake(True, LeftBaseMotor);
-		GenericBase_HAL_Brake(True, CenterBaseMotor);
-		GenericBase_HAL_Brake(True, RightBaseMotor);
-	}
-	else
-	{
-		GenericBase_HAL_Brake(False, LeftBaseMotor);
-		GenericBase_HAL_Brake(False, CenterBaseMotor);
-		GenericBase_HAL_Brake(False, RightBaseMotor);
-	}
+	Apply_Brake = inApplyBrake;
 }
 

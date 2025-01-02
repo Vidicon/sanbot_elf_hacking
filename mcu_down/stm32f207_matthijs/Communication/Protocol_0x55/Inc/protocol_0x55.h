@@ -31,7 +31,7 @@
 #define CMD_RA_MOVE		 		0x31
 #define CMD_BASE_MOVE	 		0x32
 #define CMD_COMP_MOVE			0x33
-#define CMD_BASE_BRAKE	 		0x33
+#define CMD_BASE_BRAKE	 		0x34
 
 #define RESP_BIT 				0x80
 

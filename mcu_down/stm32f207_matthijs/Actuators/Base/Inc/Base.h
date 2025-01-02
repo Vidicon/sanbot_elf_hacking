@@ -79,7 +79,7 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData);
 
 void Base_NewCompassRotation(char HighByte, char LowByte);
 
-void Base_Brake(int ApplyBrake);
+void Base_Brake(int inApplyBrake);
 
 #endif
 
