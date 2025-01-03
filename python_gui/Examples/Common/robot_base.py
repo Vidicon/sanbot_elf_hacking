@@ -39,14 +39,14 @@ class RobotBase:
             SaraRobotCommands.CMD_BASE_MOVE, 4, np.array([Sideways_Velocity, Forward_Velocity, Rotation_Velocity, 0])
         )
 
-    def move_debug(self, Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=0):
+    def move_debug(self, Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=0, tmo=999):
 
         assert abs(Sideways_Velocity <= 100), "Abs(Sideways) velocity too high"
         assert abs(Forward_Velocity <= 100), "Abs(Forward) velocity too high"
         assert abs(Rotation_Velocity <= 100), "Abs(Rotation) velocity too high"
 
         self.mod_manager.cmd_Generic(
-            SaraRobotCommands.CMD_BASE_MOVE, 4, np.array([Sideways_Velocity, Forward_Velocity, Rotation_Velocity, 4])
+            SaraRobotCommands.CMD_BASE_MOVE, 4, np.array([Sideways_Velocity, Forward_Velocity, Rotation_Velocity, tmo])
         )
 
     # Not sure if robot has brakes on base motors!!!

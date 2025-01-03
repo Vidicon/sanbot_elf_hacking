@@ -7,12 +7,12 @@ last_front_move = 0
 
 
 def drive_normal(robot):
-    robot.base.move(Sideways_Velocity=0, Forward_Velocity=40, Rotation_Velocity=0)
+    robot.base.move_debug(Sideways_Velocity=0, Forward_Velocity=40, Rotation_Velocity=0, tmo=100)
     return
 
 
 def drive_slow(robot):
-    robot.base.move(Sideways_Velocity=0, Forward_Velocity=20, Rotation_Velocity=0)
+    robot.base.move_debug(Sideways_Velocity=0, Forward_Velocity=20, Rotation_Velocity=0, tmo=100)
     return
 
 
@@ -60,22 +60,22 @@ def rotate_on_collision(robot, L, FL, F, FR, R):
         if FL and FR:
             print("F + FL + FR")
 
-            if last_front_move == 0:
+            if last_front_move <= 1:
                 robot.body.compass.rotate_absolute((angle - 120) % 360, wait_for_finish=True)
             else:
                 robot.body.compass.rotate_absolute((angle + 120) % 360, wait_for_finish=True)
 
-            last_front_move = (last_front_move + 1) % 2
+            last_front_move = (last_front_move + 1) % 4
 
         if not FL and not FR:
             print("F")
 
-            if last_front_move == 0:
+            if last_front_move <= 1:
                 robot.body.compass.rotate_absolute((angle - 60) % 360, wait_for_finish=True)
             else:
                 robot.body.compass.rotate_absolute((angle + 60) % 360, wait_for_finish=True)
 
-            last_front_move = (last_front_move + 1) % 2
+            last_front_move = (last_front_move + 1) % 4
 
         drive_normal(robot)
 
