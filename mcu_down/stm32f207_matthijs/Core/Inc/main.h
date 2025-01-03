@@ -98,6 +98,14 @@ void Error_Handler(void);
 #define EN3_Distance_J26_GPIO_Port GPIOA
 #define EN4_Distance_J26_Pin GPIO_PIN_2
 #define EN4_Distance_J26_GPIO_Port GPIOA
+#define SCL_Distance_J22_Pin GPIO_PIN_4
+#define SCL_Distance_J22_GPIO_Port GPIOC
+#define SDA_Distance_J22_Pin GPIO_PIN_5
+#define SDA_Distance_J22_GPIO_Port GPIOC
+#define EN2_Distance_J22_Pin GPIO_PIN_0
+#define EN2_Distance_J22_GPIO_Port GPIOB
+#define EN1_Distance_J22_Pin GPIO_PIN_1
+#define EN1_Distance_J22_GPIO_Port GPIOB
 #define PF13_Pin GPIO_PIN_13
 #define PF13_GPIO_Port GPIOF
 #define PF14_Pin GPIO_PIN_14

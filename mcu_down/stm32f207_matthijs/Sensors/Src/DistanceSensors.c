@@ -10,6 +10,7 @@
 #include <Left_Soft_I2C.h>
 #include <Right_Soft_I2C.h>
 #include <Mid_Soft_I2C.h>
+#include <Cliff_Soft_I2C.h>
 #include "protocol_0x55.h"
 
 struct Distance_Sensor_Type DistanceData;
@@ -33,30 +34,36 @@ void DistanceSensors_Init()
 
 void DistanceSensors_Update()
 {
-	// Left
+	// Left: 4 sensors 0, 1, 2, 3
 	if (DistanceData.SelectedSensor <= 3)
 	{
 
 		Left_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Left_Soft_I2C_Read(0x40);
 	}
-	// Right
-	else if (DistanceData.SelectedSensor <= 3+4)
+	// Right: 4 sensors 4, 5, 6, 7
+	else if (DistanceData.SelectedSensor <= 7)
 	{
 		Right_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Right_Soft_I2C_Read(0x40);
 	}
-	// Center
-	else
+	// Center: 3 sensors 8, 9, 10
+	else if (DistanceData.SelectedSensor <= 10)
 	{
 		Mid_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Mid_Soft_I2C_Read(0x40);
 	}
+	// Cliff: 2 sensors 11, 12
+	else
+	{
+		Cliff_Soft_I2C_Write(0x40, 0x5E);
+		DistanceData.Distance[DistanceData.SelectedSensor] = Cliff_Soft_I2C_Read(0x40);
+	}
 
 	// Last step is to select the next sensor
-	// 11 sensors (8 low front, 2 mid height front, 1 top height front
+	// Total = 13 sensors
 	DistanceData.SelectedSensor += 1;
-	if (DistanceData.SelectedSensor >= 11)
+	if (DistanceData.SelectedSensor >= NO_DISTANCE_SENSORS)
 	{
 		DistanceData.SelectedSensor = 0;
 
@@ -64,6 +71,7 @@ void DistanceSensors_Update()
 		SendDistanceSensors(DistanceSensors_GetPointer());
 	}
 
+	// Select next sensor in advance by setting GPIO high
 	DistanceSensors_Select(DistanceData.SelectedSensor);
 }
 
@@ -111,5 +119,14 @@ void DistanceSensors_Select(int SensorID)
 
 	if (SensorID == 10) { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_SET);}
 	else { HAL_GPIO_WritePin(EN1_Distance_J28_GPIO_Port, EN1_Distance_J28_Pin, GPIO_PIN_RESET); }
+
+	//-----------------------------------------------------------------------------------------------
+	// 2 Cliff sensors
+	//-----------------------------------------------------------------------------------------------
+	if (SensorID == 11) { HAL_GPIO_WritePin(EN1_Distance_J22_GPIO_Port, EN1_Distance_J22_Pin, GPIO_PIN_SET);}
+	else { HAL_GPIO_WritePin(EN1_Distance_J22_GPIO_Port, EN1_Distance_J22_Pin, GPIO_PIN_RESET); }
+
+	if (SensorID == 12) { HAL_GPIO_WritePin(EN2_Distance_J22_GPIO_Port, EN2_Distance_J22_Pin, GPIO_PIN_SET);}
+	else { HAL_GPIO_WritePin(EN2_Distance_J22_GPIO_Port, EN2_Distance_J22_Pin, GPIO_PIN_RESET); }
 }
 

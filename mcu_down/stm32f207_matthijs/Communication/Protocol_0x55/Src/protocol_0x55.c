@@ -306,13 +306,13 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_DISTANCESENSORS, RESPONSE_TRUE);
 
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < NO_DISTANCE_SENSORS; i++)
 	{
 		Buffer[3 + i*2] = (DistanceData->Distance[i] >> 8);
 		Buffer[4 + i*2] = (DistanceData->Distance[i] & 0xff);
 	}
 
-	int payloadLen = 11*2;
+	int payloadLen = NO_DISTANCE_SENSORS * 2;
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);

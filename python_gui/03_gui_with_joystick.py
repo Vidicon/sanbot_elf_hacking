@@ -76,6 +76,8 @@ distance8_Front = []
 distance9_Front = []
 distance10_Front = []
 distance11_Front = []
+distance12_Front = []
+distance13_Front = []
 
 compass_button = []
 
@@ -96,6 +98,17 @@ def SetDistanceButtonBGColor(button, distance):
         button.config(bg="yellow")
     else:
         button.config(bg="lime")
+
+
+def SetCliffButtonBGColor(button, distance):
+    button.config(text=str(distance))
+
+    if distance < 25000:
+        button.config(bg="lime")
+    elif distance < 40000:
+        button.config(bg="yellow")
+    else:
+        button.config(bg="red")
 
 
 # Function to calculate the angle
@@ -259,6 +272,18 @@ def my_receive_callback(data, stream_area):
             new_byte_array[20:22], byteorder="big"
         )  # 'big' for big-endian, 'little' for little-endian
         SetDistanceButtonBGColor(distance11_Front, combined11_int)
+
+        # --------------------------------------------------------------------------
+        combined12_int = int.from_bytes(
+            new_byte_array[22:24], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetCliffButtonBGColor(distance12_Front, combined12_int)
+
+        # --------------------------------------------------------------------------
+        combined13_int = int.from_bytes(
+            new_byte_array[24:26], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetCliffButtonBGColor(distance13_Front, combined13_int)
 
     if response == (CMD_GET_BATTERY | RESP_BIT):
         # 4x uint16_t
@@ -766,6 +791,15 @@ def show_gui(mod_manager):
     global distance11_Front
     distance11_Front = tk.Button(frame, height=1, width=10, text="inf")
     distance11_Front.grid(row=5, column=5, sticky="w")
+
+    global distance12_Front
+    distance12_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance12_Front.grid(row=6, column=5, sticky="w")
+
+    global distance13_Front
+    distance13_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance13_Front.grid(row=7, column=5, sticky="w")
+
     # --------------------------------------------------------------------------------------
     # Generic buttons
     # --------------------------------------------------------------------------------------
