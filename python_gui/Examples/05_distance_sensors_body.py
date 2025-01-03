@@ -4,6 +4,7 @@ from Common.sara_library import SaraRobot
 
 def main():
     robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    time.sleep(1)
 
     robot.getversion()
 
@@ -13,6 +14,7 @@ def main():
         while True:
             distance_warning = robot.body.distancesensors.sensor_warning()
             distance_collision = robot.body.distancesensors.sensor_collision()
+            cliff_warning = robot.body.distancesensors.sensor_cliffwarning()
 
             if distance_collision:
                 print("Distance sensors: Collision ahead!")
@@ -21,6 +23,11 @@ def main():
                 if distance_warning:
                     print("Distance sensors: Getting close!")
                     robot.body.distancesensors.print_values()
+
+            #------------------------------------------------------------------------
+            # Safety measure. If cliff_warning == True, the programm will stop.
+            #------------------------------------------------------------------------
+            assert cliff_warning == False, "Cliff sensor triggered!"
 
             print(".")
             time.sleep(0.5)

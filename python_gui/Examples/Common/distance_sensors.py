@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import numpy as np
 from Common.mod_manager import ModManager
@@ -36,7 +37,12 @@ class DistanceSensors:
         self.mod_manager = mod_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".distancesensors"
 
-        self.sensors = np.ones(11) * 65295
+        self.sensors = np.ones(13) * 65295
+
+        # Cliff sensors need to start at 0.
+        self.sensors[10] = 0
+        self.sensors[11] = 0
+
         self.valid_data = False
         self.error_counter = 0
         self.rx_counter = 0
@@ -46,9 +52,10 @@ class DistanceSensors:
     def new_data(self, data):
         try:
             datalength = data[2]
-            assert datalength == 22, self.full_bodypart_name + " data length not correct!"
 
-            for i in range(11):
+            assert datalength == 26, self.full_bodypart_name + " data length not correct!"
+
+            for i in range(13):
                 new_byte_array = data[3 + i * 2 : -2]
 
                 uint8_array = np.frombuffer(new_byte_array, dtype=">u1")
@@ -66,18 +73,34 @@ class DistanceSensors:
             if self.error_counter > 3:
                 self.valid_data = False
 
+        #------------------------------------------------------------------------
+        # Cliff sensors
+        #------------------------------------------------------------------------
+        if self.sensors[11] >= 40000:
+            print("Left cliff sensor too large value!")
+
+        if self.sensors[12] >= 40000:
+            print("Right cliff sensor too large value!")
+
     def sensor_warning(self, threshold=30000):
 
         if self.valid_data == False:
             return False
         else:
-            return np.any(self.sensors < threshold)
+            return np.any(self.sensors[0:-2] < threshold)
 
     def sensor_collision(self, threshold=20000):
         if self.valid_data == False:
             return False
         else:
-            return np.any(self.sensors < threshold)
+            return np.any(self.sensors[0:-2] < threshold)
+
+    def sensor_cliffwarning(self):
+        print(self.sensors[-2:])
+        if self.valid_data == False:
+            return True
+        else:
+            return (self.sensors[11] >= 40000) or self.sensors[12] >= 40000
 
     def print_values(self):
         print(self.sensors)
