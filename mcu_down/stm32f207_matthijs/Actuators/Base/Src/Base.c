@@ -11,15 +11,16 @@
 #include "protocol_0x55.h"
 
 
-struct Base_State_Type LeftBaseMotor_State;
-struct Base_State_Type RightBaseMotor_State;
-struct Base_State_Type CenterBaseMotor_State;
+static struct Base_State_Type LeftBaseMotor_State;
+static struct Base_State_Type RightBaseMotor_State;
+static struct Base_State_Type CenterBaseMotor_State;
 
-double Compass_Target;
-double Compass_Error;
-int Compass_MoveState;
-int Compass_MoveSpeed;
-int Apply_Brake;
+static double Compass_Target;
+static double Compass_Error;
+static int Compass_MoveState;
+static int Compass_MoveSpeed;
+static int Apply_Brake;
+static int Watchdog_Timer;
 
 
 void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
@@ -46,6 +47,7 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTy
 	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_1);
 
 	Apply_Brake = False;
+	Watchdog_Timer = 0;
 }
 
 void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
@@ -263,3 +265,35 @@ void Base_Brake(int inApplyBrake)
 	Apply_Brake = inApplyBrake;
 }
 
+void Base_MotionStartWatchdog(int NewWatchdogTimeout)
+{
+	// Old commands without watchdog or watchdog not set --> use 2 seconds.
+	if (NewWatchdogTimeout <= 0)
+	{
+		Watchdog_Timer = 2 * UPDATE_10HZ;
+	}
+	else
+	{
+		Watchdog_Timer = NewWatchdogTimeout * UPDATE_10HZ;
+	}
+}
+
+void Base_MotionUpdateWatchdog()
+{
+	if (Watchdog_Timer > 0)
+	{
+		Watchdog_Timer--;
+
+		// Watchdog changed to 0 --> stop any motion
+		if (Watchdog_Timer == 0)
+		{
+			// Stop base movements
+			RightBaseMotor_State.PWM_Output = 100;
+			LeftBaseMotor_State.PWM_Output = 100;
+			CenterBaseMotor_State.PWM_Output = 100;
+
+			// Stop compass rotations
+			Compass_MoveState = 0;
+		}
+	}
+}

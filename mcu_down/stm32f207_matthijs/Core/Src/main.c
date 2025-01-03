@@ -161,6 +161,7 @@ void Check_USB_Communication()
 
 		if (command == CMD_BASE_MOVE)
 		{
+			Base_MotionStartWatchdog(Protocol_0x55_GetData(6));
 			Base_VelocitySetpoint(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4), Protocol_0x55_GetData(5));
 		}
 
@@ -171,9 +172,9 @@ void Check_USB_Communication()
 
 		if (command == CMD_COMP_MOVE)
 		{
+			Base_MotionStartWatchdog(Protocol_0x55_GetData(5));
 			Base_NewCompassRotation(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
-
 
 		Protocol_0x55_MarkProcessed();
 	}
@@ -268,6 +269,8 @@ int main(void)
 		  MotionSensors_Update10Hz();
 
 		  Compass_Update();
+
+		  Base_MotionUpdateWatchdog();
 		  Base_MotionControl(Compass_GetPointer());
 	  }
 

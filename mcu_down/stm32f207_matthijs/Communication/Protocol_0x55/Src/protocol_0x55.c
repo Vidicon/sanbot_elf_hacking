@@ -7,11 +7,11 @@
 #include "Compass.h"
 #include "Battery.h"
 
-struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
-struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
 
 // volatile to indicate this variable can be changed at any time.
-volatile uint8_t RxMutex;
+static volatile uint8_t RxMutex;
 
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()

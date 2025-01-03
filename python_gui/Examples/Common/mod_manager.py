@@ -161,10 +161,11 @@ class ModManager:
 
         return
 
-    def cmd_createCompassMoveCommand(self, cmd, angle):
+    def cmd_createCompassMoveCommand(self, cmd, angle, timeout):
         high = (int(angle) >> 8) & 0xFF
         low = int(angle) & 0xFF
 
-        self.cmd_Generic(cmd, 2, np.array([high, low]))
+        # Parameter #3 = timeout
+        self.cmd_Generic(cmd, 3, np.array([high, low, timeout]))
 
         return

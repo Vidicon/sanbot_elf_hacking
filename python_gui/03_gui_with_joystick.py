@@ -334,8 +334,18 @@ def createMoveCommand(mod_manager, Parameters):
     return
 
 
+def createCompCommand(mod_manager, Parameters):
+    high = (int(Parameters[1]) >> 8) & 0xFF
+    low = int(Parameters[1]) & 0xFF
+
+    mod_manager.cmd_Generic(Parameters[0], 3, np.array([high, low, 10]))
+
+    return
+
+
+# Added watchdog timeout (0 = default = 2 seconds)
 def createBaseCommand(mod_manager, Parameters):
-    mod_manager.cmd_Generic(Parameters[0], 3, np.array(Parameters[1:]))
+    mod_manager.cmd_Generic(Parameters[0], 4, np.array(Parameters[1:]))
 
     return
 
@@ -667,7 +677,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="North",
-        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createCompCommand(mod_manager, t),
     )
     button_rotate_North.grid(row=0, column=4, sticky="w")
 
@@ -676,7 +686,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="East",
-        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createCompCommand(mod_manager, t),
     )
     button_rotate_East.grid(row=1, column=4, sticky="w")
 
@@ -685,7 +695,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="South",
-        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createCompCommand(mod_manager, t),
     )
     button_rotate_South.grid(row=2, column=4, sticky="w")
 
@@ -694,7 +704,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="West",
-        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createCompCommand(mod_manager, t),
     )
     button_rotate_West.grid(row=3, column=4, sticky="w")
 
@@ -964,14 +974,7 @@ def handle_pygame_events():
         print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 3 : {-1*axis3:.2f}")
         createBaseCommand(
             mod_manager,
-            np.array(
-                [
-                    CMD_BASE_MOVE,
-                    int(axis0 * 50),
-                    int(-1 * axis1 * 50),
-                    int(-1 * axis3 * 50),
-                ]
-            ),
+            np.array([CMD_BASE_MOVE, int(axis0 * 50), int(-1 * axis1 * 50), int(-1 * axis3 * 50), 0]),
         )
 
     if axis2_event == True:

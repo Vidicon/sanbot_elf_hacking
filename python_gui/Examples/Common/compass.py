@@ -70,7 +70,7 @@ class Compass:
         return compass_degree, angle_degrees
 
     # Rotate to an absolute angle using the compass
-    def rotate_absolute(self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=100):
+    def rotate_absolute(self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=10):
         assert abs_rotation_angle < 360, "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
         assert abs_rotation_angle >= 0, "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
 
@@ -82,11 +82,13 @@ class Compass:
         print(f"Compass rotation to {self.target_rotation :.0f} Deg ", end="")
 
         # Send command
-        self.mod_manager.cmd_createCompassMoveCommand(SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation)
+        self.mod_manager.cmd_createCompassMoveCommand(
+            SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation, rotation_tmo_threshold
+        )
 
         # Wait for the response message or a timeout of 20 seconds
         while self.rotate_ready == False:
-            assert self.rotation_tmo_counter < (20 * 10), "Rotate absolute timeout!"
+            assert self.rotation_tmo_counter < (rotation_tmo_threshold * 10), "Rotate absolute timeout!"
 
             time.sleep(0.1)
             self.rotation_tmo_counter += 1
