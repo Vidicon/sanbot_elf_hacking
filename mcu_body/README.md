@@ -93,7 +93,6 @@ Notes Matthijs:
 |    | Pin 1 | Pin 2 | Pin 3 | Pin 4 |
 |----------|----------|----------|----------|----------|
 |          |   GND  |   Red  |   Green  |   Blue  |
-|  |  |  |  |  |
 | Wing Left  |     |   PH13  |   PH14  |   PH15  |
 | Wing Right |     |   PD10  |   PD14  |   PD15  |
 | Bottom     |     |   PG12  |   PG13  |   PG15  |
