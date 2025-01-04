@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "protocol_0x55.h"
 #include "RobotGlobals.h"
+#include "RGBLeds_Head.h"
 
 /* USER CODE END Includes */
 
@@ -64,10 +65,11 @@ static void MX_TIM7_Init(void);
 /* USER CODE BEGIN 0 */
 void System_Initialize()
 {
-//	HAL_TIM_Base_Start_IT(&htim14);
-//
+	// Main timer
+	HAL_TIM_Base_Start_IT(&htim7);
+
 //	RGBLeds_Init();
-//
+
 //	Encoders_Init(&huart6);
 //
 //	LeftArm_Init(&htim9);
@@ -87,6 +89,8 @@ void System_SelfTest(enum ENUM_Booleans Enabled)
 {
 	Selftest = Enabled;
 
+	RGBLeds_SelfTest(Selftest);
+
 //	LeftArm_Home();
 //	RightArm_Home();
 }
@@ -98,6 +102,7 @@ void UpdateSelfTest()
 		if (Time20Hz == 10 * UPDATE_20HZ)
 		{
 			Selftest = False;
+			RGBLeds_SelfTest(False);
 		}
 	}
 }
@@ -108,7 +113,20 @@ void Check_USB_Communication()
 	{
 		int command = Protocol_0x55_GetCommand();
 
-		if (command == CMD_VERSION) 	{ SendVersion();}
+		if (command == CMD_VERSION)
+		{
+			SendVersion();
+		}
+
+		if (command == CMD_LEFTHEAD_COLOR)
+		{
+			RGBLeds_SetAllColors(LeftHead, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
+		if (command == CMD_RIGHTHEAD_COLOR)
+		{
+			RGBLeds_SetAllColors(RightHead, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
 
 		Protocol_0x55_MarkProcessed();
 	}
@@ -157,7 +175,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-  System_SelfTest(False);
+  System_SelfTest(True);
+
+//  RGBLeds_SetColorOn(LeftHead, Blue);
 
   Protocol_0x55_Init();
 
@@ -175,11 +195,15 @@ int main(void)
 	  if (Update_20Hz)
 	  {
 		  Update_20Hz = 0;
+
+		  UpdateSelfTest();
 	  }
 
 	  if (Update_10Hz)
 	  {
 		  Update_10Hz = 0;
+
+		  RGBLeds_Update10Hz();
 	  }
 
 	  if (Update_5Hz)
@@ -195,6 +219,8 @@ int main(void)
 	  if (Update_1Hz)
 	  {
 		  Update_1Hz = 0;
+
+//		  SendVersion();
 	  }
 
 	  //--------------------------------------------------------
@@ -275,7 +301,7 @@ static void MX_TIM7_Init(void)
 
   /* USER CODE END TIM7_Init 1 */
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 2399;
+  htim7.Init.Prescaler = 4799;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim7.Init.Period = 99;
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -306,10 +332,18 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOG_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USB_ENABLE_LOW_GPIO_Port, USB_ENABLE_LOW_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : USB_ENABLE_LOW_Pin */
   GPIO_InitStruct.Pin = USB_ENABLE_LOW_Pin;
@@ -317,6 +351,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(USB_ENABLE_LOW_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LeftHeadRed_Pin LeftHeadGreen_Pin LeftHeadBlue_Pin */
+  GPIO_InitStruct.Pin = LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : RightHeadRed_Pin RightHeadGreen_Pin RightHeadBlue_Pin */
+  GPIO_InitStruct.Pin = RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 

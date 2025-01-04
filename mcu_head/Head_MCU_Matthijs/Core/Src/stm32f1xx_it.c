@@ -35,7 +35,7 @@ extern int Update_10Hz;
 extern int Update_5Hz;
 extern int Update_2Hz;
 extern int Update_1Hz;
-int TIM7_Counter = 0;
+static volatile int TIM7_Counter = 0;
 
 /* USER CODE END TD */
 

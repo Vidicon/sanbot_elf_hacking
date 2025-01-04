@@ -66,6 +66,18 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USB_ENABLE_LOW_Pin GPIO_PIN_1
 #define USB_ENABLE_LOW_GPIO_Port GPIOG
+#define LeftHeadRed_Pin GPIO_PIN_8
+#define LeftHeadRed_GPIO_Port GPIOE
+#define LeftHeadGreen_Pin GPIO_PIN_10
+#define LeftHeadGreen_GPIO_Port GPIOE
+#define LeftHeadBlue_Pin GPIO_PIN_12
+#define LeftHeadBlue_GPIO_Port GPIOE
+#define RightHeadRed_Pin GPIO_PIN_13
+#define RightHeadRed_GPIO_Port GPIOD
+#define RightHeadGreen_Pin GPIO_PIN_14
+#define RightHeadGreen_GPIO_Port GPIOD
+#define RightHeadBlue_Pin GPIO_PIN_15
+#define RightHeadBlue_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

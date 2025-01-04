@@ -16,8 +16,10 @@ CMD_VERSION = 0x01
 CMD_LA_COLOR = 0x10
 CMD_RA_COLOR = 0x11
 CMD_BASE_COLOR = 0x12
-CMD_BA_COLOR = 0x13
-CMD_LARA_COLOR = 0x14
+CMD_BA_COLOR = 0x13  # ?
+CMD_LARA_COLOR = 0x14  # Left arm & Right arm
+CMD_LEFTHEAD_COLOR = 0x15
+CMD_RIGHTHEAD_COLOR = 0x16
 
 CMD_GET_ENCODERS = 0x20
 CMD_GET_MOTIONSENSORS = 0x21
@@ -142,6 +144,122 @@ def show_gui(mod_manager):
 
     global default_bg
     default_bg = button_version.cget("bg")
+
+    # --------------------------------------------------------------------------------------
+    # Left Head colors
+    # --------------------------------------------------------------------------------------
+    button_LH_White = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left White",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_LH_White.grid(row=0, column=0, sticky="w")
+
+    button_LH_Red = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left Red",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_RED, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_LH_Red.grid(row=1, column=0, sticky="w")
+
+    button_LH_Green = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left Green",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_GREEN, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_LH_Green.grid(row=2, column=0, sticky="w")
+
+    button_LH_Blue = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left Blue",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_BLUE, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_LH_Blue.grid(row=3, column=0, sticky="w")
+
+    button_LH_Off = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left Off",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
+    )
+    button_LH_Off.grid(row=4, column=0, sticky="w")
+
+    button_LH_Blue_Blink = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Left Blue Blink",
+        command=lambda t=np.array([CMD_LEFTHEAD_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(
+            mod_manager, t
+        ),
+    )
+    button_LH_Blue_Blink.grid(row=5, column=0, sticky="w")
+
+    # --------------------------------------------------------------------------------------
+    # Right Head colors
+    # --------------------------------------------------------------------------------------
+    button_RH_White = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right White",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_WHITE, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_RH_White.grid(row=0, column=1, sticky="w")
+
+    button_RH_Red = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right Red",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_RED, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_RH_Red.grid(row=1, column=1, sticky="w")
+
+    button_RH_Green = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right Green",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_GREEN, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_RH_Green.grid(row=2, column=1, sticky="w")
+
+    button_RH_Blue = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right Blue",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_BLUE, CMD_LED_ON]): createLedCommand(mod_manager, t),
+    )
+    button_RH_Blue.grid(row=3, column=1, sticky="w")
+
+    button_RH_Off = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right Off",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
+    )
+    button_RH_Off.grid(row=4, column=1, sticky="w")
+    
+    button_RH_Blue_Blink = tk.Button(
+        frame,
+        height=1,
+        width=10,
+        text="Right Blue Blink",
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t),
+    )
+    button_RH_Blue_Blink.grid(row=5, column=1, sticky="w")
 
     # --------------------------------------------------------------------------------------
     # streaming data area
