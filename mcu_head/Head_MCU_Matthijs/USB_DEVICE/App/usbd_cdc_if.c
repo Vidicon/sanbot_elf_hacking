@@ -2,12 +2,12 @@
 /**
   ******************************************************************************
   * @file           : usbd_cdc_if.c
-  * @version        : v1.0_Cube
+  * @version        : v2.0_Cube
   * @brief          : Usb device for Virtual Com Port.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -23,8 +23,6 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-#include "protocol_0x55.h"
-
 
 /* USER CODE END INCLUDE */
 
@@ -34,8 +32,6 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-struct PROTOCOL_0X55_Data_Type *TmpPointer;
-static uint8_t lineCoding[7];
 
 /* USER CODE END PV */
 
@@ -223,12 +219,12 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-    	memcpy(lineCoding, pbuf, sizeof(lineCoding));
-	break;
 
-	case CDC_GET_LINE_CODING:
-		memcpy(pbuf, lineCoding, sizeof(lineCoding));
-	break;
+    break;
+
+    case CDC_GET_LINE_CODING:
+
+    break;
 
     case CDC_SET_CONTROL_LINE_STATE:
 
@@ -264,13 +260,9 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-	Protocol_0x55_NewData(Buf, Len);
-
-	// Prepare next receive
-	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-
-	return (USBD_OK);
+  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  return (USBD_OK);
   /* USER CODE END 6 */
 }
 
