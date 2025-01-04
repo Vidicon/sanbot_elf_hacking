@@ -9,7 +9,7 @@
 #include <main.h>
 
 static struct RGBLeds_State_Type RGBLeds_State[2];
-static int SelfTestCounterTmo = 0;
+//static int SelfTestCounterTmo = 0;
 
 void RGBLeds_Init()
 {
@@ -147,26 +147,12 @@ void RGBLeds_Update10Hz()
 //			RGBLeds_SetColorOff((enum ENUM_BodyParts)(i));
 		}
 	}
-
-	//---------------------------------------------------------
-	// Selftest update
-	//---------------------------------------------------------
-
-	if (SelfTestCounterTmo > 0)
-	{
-		if (SelfTestCounterTmo == 1) { RGBLeds_SelfTest(False);}
-
-		SelfTestCounterTmo -= 1;
-	}
-
 }
 
 void RGBLeds_SelfTest(enum ENUM_Booleans Enabled)
 {
 	if (Enabled == True)
 	{
-		SelfTestCounterTmo = 5 * UPDATE_10HZ;
-
 		RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
 		RGBLeds_BlinkColor(RightHead, Green, LED_Blink_Fast);
 	}

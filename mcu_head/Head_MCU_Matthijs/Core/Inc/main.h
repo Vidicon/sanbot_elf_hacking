@@ -33,6 +33,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#define DEMO
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -56,6 +58,8 @@ int Update_1Hz;
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -64,6 +68,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define HeadLedEnable_Pin GPIO_PIN_3
+#define HeadLedEnable_GPIO_Port GPIOC
+#define HeadTopButton_Pin GPIO_PIN_0
+#define HeadTopButton_GPIO_Port GPIOA
 #define USB_ENABLE_LOW_Pin GPIO_PIN_1
 #define USB_ENABLE_LOW_GPIO_Port GPIOG
 #define LeftHeadRed_Pin GPIO_PIN_8
@@ -80,6 +88,8 @@ void Error_Handler(void);
 #define RightHeadBlue_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
+//#define TOP_BUTTON_Pin GPIO_PIN_0
+//#define TOP_BUTTON_GPIO_Port GPIOA
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
