@@ -28,6 +28,15 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
+extern int Update_25Hz;
+extern int Update_20Hz;
+extern int Update_16Hz;
+extern int Update_10Hz;
+extern int Update_5Hz;
+extern int Update_2Hz;
+extern int Update_1Hz;
+int TIM7_Counter = 0;
+
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -57,6 +66,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
+extern TIM_HandleTypeDef htim7;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -211,6 +221,63 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
 
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM7 global interrupt.
+  */
+void TIM7_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM7_IRQn 0 */
+	// 100 Hz counter for various purposes
+	TIM7_Counter += 1;
+
+	// 1 Hz overflow
+	if (TIM7_Counter == 100)
+	{
+		TIM7_Counter = 0;
+	}
+
+	if ((TIM7_Counter % 4) == 0)
+	{
+		Update_25Hz = 1;
+	}
+
+	if ((TIM7_Counter % 5) == 0)
+	{
+		Update_20Hz = 1;
+	}
+
+	if ((TIM7_Counter % 10) == 0)
+	{
+		Update_10Hz = 1;
+	}
+
+	if ((TIM7_Counter % 20) == 0)
+	{
+		Update_5Hz = 1;
+	}
+
+	if ((TIM7_Counter % 50) == 0)
+	{
+		Update_2Hz = 1;
+	}
+
+	if ((TIM7_Counter % 100) == 0)
+	{
+		Update_1Hz = 1;
+	}
+
+	if ((TIM7_Counter % 6) == 0)
+	{
+		Update_16Hz = 1;
+	}
+
+  /* USER CODE END TIM7_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim7);
+  /* USER CODE BEGIN TIM7_IRQn 1 */
+
+  /* USER CODE END TIM7_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

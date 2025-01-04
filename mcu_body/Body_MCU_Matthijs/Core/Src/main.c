@@ -292,6 +292,8 @@ int main(void)
 		  Update_1Hz = 0;
 
 		  Battery_Update();
+
+		  Compass_Init(&hi2c3);
 	  }
 
 	  //--------------------------------------------------------

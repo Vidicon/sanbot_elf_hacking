@@ -52,6 +52,7 @@ compass_button = []
 
 canvas = []
 
+
 # ===============================================================================
 # Define the receive callback function
 # ===============================================================================
@@ -159,7 +160,7 @@ def main():
 
     if "LINUX" in platform.system().upper():
         print("Linux detected!")
-        mod_manager = ModManager(port1="/dev/ttyACM0", port2="/dev/ttyACM1", baudrate=115200)
+        mod_manager = ModManager(port1="/dev/ttyACM0", port2="/dev/ttyACM99", baudrate=115200)
     else:
         mod_manager = ModManager(port1="COM7", port2="COM10", baudrate=115200)
 
