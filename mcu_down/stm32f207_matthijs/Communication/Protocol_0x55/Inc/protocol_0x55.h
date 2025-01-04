@@ -31,6 +31,7 @@
 #define CMD_RA_MOVE		 		0x31
 #define CMD_BASE_MOVE	 		0x32
 #define CMD_COMP_MOVE			0x33
+#define CMD_BASE_BRAKE	 		0x34
 
 #define RESP_BIT 				0x80
 
@@ -98,5 +99,11 @@ void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *Compass
 void SendBattery(struct Battery_Sensor_Type *BatteryData);
 
 void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *BatteryData);
+
+//------------------------------------------------------------------------------------------
+void SendCompassMoveDone(uint8_t Succes);
+
+void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes);
+
 
 #endif

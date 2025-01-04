@@ -7,11 +7,11 @@
 #include "Compass.h"
 #include "Battery.h"
 
-struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
-struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
 
 // volatile to indicate this variable can be changed at any time.
-volatile uint8_t RxMutex;
+static volatile uint8_t RxMutex;
 
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()
@@ -166,7 +166,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-BODY by Matthijs Hajer");
+	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -306,13 +306,13 @@ void Protocol_0x55_SendDistanceEvent(char *Buffer, struct Distance_Sensor_Type *
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_DISTANCESENSORS, RESPONSE_TRUE);
 
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < NO_DISTANCE_SENSORS; i++)
 	{
 		Buffer[3 + i*2] = (DistanceData->Distance[i] >> 8);
 		Buffer[4 + i*2] = (DistanceData->Distance[i] & 0xff);
 	}
 
-	int payloadLen = 11*2;
+	int payloadLen = NO_DISTANCE_SENSORS * 2;
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);
@@ -348,7 +348,7 @@ void Protocol_0x55_SendCompass(char *Buffer, struct Compass_Sensor_Type *Compass
 }
 
 //----------------------------------------------------------------
-// Raw compass data
+// Battery data
 //----------------------------------------------------------------
 void SendBattery(struct Battery_Sensor_Type *BatteryData)
 {
@@ -390,6 +390,27 @@ void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *Battery
 	Buffer[3 + 12] = (BatteryData->Voltage >> 8 );
 	Buffer[3 + 13] = (BatteryData->Voltage & 0xff);
 
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}
+
+//----------------------------------------------------------------
+// Raw compass data
+//----------------------------------------------------------------
+void SendCompassMoveDone(uint8_t Succes)
+{
+	Protocol_0x55_SendCompassMoveDone((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], Succes);
+}
+
+void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_COMP_MOVE, RESPONSE_TRUE);
+
+	int payloadLen = 1;
+
+	Buffer[3 + 0] = Succes;
 
 	Protocol_0x55_SetLength(Buffer, payloadLen);
 	Protocol_0x55_AddCRC(Buffer, payloadLen);

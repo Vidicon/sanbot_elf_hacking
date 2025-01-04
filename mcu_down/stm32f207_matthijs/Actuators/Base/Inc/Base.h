@@ -36,9 +36,6 @@ struct Base_State_Type {
 
 	int Integral;
 	int Differential;
-//	int MainState;
-
-	// Velocity controller
 	int TargetVelocity;
 	int TargetAcceleration;
 
@@ -79,6 +76,11 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData);
 
 void Base_NewCompassRotation(char HighByte, char LowByte);
 
+void Base_Brake(int inApplyBrake);
+
+void Base_MotionStartWatchdog(int NewWatchdogTimeout);
+
+void Base_MotionUpdateWatchdog();
 
 #endif
 

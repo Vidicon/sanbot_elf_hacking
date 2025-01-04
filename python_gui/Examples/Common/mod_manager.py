@@ -43,9 +43,10 @@ class ModManager:
                 self.serial_port.write(data_bytes)
                 # print(f"Data sent: {data}")
             except serial.SerialException as e:
-                print(f"Failed to send data: {e}")
+                assert False, f"Failed to send data: {e}"
+
         else:
-            print("Serial port is not open. Cannot send data.")
+            assert False, "Serial port is not open. Cannot send data."
 
     def set_receive_callback(self, callback):
         self.receive_callback = callback
@@ -157,5 +158,14 @@ class ModManager:
 
         # self.print_array_as_hex(data)
         self.send_data(data)
+
+        return
+
+    def cmd_createCompassMoveCommand(self, cmd, angle, timeout):
+        high = (int(angle) >> 8) & 0xFF
+        low = int(angle) & 0xFF
+
+        # Parameter #3 = timeout
+        self.cmd_Generic(cmd, 3, np.array([high, low, timeout]))
 
         return

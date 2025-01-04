@@ -28,6 +28,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
+extern int Update_25Hz;
 extern int Update_20Hz;
 extern int Update_16Hz;
 extern int Update_10Hz;
@@ -224,6 +225,11 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 	if (TIM14_Counter == 100)
 	{
 		TIM14_Counter = 0;
+	}
+
+	if ((TIM14_Counter % 4) == 0)
+	{
+		Update_25Hz = 1;
 	}
 
 	if ((TIM14_Counter % 5) == 0)

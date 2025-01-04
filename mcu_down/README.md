@@ -130,19 +130,27 @@ Notes Matthijs:
 
 ---
 Connector for LEFT sensors has 1 pin less than RIGHT connector has.
-### Distance sensor 4x (J18)(Left)
+### Distance sensors 4x (J18) (Left 4 sensors, 13 pins)
 
 |     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 | Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |
 | IO Pin |   - |  PB8   |-     |  PB9   | -   | PI4  |  PI5   | PI6 |  PI7   | -    | -    | -    |  -   |
 
-### Distance sensor 4x (J26)(Right)
+### Distance sensors 4x (J26) (Right 4 sensors, 14 pins)
 
 |     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 | Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   EN3  |   EN4  |   NC  |   NC  |   NC  |   NC  |   NC  |
 | IO Pin |   - |  PC0   |-     | PC1    | -   |  PC2 |  PC3   | PA1 | PA2    | -    | -    | -    |  -   |     -|
+
+
+### Cliff sensors 2x (J22) (2 Front sensors, 13 pins)
+
+|     | Pin 1 | Pin 2 | Pin 3 | Pin 4 | Pin 5 | Pin 6 | Pin 7 | Pin 8 | Pin 9 | Pin 10 | Pin 11 | Pin 12 | Pin 13 | Pin 14 |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| Signals |  3.3v  |   SCL  |   GND  |   SDA  |   GND | EN1  |   EN2  |   NC  |   NC  |   NC  |   NC  |   NC  |   NC  |   NC  |
+| IO Pin |   - |  PC4   |-     |  PC5   | -   | PB1  | PB0    |  |     | -    | -    | -    |  -   |     -|
 
 Notes Matthijs:
 * IO pins are correct.

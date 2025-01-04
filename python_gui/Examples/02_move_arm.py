@@ -2,7 +2,9 @@ import sys
 import os
 import time
 
-from Common.sara_library import *
+from Common.sara_library import SaraRobot
+from Common.sara_library import SaraRobotPartNames
+from Common.sara_common import RobotArmPositions
 
 
 def main():
@@ -10,18 +12,23 @@ def main():
 
     robot.getversion()
 
-    robot.left_arm.motor.move(position=RobotArm.UP)
-    robot.right_arm.motor.move(position=RobotArm.UP)
+    robot.left_arm.motor.move(position=RobotArmPositions.UP)
+    robot.right_arm.motor.move(position=RobotArmPositions.UP)
 
-    time.sleep(5)
+    time.sleep(3)
 
-    robot.left_arm.motor.move(position=RobotArm.FORWARD)
-    robot.right_arm.motor.move(position=RobotArm.DOWN)
+    robot.left_arm.motor.move(position=RobotArmPositions.FORWARD)
+    robot.right_arm.motor.move(position=RobotArmPositions.FORWARD)
 
-    time.sleep(5)
+    time.sleep(3)
 
-    robot.left_arm.motor.move(position=220)
-    robot.right_arm.motor.move(position=300)
+    robot.left_arm.motor.move(position=RobotArmPositions.DOWN)
+    robot.right_arm.motor.move(position=RobotArmPositions.DOWN)
+
+    time.sleep(3)
+
+    # robot.left_arm.motor.move(position=220)
+    # robot.right_arm.motor.move(position=300)
 
     robot.stop()
 

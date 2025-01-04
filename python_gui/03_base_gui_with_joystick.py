@@ -29,6 +29,7 @@ CMD_LA_MOVE = 0x30
 CMD_RA_MOVE = 0x31
 CMD_BASE_MOVE = 0x32
 CMD_COMP_MOVE = 0x33
+CMD_BASE_BRAKE = 0x34
 
 CMD_COLOR_NONE = 0
 CMD_RED = 1
@@ -75,6 +76,8 @@ distance8_Front = []
 distance9_Front = []
 distance10_Front = []
 distance11_Front = []
+distance12_Front = []
+distance13_Front = []
 
 compass_button = []
 
@@ -95,6 +98,17 @@ def SetDistanceButtonBGColor(button, distance):
         button.config(bg="yellow")
     else:
         button.config(bg="lime")
+
+
+def SetCliffButtonBGColor(button, distance):
+    button.config(text=str(distance))
+
+    if distance < 25000:
+        button.config(bg="lime")
+    elif distance < 40000:
+        button.config(bg="yellow")
+    else:
+        button.config(bg="red")
 
 
 # Function to calculate the angle
@@ -259,17 +273,29 @@ def my_receive_callback(data, stream_area):
         )  # 'big' for big-endian, 'little' for little-endian
         SetDistanceButtonBGColor(distance11_Front, combined11_int)
 
+        # --------------------------------------------------------------------------
+        combined12_int = int.from_bytes(
+            new_byte_array[22:24], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetCliffButtonBGColor(distance12_Front, combined12_int)
+
+        # --------------------------------------------------------------------------
+        combined13_int = int.from_bytes(
+            new_byte_array[24:26], byteorder="big"
+        )  # 'big' for big-endian, 'little' for little-endian
+        SetCliffButtonBGColor(distance13_Front, combined13_int)
+
     if response == (CMD_GET_BATTERY | RESP_BIT):
         # 4x uint16_t
         # 3x int16_t
         new_byte_array_uint16 = data[3 : 3 + 4 * 2]
         new_byte_array_int16 = data[3 + (4 * 2) : -2]
 
-        hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
-        print("< " + hex_values)
+        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
+        # print("< " + hex_values)
 
-        hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
-        print("< " + hex_values)
+        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
+        # print("< " + hex_values)
 
         try:
             unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
@@ -287,13 +313,17 @@ def my_receive_callback(data, stream_area):
 
             txt = "< Battery : Voltage {} mV, Current {} mA\n".format(Voltage, Current)
 
-            if (BatteryState & 0x0500) == 0x0100:
-                print("Discharge")
+            if (BatteryState & 0x0F00) == 0x0100:
+                # print("Discharge")
                 button_battery_state.config(bg="yellow", text="Discharging")
 
-            if (BatteryState & 0x0500) == 0x0500:
-                print("Charge")
+            if (BatteryState & 0x0F00) == 0x0500:
+                # print("Charge")
                 button_battery_state.config(bg="lime", text="Charging")
+
+            if (BatteryState & 0x0F00) == 0x0C00:
+                # print("Empty")
+                button_battery_state.config(bg="red", text="Empty")
 
             button_battery_voltage.config(text=str(Voltage) + " mV")
             button_battery_current.config(text=str(Current) + " mA")
@@ -329,8 +359,18 @@ def createMoveCommand(mod_manager, Parameters):
     return
 
 
+def createCompCommand(mod_manager, Parameters):
+    high = (int(Parameters[1]) >> 8) & 0xFF
+    low = int(Parameters[1]) & 0xFF
+
+    mod_manager.cmd_Generic(Parameters[0], 3, np.array([high, low, 10]))
+
+    return
+
+
+# Added watchdog timeout (0 = default = 2 seconds)
 def createBaseCommand(mod_manager, Parameters):
-    mod_manager.cmd_Generic(Parameters[0], 3, np.array(Parameters[1:]))
+    mod_manager.cmd_Generic(Parameters[0], 4, np.array(Parameters[1:]))
 
     return
 
@@ -370,7 +410,7 @@ def on_closing():
 # ===============================================================================
 def show_gui(mod_manager):
     root = tk.Tk()
-    root.title("Sara Developement User Interface")
+    root.title("Sara Developement User Interface - BODY")
 
     # Set up the window close protocol
     root.protocol("WM_DELETE_WINDOW", on_closing)
@@ -662,7 +702,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="North",
-        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 0]): createCompCommand(mod_manager, t),
     )
     button_rotate_North.grid(row=0, column=4, sticky="w")
 
@@ -671,7 +711,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="East",
-        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 90]): createCompCommand(mod_manager, t),
     )
     button_rotate_East.grid(row=1, column=4, sticky="w")
 
@@ -680,7 +720,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="South",
-        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 180]): createCompCommand(mod_manager, t),
     )
     button_rotate_South.grid(row=2, column=4, sticky="w")
 
@@ -689,7 +729,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="West",
-        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_COMP_MOVE, 270]): createCompCommand(mod_manager, t),
     )
     button_rotate_West.grid(row=3, column=4, sticky="w")
 
@@ -751,6 +791,15 @@ def show_gui(mod_manager):
     global distance11_Front
     distance11_Front = tk.Button(frame, height=1, width=10, text="inf")
     distance11_Front.grid(row=5, column=5, sticky="w")
+
+    global distance12_Front
+    distance12_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance12_Front.grid(row=6, column=5, sticky="w")
+
+    global distance13_Front
+    distance13_Front = tk.Button(frame, height=1, width=10, text="inf")
+    distance13_Front.grid(row=7, column=5, sticky="w")
+
     # --------------------------------------------------------------------------------------
     # Generic buttons
     # --------------------------------------------------------------------------------------
@@ -883,7 +932,7 @@ def handle_pygame_events():
                 createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_BLUE, CMD_LED_ON]))
 
             if event.button == 3:
-                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_ALL, CMD_LED_OFF]))
+                createLedCommand(mod_manager, np.array([CMD_BA_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]))
 
             # Left forward
             if event.button == 4:
@@ -959,14 +1008,7 @@ def handle_pygame_events():
         print(f"Axis 0 : {axis0:.2f}, Axis 1 : {axis1:.2f}, Axis 3 : {-1*axis3:.2f}")
         createBaseCommand(
             mod_manager,
-            np.array(
-                [
-                    CMD_BASE_MOVE,
-                    int(axis0 * 50),
-                    int(-1 * axis1 * 50),
-                    int(-1 * axis3 * 50),
-                ]
-            ),
+            np.array([CMD_BASE_MOVE, int(axis0 * 50), int(-1 * axis1 * 50), int(-1 * axis3 * 50), 0]),
         )
 
     if axis2_event == True:

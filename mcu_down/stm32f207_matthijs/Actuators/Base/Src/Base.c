@@ -3,22 +3,24 @@
 #include <main.h>
 #include "Encoders.h"
 #include "RGBLeds.h"
-#include <stdlib.h>  // For abs()
-
-#include <string.h>		// For tracing
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include "usbd_cdc_if.h"
 #include "Compass.h"
+#include "protocol_0x55.h"
 
 
-struct Base_State_Type LeftBaseMotor_State;
-struct Base_State_Type RightBaseMotor_State;
-struct Base_State_Type CenterBaseMotor_State;
+static struct Base_State_Type LeftBaseMotor_State;
+static struct Base_State_Type RightBaseMotor_State;
+static struct Base_State_Type CenterBaseMotor_State;
 
-double Compass_Target;
-double Compass_Error;
-int Compass_MoveState;
-int Compass_MoveSpeed;
+static double Compass_Target;
+static double Compass_Error;
+static int Compass_MoveState;
+static int Compass_MoveSpeed;
+static int Apply_Brake;
+static int Watchdog_Timer;
 
 
 void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTypeDef *htim12)
@@ -43,6 +45,9 @@ void Base_Init(TIM_HandleTypeDef *htim9, TIM_HandleTypeDef *htim11, TIM_HandleTy
 
 	HAL_TIM_Base_Start(htim12);
 	HAL_TIM_PWM_Start(htim12, TIM_CHANNEL_1);
+
+	Apply_Brake = False;
+	Watchdog_Timer = 0;
 }
 
 void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
@@ -61,6 +66,12 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	// PhiDot = rotational velocity around Rz.
 	//-------------------------------------------------------------------------------------------------
 
+	// Sanity check on the setpoints
+
+	if (abs(Vx) > 100) { return;}
+	if (abs(Vy) > 100) { return;}
+	if (abs(PhiDot) > 100) { return;}
+
 	long M1 = 0;
 	long M2 = 0;
 	long M3 = 0;
@@ -76,6 +87,8 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	M2 = M2 / 200;
 	M3 = M3 / 200;
 
+	// For motors: "100" is standstil. Smaller 100, is moving.
+
 	if (M1 > 0) { RightBaseMotor_State.Direction = Base_Motion_Negative;} else {RightBaseMotor_State.Direction = Base_Motion_Positive;}
 	RightBaseMotor_State.PWM_Output = (100 - abs(M1));
 
@@ -85,9 +98,7 @@ void Base_VelocitySetpoint(int Vx, int Vy, int PhiDot)
 	if (M3 > 0) { CenterBaseMotor_State.Direction = Base_Motion_Negative;} else {CenterBaseMotor_State.Direction = Base_Motion_Positive;}
 	CenterBaseMotor_State.PWM_Output = (100 - abs(M3));
 
-	GenericBase_HAL_Brake(False, LeftBaseMotor);
-	GenericBase_HAL_Brake(False, CenterBaseMotor);
-	GenericBase_HAL_Brake(False, RightBaseMotor);
+	Apply_Brake = False;
 }
 
 void Base_Update20Hz(struct Encoders_Data_Type *EncoderData)
@@ -96,13 +107,26 @@ void Base_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	CenterBaseMotor_State.ActualPosition = EncoderData->Encoder[1];
 	RightBaseMotor_State.ActualPosition = EncoderData->Encoder[2];
 
-	GenericBase_HAL_Brake(False, LeftBaseMotor);
-	GenericBase_HAL_Brake(False, CenterBaseMotor);
-	GenericBase_HAL_Brake(False, RightBaseMotor);
+	if (Apply_Brake == True)
+	{
+		GenericBase_HAL_Brake(True, LeftBaseMotor);
+		GenericBase_HAL_Brake(True, CenterBaseMotor);
+		GenericBase_HAL_Brake(True, RightBaseMotor);
 
-	GenericBase_HAL_Direction(LeftBaseMotor_State.Direction, LeftBaseMotor);
-	GenericBase_HAL_Direction(CenterBaseMotor_State.Direction, CenterBaseMotor);
-	GenericBase_HAL_Direction(RightBaseMotor_State.Direction, RightBaseMotor);
+		RightBaseMotor_State.PWM_Output = 100;
+		LeftBaseMotor_State.PWM_Output = 100;
+		CenterBaseMotor_State.PWM_Output = 100;
+	}
+	else
+	{
+		GenericBase_HAL_Brake(False, LeftBaseMotor);
+		GenericBase_HAL_Brake(False, CenterBaseMotor);
+		GenericBase_HAL_Brake(False, RightBaseMotor);
+
+		GenericBase_HAL_Direction(LeftBaseMotor_State.Direction, LeftBaseMotor);
+		GenericBase_HAL_Direction(CenterBaseMotor_State.Direction, CenterBaseMotor);
+		GenericBase_HAL_Direction(RightBaseMotor_State.Direction, RightBaseMotor);
+	}
 
 	GenericBase_HAL_PWM(LeftBaseMotor_State.PWM_Output, LeftBaseMotor);
 	GenericBase_HAL_PWM(CenterBaseMotor_State.PWM_Output, CenterBaseMotor);
@@ -148,6 +172,9 @@ void GenericBase_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 	}
 }
 
+//------------------------------------------------------------------------------
+// Only used for feedback controlled compass rotations
+//------------------------------------------------------------------------------
 void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 {
 	// 0 = disabled
@@ -183,7 +210,6 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		}
 	}
 
-
 	if (abs(Compass_Error) < 10)
 	{
 		Compass_MoveSpeed = Compass_MoveSpeed / 2;
@@ -199,16 +225,13 @@ void Base_MotionControl(struct Compass_Sensor_Type *CompassData)
 		Base_VelocitySetpoint(0, 0, Compass_MoveSpeed);
 	}
 
+	// Compass rotation move = DONE
 	if ((Compass_MoveState > 0) && abs(Compass_Error) < 5)
 	{
 		Compass_MoveState = 0;
 		Base_VelocitySetpoint(0, 0, 0);
 
-		HAL_Delay(1);
-
-		GenericBase_HAL_Brake(True, LeftBaseMotor);
-		GenericBase_HAL_Brake(True, CenterBaseMotor);
-		GenericBase_HAL_Brake(True, RightBaseMotor);
+		SendCompassMoveDone(True);
 	}
 }
 
@@ -216,10 +239,61 @@ void Base_NewCompassRotation(char HighByte, char LowByte)
 {
 	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;
 
-	if (Compass_MoveState == 0)
+	// Limit moves to 1 turn
+	if ((combined >= 0) && (combined < 360))
 	{
-		Compass_MoveState = 1;
-		Compass_Target = (float)combined;
+		if (Compass_MoveState == 0)
+		{
+			Apply_Brake = False;
+			Compass_MoveState = 1;
+			Compass_Target = (float)combined;
+
+		}
+		else
+		{
+			SendCompassMoveDone(False);
+		}
+	}
+	else
+	{
+		SendCompassMoveDone(False);
 	}
 }
 
+void Base_Brake(int inApplyBrake)
+{
+	Apply_Brake = inApplyBrake;
+}
+
+void Base_MotionStartWatchdog(int NewWatchdogTimeout)
+{
+	// Old commands without watchdog or watchdog not set --> use 2 seconds.
+	if (NewWatchdogTimeout <= 0)
+	{
+		Watchdog_Timer = 2 * UPDATE_10HZ;
+	}
+	else
+	{
+		Watchdog_Timer = NewWatchdogTimeout * UPDATE_10HZ;
+	}
+}
+
+void Base_MotionUpdateWatchdog()
+{
+	if (Watchdog_Timer > 0)
+	{
+		Watchdog_Timer--;
+
+		// Watchdog changed to 0 --> stop any motion
+		if (Watchdog_Timer == 0)
+		{
+			// Stop base movements
+			RightBaseMotor_State.PWM_Output = 100;
+			LeftBaseMotor_State.PWM_Output = 100;
+			CenterBaseMotor_State.PWM_Output = 100;
+
+			// Stop compass rotations
+			Compass_MoveState = 0;
+		}
+	}
+}
