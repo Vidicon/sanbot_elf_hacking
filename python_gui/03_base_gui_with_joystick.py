@@ -410,7 +410,7 @@ def on_closing():
 # ===============================================================================
 def show_gui(mod_manager):
     root = tk.Tk()
-    root.title("Sara Developement User Interface")
+    root.title("Sara Developement User Interface - BODY")
 
     # Set up the window close protocol
     root.protocol("WM_DELETE_WINDOW", on_closing)
