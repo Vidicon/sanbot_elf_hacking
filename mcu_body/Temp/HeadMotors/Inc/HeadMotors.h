@@ -5,7 +5,7 @@
 #include "stm32f1xx_hal.h"
 #include "Encoders.h"
 
-enum ENUM_HeadHomeMotorState {
+enum ENUM_HeadMotorState {
 	NotHomed,
 	Homing,
 	Homed
@@ -17,14 +17,17 @@ enum ENUM_HeadMotorDirection {
 };
 
 enum ENUM_HeadMotorMotionState {
-	Motion_Idle,
-	Motion_Moving
+	Motion_Disabled,
+	Motion_AtTarget,
+	Motion_Error,
+	Motion_MovingUp,
+	Motion_MovingDown,
 };
 
 struct HeadMotor_State_Type {
-	enum ENUM_HeadHomeMotorState HomeState ;
-	enum ENUM_HeadMotorDirection MotionDirection;
-	enum ENUM_HeadMotorMotionState MotionState;
+	enum ENUM_HeadMotorState MotionState;
+	enum ENUM_HeadMotorDirection ArmDirection;
+	enum ENUM_HeadMotorMotionState HomeState;
 
 	TIM_HandleTypeDef *TIM;
 
@@ -47,7 +50,7 @@ void Generic_Head_Position_Setpoint(enum ENUM_BodyParts BodyPart, char HighByte,
 
 void Generic_Head_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
-void GenericHead_HAL_Direction(enum ENUM_HeadMotorDirection Direction, enum ENUM_BodyParts BodyPart);
+void GenericHead_HAL_Direction(enum ENUM_ArmMotionState Direction, enum ENUM_BodyParts BodyPart);
 
 void Generic_Head_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart);
 

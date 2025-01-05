@@ -10,6 +10,9 @@ import numpy as np
 import platform
 import math
 
+DEBUG = True
+# DEBUG = False
+
 RESP_BIT = 0x80
 
 CMD_VERSION = 0x01
@@ -26,6 +29,8 @@ CMD_GET_MOTIONSENSORS = 0x21
 CMD_GET_DISTANCESENSORS = 0x22
 CMD_GET_COMPASS = 0x23
 CMD_GET_BATTERY = 0x24
+CMD_GET_HEAD_ENCODERS = 0x20
+
 
 CMD_LA_MOVE = 0x30
 CMD_RA_MOVE = 0x31
@@ -72,6 +77,18 @@ def my_receive_callback(data, stream_area):
             stream_area.yview_moveto(1)  # Scrolling to the bottom
         except:
             print("Version bytes error")
+
+    if response == (CMD_GET_HEAD_ENCODERS | RESP_BIT):
+        try:
+            new_byte_array = data[3:-2]
+            int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
+
+            if DEBUG:
+                stream_area.insert(tk.END, "< Encoders   : " + str(int16_array_5) + "\n")
+
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Encoders bytes error")
 
 
 def createCommand(mod_manager, InputCommmand, Parameters):
@@ -251,13 +268,15 @@ def show_gui(mod_manager):
         command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_COLOR_NONE, CMD_LED_OFF]): createLedCommand(mod_manager, t),
     )
     button_RH_Off.grid(row=4, column=1, sticky="w")
-    
+
     button_RH_Blue_Blink = tk.Button(
         frame,
         height=1,
         width=10,
         text="Right Blue Blink",
-        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_RIGHTHEAD_COLOR, CMD_BLUE, CMD_LED_BLINK_VERYFAST]): createLedCommand(
+            mod_manager, t
+        ),
     )
     button_RH_Blue_Blink.grid(row=5, column=1, sticky="w")
 
