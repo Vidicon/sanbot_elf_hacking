@@ -68,6 +68,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define PAN1_SENS_Pin GPIO_PIN_2
+#define PAN1_SENS_GPIO_Port GPIOF
+#define PAN2_SENS_Pin GPIO_PIN_3
+#define PAN2_SENS_GPIO_Port GPIOF
 #define HeadLedEnable_Pin GPIO_PIN_3
 #define HeadLedEnable_GPIO_Port GPIOC
 #define HeadTopButton_Pin GPIO_PIN_0
@@ -80,6 +84,12 @@ void Error_Handler(void);
 #define LeftHeadGreen_GPIO_Port GPIOE
 #define LeftHeadBlue_Pin GPIO_PIN_12
 #define LeftHeadBlue_GPIO_Port GPIOE
+#define TIL_EN_Pin GPIO_PIN_14
+#define TIL_EN_GPIO_Port GPIOE
+#define PAN_EN_Pin GPIO_PIN_15
+#define PAN_EN_GPIO_Port GPIOE
+#define PAN_DIR_Pin GPIO_PIN_12
+#define PAN_DIR_GPIO_Port GPIOD
 #define RightHeadRed_Pin GPIO_PIN_13
 #define RightHeadRed_GPIO_Port GPIOD
 #define RightHeadGreen_Pin GPIO_PIN_14

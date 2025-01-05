@@ -26,17 +26,19 @@
 #include "protocol_0x55.h"
 #include "RobotGlobals.h"
 #include "RGBLeds_Head.h"
+//#include "Encoders.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-void HeadLed(int Enable);
+void HeadLed(int LedOn);
 
 /* USER CODE END PD */
 
@@ -46,7 +48,9 @@ void HeadLed(int Enable);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN PV */
@@ -58,6 +62,12 @@ int Selftest = False;
 int HeadButtonOld;
 int HeadButton;
 
+int tmp1;
+int tmp2;
+
+
+int head_pan_max;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +75,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_TIM1_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -75,6 +87,8 @@ void System_Initialize()
 {
 	// Main timer
 	HAL_TIM_Base_Start_IT(&htim7);
+
+	Encoders_Init(&htim1, &htim3);
 
 //	RGBLeds_Init();
 
@@ -148,22 +162,18 @@ void Check_USB_Communication()
 	}
 }
 
-void HeadLed(int Enable)
+void HeadLed(int LedOn)
 {
-	// Low to enable headled
-	// 99 = almost off
-	// 0 = full on.
-	if (Enable)
+	if (LedOn)
 	{
-		HAL_GPIO_WritePin(HeadLedEnable_GPIO_Port, HeadLedEnable_Pin, 0);
-		TIM2->CCR2 = 70;
+		HAL_GPIO_WritePin(HeadLedEnable_GPIO_Port, HeadLedEnable_Pin, GPIO_PIN_SET);
 	}
 	else
 	{
-		HAL_GPIO_WritePin(HeadLedEnable_GPIO_Port, HeadLedEnable_Pin, 1);
-		TIM2->CCR2 = 99;
+		HAL_GPIO_WritePin(HeadLedEnable_GPIO_Port, HeadLedEnable_Pin, GPIO_PIN_RESET);
 	}
 }
+
 
 int ReadHeadButton()
 {
@@ -194,13 +204,13 @@ void RunDemoProgram()
 
 			// Change eye to normal eyes
 		}
-
-//		if (ReadTouch() == 1)
-//		{
-//			// If touched left, close left eye
-			// If touched right, close right eye
-//		}
 	}
+}
+
+void setPanMotor(int8_t setSpeed)
+{
+	HAL_GPIO_WritePin(PAN_DIR_GPIO_Port, PAN_DIR_Pin, setSpeed<0); // PAN
+	TIM8->CCR4 = 100 - abs(setSpeed); // PAN
 }
 
 /* USER CODE END 0 */
@@ -232,21 +242,32 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USB_DEVICE_Init();
-  MX_TIM7_Init();
-  MX_TIM2_Init();
-  /* USER CODE BEGIN 2 */
+	MX_GPIO_Init();
+	MX_USB_DEVICE_Init();
+	MX_TIM7_Init();
+	MX_TIM2_Init();
+	MX_TIM1_Init();
+	MX_TIM3_Init();
+	/* USER CODE BEGIN 2 */
 
-  TIM2->CCR2 = 0;
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	TIM2->CCR2 = 0;
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
-  System_Initialize();
-  System_SelfTest(True);
+	System_Initialize();
+	System_SelfTest(True);
 
-  Protocol_0x55_Init();
+	Protocol_0x55_Init();
 
-  HeadLed(True);
+	HeadLed(True);
+
+	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
+	__HAL_TIM_SET_COUNTER(&htim1, 0);
+
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_1 | TIM_CHANNEL_2);
+	__HAL_TIM_SET_COUNTER(&htim3, 0);
+
+	HAL_GPIO_WritePin(PAN_EN_GPIO_Port, PAN_EN_Pin, 1);
+	HAL_GPIO_WritePin(TIL_EN_GPIO_Port, TIL_EN_Pin, 1);
 
   /* USER CODE END 2 */
 
@@ -271,9 +292,10 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 
-		  #ifdef DEMO
-		  RunDemoProgram();
-		  #endif
+		  tmp1 = __HAL_TIM_GET_COUNTER(&htim1);
+		  tmp2 = __HAL_TIM_GET_COUNTER(&htim3);
+
+		  HAL_Delay(1);
 	  }
 
 	  if (Update_5Hz)
@@ -354,6 +376,56 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_Encoder_InitTypeDef sConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 0;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 65535;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
+  sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC1Filter = 0;
+  sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC2Filter = 0;
+  if (HAL_TIM_Encoder_Init(&htim1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -399,6 +471,55 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_Encoder_InitTypeDef sConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 0;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 65535;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC1Filter = 0;
+  sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC2Filter = 0;
+  if (HAL_TIM_Encoder_Init(&htim3, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
 
 }
 
@@ -450,6 +571,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -463,10 +585,17 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(USB_ENABLE_LOW_GPIO_Port, USB_ENABLE_LOW_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin|TIL_EN_Pin
+                          |PAN_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, PAN_DIR_Pin|RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PAN1_SENS_Pin PAN2_SENS_Pin */
+  GPIO_InitStruct.Pin = PAN1_SENS_Pin|PAN2_SENS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HeadLedEnable_Pin */
   GPIO_InitStruct.Pin = HeadLedEnable_Pin;
@@ -494,6 +623,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : TIL_EN_Pin PAN_EN_Pin */
+  GPIO_InitStruct.Pin = TIL_EN_Pin|PAN_EN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PAN_DIR_Pin */
+  GPIO_InitStruct.Pin = PAN_DIR_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(PAN_DIR_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RightHeadRed_Pin RightHeadGreen_Pin RightHeadBlue_Pin */
   GPIO_InitStruct.Pin = RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin;

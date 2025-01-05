@@ -49,8 +49,9 @@
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"/>
 									<listOptionValue builtIn="false" value="../Communication/Protocol_0x55/Inc"/>
-									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/RGBLeds/Inc"/>
+									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
+									<listOptionValue builtIn="false" value="../Actuators/Encoders/Inc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.2049293551" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -136,8 +137,9 @@
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"/>
 									<listOptionValue builtIn="false" value="../Communication/Protocol_0x55/Inc"/>
-									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
 									<listOptionValue builtIn="false" value="../Actuators/RGBLeds/Inc"/>
+									<listOptionValue builtIn="false" value="../RobotGlobals/Inc"/>
+									<listOptionValue builtIn="false" value="../Actuators/Encoders/Inc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.150407550" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
