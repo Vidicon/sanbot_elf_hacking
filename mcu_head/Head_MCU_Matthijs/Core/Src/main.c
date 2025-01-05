@@ -26,7 +26,7 @@
 #include "protocol_0x55.h"
 #include "RobotGlobals.h"
 #include "RGBLeds_Head.h"
-//#include "Encoders.h"
+#include "Encoders.h"
 
 /* USER CODE END Includes */
 
@@ -292,9 +292,10 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 
-		  tmp1 = __HAL_TIM_GET_COUNTER(&htim1);
-		  tmp2 = __HAL_TIM_GET_COUNTER(&htim3);
+//		  tmp1 = __HAL_TIM_GET_COUNTER(&htim1);
+//		  tmp2 = __HAL_TIM_GET_COUNTER(&htim3);
 
+		  Encoders_Update();
 		  HAL_Delay(1);
 	  }
 

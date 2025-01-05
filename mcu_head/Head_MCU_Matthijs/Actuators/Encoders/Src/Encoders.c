@@ -14,12 +14,10 @@ struct Encoders_Data_Type *Encoders_GetPointer()
 	return &EncoderData;
 }
 
-void Encoders_Update(TIM_HandleTypeDef *htim1, TIM_HandleTypeDef *htim3)
+void Encoders_Update()
 {
-//	EncoderData.Encoder[0] = __HAL_TIM_GET_COUNTER(htim1);
-//	EncoderData.Encoder[1] = __HAL_TIM_GET_COUNTER(htim3);
-
-	HAL_Delay(1);
+	EncoderData.Encoder[0] = __HAL_TIM_GET_COUNTER(EncoderData.TIM[0]);
+	EncoderData.Encoder[1] = __HAL_TIM_GET_COUNTER(EncoderData.TIM[1]);
 }
 
 //----------------------------------------------------------------
@@ -27,14 +25,17 @@ void Encoders_Update(TIM_HandleTypeDef *htim1, TIM_HandleTypeDef *htim3)
 //----------------------------------------------------------------
 void Encoders_Init(TIM_HandleTypeDef *htim1, TIM_HandleTypeDef *htim3)
 {
-//	__HAL_TIM_SET_COUNTER(htim1, 0);
-//	__HAL_TIM_SET_COUNTER(htim3, 0);
-//
-//	HAL_TIM_Encoder_Start(htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-//	HAL_TIM_Encoder_Start(htim3, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-//
-//	EncoderData.Encoder[0] = 0;
-//	EncoderData.Encoder[1] = 0;
+	EncoderData.TIM[0] = htim1;
+	EncoderData.TIM[1] = htim3;
+
+	__HAL_TIM_SET_COUNTER(htim1, 0);
+	__HAL_TIM_SET_COUNTER(htim3, 0);
+
+	HAL_TIM_Encoder_Start(htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
+	HAL_TIM_Encoder_Start(htim3, TIM_CHANNEL_1 | TIM_CHANNEL_2);
+
+	EncoderData.Encoder[0] = 0;
+	EncoderData.Encoder[1] = 0;
 }
 
 void Encoders_SelfTest()
