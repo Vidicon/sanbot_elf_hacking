@@ -27,6 +27,7 @@
 #include "RobotGlobals.h"
 #include "RGBLeds_Head.h"
 #include "Encoders.h"
+#include "HeadMotors.h"
 
 /* USER CODE END Includes */
 
@@ -88,23 +89,12 @@ void System_Initialize()
 	// Main timer
 	HAL_TIM_Base_Start_IT(&htim7);
 
+	RGBLeds_Init();
+
 	Encoders_Init(&htim1, &htim3);
 
-//	RGBLeds_Init();
-
-//	Encoders_Init(&huart6);
-//
-//	LeftArm_Init(&htim9);
-//	RightArm_Init(&htim9);
-//
-//	Base_Init(&htim9, &htim11, &htim12);
-//
-//	MotionSensors_Init();
-//	DistanceSensors_Init();
-//
-//	Compass_Init(&hi2c3);
-//
-//	Battery_Init(&hi2c1);
+	Head_Pan_Init(&htim8);
+//	Head_Tilt_Init(&htim8);
 }
 
 void System_SelfTest(enum ENUM_Booleans Enabled)

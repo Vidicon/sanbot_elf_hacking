@@ -21,7 +21,9 @@ enum ENUM_BodyParts{
 	CenterBaseMotor,
 	RightBaseMotor,
 	LeftHead,
-	RightHead
+	RightHead,
+	HeadPan,
+	HeadTilt
 };
 
 enum ENUM_BodyParts BodyParts;
