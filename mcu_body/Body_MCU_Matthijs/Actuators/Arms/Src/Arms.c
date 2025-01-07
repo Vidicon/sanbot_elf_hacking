@@ -8,7 +8,6 @@
 struct Arm_State_Type LeftArm_State;
 struct Arm_State_Type RightArm_State;
 
-
 void Arm_PositionSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte)
 {
 	short combined = ((unsigned char)HighByte << 8) | (unsigned char)LowByte;

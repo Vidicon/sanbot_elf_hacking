@@ -5,6 +5,11 @@
 #include "stm32f1xx_hal.h"
 #include "Encoders.h"
 
+// Allocate the memory in the c-file
+// Make available for other c-files to use, in the h-file
+extern struct HeadMotor_State_Type HeadPan_State;
+extern struct HeadMotor_State_Type HeadTilt_State;
+
 enum ENUM_HeadHomeMotorState {
 	NotHomed,
 	Homing,

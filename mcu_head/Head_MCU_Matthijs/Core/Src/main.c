@@ -74,8 +74,9 @@ int HeadButton;
 int tmp1;
 int tmp2;
 
-
 int head_pan_max;
+
+int System_Ready = False;
 
 /* USER CODE END PV */
 
@@ -93,7 +94,7 @@ static void MX_TIM8_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void System_Initialize()
+void System_Initialize_Start()
 {
 	// Main timer
 	HAL_TIM_Base_Start_IT(&htim7);
@@ -107,34 +108,13 @@ void System_Initialize()
 //	Head_Tilt_Init(&htim8);
 }
 
-void System_SelfTest(enum ENUM_Booleans Enabled)
+void System_Initialze_Update()
 {
-	Selftest = Enabled;
+	if (HeadPan_State.HomeState != Homed) {return;}
+	if (HeadTilt_State.HomeState != Homed) {return;}
 
-	if (Selftest)
-	{
-		SelfTestTimer = 0;
-		RGBLeds_SelfTest(True);
-		HeadLed(True);
-	}
-
-//	LeftArm_Home();
-//	RightArm_Home();
-}
-
-void UpdateSelfTest()
-{
-	if (Selftest)
-	{
-		SelfTestTimer += 1;
-		if (SelfTestTimer == 5 * UPDATE_20HZ)
-		{
-			SelfTestTimer = 0;
-			Selftest = False;
-			RGBLeds_SelfTest(False);
-			HeadLed(False);
-		}
-	}
+	System_Ready = True;
+	HeadLed(False);
 }
 
 void Check_USB_Communication()
@@ -182,7 +162,7 @@ int ReadHeadButton()
 
 void RunDemoProgram()
 {
-	if (Selftest == 0)
+	if (System_Ready == 0)
 	{
 		HeadButtonOld = HeadButton;
 		HeadButton = ReadHeadButton();
@@ -254,8 +234,8 @@ int main(void)
 	TIM2->CCR2 = 0;
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
-	System_Initialize();
-	System_SelfTest(False);
+	System_Initialize_Start();
+	System_Initialze_Update(False);
 
 	Protocol_0x55_Init();
 
@@ -291,7 +271,7 @@ int main(void)
 	  if (Update_20Hz)
 	  {
 		  Update_20Hz = 0;
-		  UpdateSelfTest();
+		  System_Initialze_Update();
 
 		  Head_Update20Hz(Encoders_GetPointer());
 	  }

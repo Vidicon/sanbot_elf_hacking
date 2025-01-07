@@ -6,3 +6,5 @@
 *.bak
 *.ini
 *.pyc
+/mcu_body/Body_MCU_Matthijs/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs
+/mcu_head/Head_MCU_Matthijs/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs

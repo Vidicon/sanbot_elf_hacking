@@ -34,7 +34,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "RobotGlobals.h"
 
-
+#define DEMO
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

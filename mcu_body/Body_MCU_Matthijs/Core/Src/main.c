@@ -35,7 +35,6 @@
 #include "Battery.h"
 #include "stm32f2xx.h"
 
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,6 +79,7 @@ int Update_5Hz;
 int Update_2Hz;
 int Update_1Hz;
 
+int System_Ready = False;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -112,6 +112,9 @@ void System_Initialize()
 	LeftArm_Init(&htim9);
 	RightArm_Init(&htim9);
 
+	LeftArm_Home();
+	RightArm_Home();
+
 	Base_Init(&htim9, &htim11, &htim12);
 
 	MotionSensors_Init();
@@ -122,23 +125,12 @@ void System_Initialize()
 	Battery_Init(&hi2c1);
 }
 
-void System_SelfTest(enum ENUM_Booleans Enabled)
+void System_Initialze_Update()
 {
-	Selftest = Enabled;
+	if (LeftArm_State.HomeState != Arm_Homed) {return;}
+	if (RightArm_State.HomeState != Arm_Homed) {return;}
 
-	LeftArm_Home();
-	RightArm_Home();
-}
-
-void UpdateSelfTest()
-{
-	if (Selftest)
-	{
-		if (Time20Hz == 10 * UPDATE_20HZ)
-		{
-			Selftest = False;
-		}
-	}
+	System_Ready = True;
 }
 
 void Check_USB_Communication()
@@ -197,6 +189,13 @@ void TracingUpdate()
 	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
 }
 
+void RunDemoProgram()
+{
+	if (System_Ready == 0)
+	{
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -239,7 +238,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-  System_SelfTest(False);
 
   Protocol_0x55_Init();
 
@@ -264,7 +262,7 @@ int main(void)
 		  Update_20Hz = 0;
 		  Time20Hz += 1;
 
-		  UpdateSelfTest();
+		  System_Initialze_Update();
 
 		  Base_Update20Hz(Encoders_GetPointer());
 		  Arms_Update20Hz(Encoders_GetPointer());
@@ -281,6 +279,10 @@ int main(void)
 
 		  Base_MotionUpdateWatchdog();
 		  Base_MotionControl(Compass_GetPointer());
+
+#ifdef DEMO
+		  RunDemoProgram();
+#endif
 	  }
 
 	  if (Update_5Hz)
