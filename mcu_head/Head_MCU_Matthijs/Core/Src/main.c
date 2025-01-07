@@ -57,8 +57,15 @@ TIM_HandleTypeDef htim8;
 
 /* USER CODE BEGIN PV */
 int SelfTestTimer = 0;
-int Time20Hz = 0;
-int Time16Hz = 0;
+
+int Update_25Hz;
+int Update_20Hz;
+int Update_16Hz;
+int Update_10Hz;
+int Update_5Hz;
+int Update_2Hz;
+int Update_1Hz;
+
 int Selftest = False;
 
 int HeadButtonOld;
