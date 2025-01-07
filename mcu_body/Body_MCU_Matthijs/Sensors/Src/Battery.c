@@ -16,6 +16,10 @@ I2C_HandleTypeDef *Battery_I2C;
 uint8_t Battery_Address = 0x16;
 HAL_StatusTypeDef status;
 
+uint8_t reg;
+uint8_t command[2];
+uint8_t response[10];
+
 //----------------------------------------------------------------
 // Return pointer instead of copy
 //----------------------------------------------------------------
@@ -98,7 +102,6 @@ void Battery_Init(I2C_HandleTypeDef *hI2C)
 	{
 		BatteryData.HW_Version  = 0;
 	}
-
 }
 
 void Battery_Update()

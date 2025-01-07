@@ -24,7 +24,7 @@ enum ENUM_BodyParts{
 	RightHead
 };
 
-enum ENUM_BodyParts BodyParts;
+extern enum ENUM_BodyParts BodyParts;
 
 struct RGBLeds_StateType {
 		int tmp;
@@ -35,6 +35,6 @@ enum ENUM_Booleans {
 	True
 	};
 
-enum ENUM_Booleans Boolean;
+extern enum ENUM_Booleans Boolean;
 
 #endif /* INC_ROBOTGLOBALS_H_ */

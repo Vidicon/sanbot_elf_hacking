@@ -14,7 +14,7 @@ struct Compass_Sensor_Type CompassData;
 
 I2C_HandleTypeDef *Compass_I2C;
 uint8_t Compass_Address = 0x3c;
-HAL_StatusTypeDef status;
+static HAL_StatusTypeDef status;
 
 //----------------------------------------------------------------
 // Return pointer instead of copy

@@ -33,6 +33,7 @@
 #include "DistanceSensors.h"
 #include "Compass.h"
 #include "Battery.h"
+#include "stm32f2xx.h"
 
 
 /* USER CODE END Includes */
@@ -70,6 +71,14 @@ int Selftest = False;
 int TempCS = 0;
 int Distance = 0;
 char TextBuffer[100];
+
+int Update_25Hz;
+int Update_20Hz;
+int Update_16Hz;
+int Update_10Hz;
+int Update_5Hz;
+int Update_2Hz;
+int Update_1Hz;
 
 /* USER CODE END PV */
 

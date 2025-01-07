@@ -30,7 +30,7 @@ enum ENUM_RGBLeds_Command {
 };
 
 // Declare a variable of type Color
-enum ENUM_RGBLeds_Color RGBLeds_Color;
+extern enum ENUM_RGBLeds_Color RGBLeds_Color;
 
 struct RGBLeds_State_Type {
 	enum ENUM_RGBLeds_Color Color;
