@@ -29,6 +29,7 @@
 #include "Encoders.h"
 #include "HeadMotors.h"
 #include "SSD1305_eyes.h"
+#include "default_eyes.h"
 
 /* USER CODE END Includes */
 
@@ -79,6 +80,7 @@ int tmp1;
 int tmp2;
 
 int head_pan_max;
+int Counter_2Hz = 0;
 
 int System_Ready = False;
 
@@ -113,10 +115,10 @@ void System_Initialize_Start()
 	Encoders_Init(&htim1, &htim3);
 
 	Head_Pan_Init(&htim8);
-//	Head_Pan_Home();
+	Head_Pan_Home();
 
 	Head_Tilt_Init(&htim8);
-//	Head_Tilt_Home();
+	Head_Tilt_Home();
 
 	System_Ready = True;
 
@@ -134,6 +136,9 @@ void System_Initialize_Start()
 	  right_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
 
 	  SSD1305_init(&left_eye, &right_eye);
+
+	SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+	SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
 }
 
 void System_Initialze_Update()
@@ -206,15 +211,9 @@ void RunDemoProgram()
 		{
 			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
 			RGBLeds_BlinkColor(RightHead, Green, LED_Blink_Fast);
-			HeadLed(True);
 
-			// Change eye to Nobleo + Sara logo
-
-//			Head_Tilt_Home();
-//			Head_Pan_Home();
-
-			  SSD1305_writeDisplay(&left_eye, nobleo_logo);
-			  SSD1305_writeDisplay(&right_eye, sara_logo);
+			SSD1305_writeDisplay(&left_eye, nobleo_logo);
+			SSD1305_writeDisplay(&right_eye, sara_logo);
 		}
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
@@ -224,8 +223,8 @@ void RunDemoProgram()
 			HeadLed(False);
 
 			// Change eye to normal eyes
-			  SSD1305_writeDisplay(&left_eye, nobleo_logo2);
-			  SSD1305_writeDisplay(&right_eye, image);
+			SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+			SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
 		}
 	}
 }
@@ -339,11 +338,27 @@ int main(void)
 	  if (Update_2Hz)
 	  {
 		  Update_2Hz = 0;
+
+		  if (Counter_2Hz == 0)
+		  {
+			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+		  }
+
+		  if (Counter_2Hz == 5)
+		  {
+			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+		  }
+
+		  Counter_2Hz = (Counter_2Hz + 1) % 6;
 	  }
 
 	  if (Update_1Hz)
 	  {
 		  Update_1Hz = 0;
+
+
 	  }
 
 	  //--------------------------------------------------------

@@ -46,6 +46,45 @@ Notes Matthijs:
 | Head PAN  |  PF2 |  PF3  | 
 | Head TILT | PF4 | PF5 |
 
+---
+### Read Flash
 
+SPI1, 8 bits, MSB, 18 MBits/s
+CPOL = Low
+CPHA = 1 Edge
+CRC = disable
+NSS signal = software
 
+---
+### Write Eyes
 
+**Left eye**
+SPI2, Transmit only, 8 bits, MSB, 9.0 MBits/s
+CPOL = Low
+CPHA = 1 Edge
+CRC = disable
+NSS signal = software
+
+SPI2_SCK = PB13
+SPI2_MOSI = PB15
+
+Chip select (CS) = PB14 = OLED_L_CS
+DC pin (DC) = PD6 = OLED_DC
+RESET pin (Reset) = PD5 = OLED_RESET
+
+***Right eye***
+SPI3
+
+Chip select (CS) = PA15 = OLED_R_CS
+
+  OLED_HandleTypeDef left_eye;
+  left_eye.hspi = &hspi2;
+  left_eye.cs = toGPIO(OLED_L_CS_GPIO_Port, OLED_L_CS_Pin);
+  left_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+  left_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
+
+  OLED_HandleTypeDef right_eye;
+  right_eye.hspi = &hspi3;
+  right_eye.cs = toGPIO(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin);
+  right_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+  right_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);

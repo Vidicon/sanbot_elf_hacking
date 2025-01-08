@@ -5,6 +5,7 @@
 // *      Author: bram
 // */
 #include "SSD1305_eyes.h"
+#include "default_eyes.h"
 #include "font.h"
 
 GPIO_PIN resetPin_;
