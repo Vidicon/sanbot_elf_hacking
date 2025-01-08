@@ -16,7 +16,7 @@ struct Encoders_Data_Type *Encoders_GetPointer()
 
 void Encoders_Update()
 {
-	EncoderData.Encoder[0] = __HAL_TIM_GET_COUNTER(EncoderData.TIM[0]);
+	EncoderData.Encoder[0] = -1 * __HAL_TIM_GET_COUNTER(EncoderData.TIM[0]);
 	EncoderData.Encoder[1] = __HAL_TIM_GET_COUNTER(EncoderData.TIM[1]);
 }
 

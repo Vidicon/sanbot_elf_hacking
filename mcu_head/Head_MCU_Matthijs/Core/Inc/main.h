@@ -65,6 +65,10 @@ void Error_Handler(void);
 #define PanPosSensor_GPIO_Port GPIOF
 #define PanNegSensor_Pin GPIO_PIN_3
 #define PanNegSensor_GPIO_Port GPIOF
+#define TiltPosSensor_Pin GPIO_PIN_4
+#define TiltPosSensor_GPIO_Port GPIOF
+#define TiltNegSensor_Pin GPIO_PIN_5
+#define TiltNegSensor_GPIO_Port GPIOF
 #define HeadLedEnable_Pin GPIO_PIN_3
 #define HeadLedEnable_GPIO_Port GPIOC
 #define HeadTopButton_Pin GPIO_PIN_0
@@ -77,10 +81,12 @@ void Error_Handler(void);
 #define LeftHeadGreen_GPIO_Port GPIOE
 #define LeftHeadBlue_Pin GPIO_PIN_12
 #define LeftHeadBlue_GPIO_Port GPIOE
-#define TIL_EN_Pin GPIO_PIN_14
-#define TIL_EN_GPIO_Port GPIOE
+#define TiltEnable_Pin GPIO_PIN_14
+#define TiltEnable_GPIO_Port GPIOE
 #define PanEnable_Pin GPIO_PIN_15
 #define PanEnable_GPIO_Port GPIOE
+#define TiltDirection_Pin GPIO_PIN_11
+#define TiltDirection_GPIO_Port GPIOD
 #define PanDirection_Pin GPIO_PIN_12
 #define PanDirection_GPIO_Port GPIOD
 #define RightHeadRed_Pin GPIO_PIN_13

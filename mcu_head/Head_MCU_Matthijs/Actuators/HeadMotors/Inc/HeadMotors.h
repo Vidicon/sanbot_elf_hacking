@@ -23,7 +23,8 @@ enum ENUM_HeadMotorDirection {
 
 enum ENUM_HeadMotorMotionState {
 	Motion_Idle,
-	Motion_Moving
+	Motion_Moving,
+	Motion_Breaking
 };
 
 struct HeadMotor_State_Type {
@@ -33,16 +34,16 @@ struct HeadMotor_State_Type {
 
 	TIM_HandleTypeDef *TIM;
 
-	int VelocitySetpoint;
 	int Direction;
 	int PWM_Output;
 
 	int ActualPosition;
 	int TargetPosition;
-	int SetpointPosition;
 	int ErrorPosition;
 
 	int HomeCounter;
+
+	int BrakeTimer;
 
 	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
@@ -70,6 +71,11 @@ void Head_Pan_SelfTest(enum ENUM_Booleans Enabled);
 //------------------------------------------------
 // TILT
 //------------------------------------------------
+void Head_Tilt_Init(TIM_HandleTypeDef *htim);
+
+void Head_Tilt_Home();
+
+void Head_Tilt_SelfTest(enum ENUM_Booleans Enabled);
 
 //------------------------------------------------
 #endif /* HEADMOTOR_INC_H_ */

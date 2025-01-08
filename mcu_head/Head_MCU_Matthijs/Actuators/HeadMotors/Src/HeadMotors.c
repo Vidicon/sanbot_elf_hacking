@@ -37,7 +37,7 @@ void Generic_Head_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts 
 
 	if (BodyPart == HeadTilt)
 	{
-//		HAL_GPIO_WritePin(TiltEnable_GPIO_Port, TiltEnable_Pin, !BrakeEnable);
+		HAL_GPIO_WritePin(TiltEnable_GPIO_Port, TiltEnable_Pin, !BrakeEnable);
 	}
 }
 
@@ -59,11 +59,11 @@ void GenericHead_HAL_Direction(enum ENUM_HeadMotorDirection Direction, enum ENUM
 	{
 		if (Direction == Move_Pos)
 		{
-//			HAL_GPIO_WritePin(RightArmUp_GPIO_Port, RightArmUp_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(TiltDirection_GPIO_Port, TiltDirection_Pin, GPIO_PIN_SET);
 		}
 		else
 		{
-//			HAL_GPIO_WritePin(RightArmUp_GPIO_Port, RightArmUp_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(TiltDirection_GPIO_Port, TiltDirection_Pin, GPIO_PIN_RESET);
 		}
 	}
 }
@@ -83,20 +83,19 @@ void Generic_Head_HAL_PWM(int PWM, enum ENUM_BodyParts BodyPart)
 
 void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 {
-	// Read limit switches
+	//--------------------------------------------------------------------------------
+	// Head pan
+	//--------------------------------------------------------------------------------
 	int HeadPanLimitNeg = HAL_GPIO_ReadPin(PanNegSensor_GPIO_Port,PanNegSensor_Pin);
 	int HeadPanLimitPos = HAL_GPIO_ReadPin(PanPosSensor_GPIO_Port, PanPosSensor_Pin);
 
 	int PanSpeed = 30;
 
-	//--------------------------------------------------------------------------------
-	// Head pan
-	//--------------------------------------------------------------------------------
 	HeadPan_State.ActualPosition = EncoderData->Encoder[1];
 
 	if (HeadPan_State.ActualPosition >= 32768)
 	{
-		HeadPan_State.ActualPosition = EncoderData->Encoder[1] - 66536;
+		HeadPan_State.ActualPosition = EncoderData->Encoder[1] - 65536;
 	}
 
 	if (HeadPan_State.HomeState < Homed)
@@ -147,8 +146,23 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 			HeadPan_State.PWM_Output = (100 - abs(0));
 			Generic_Head_HAL_Brake(False, HeadPan);
 			HeadPan_State.MotionState = Motion_Idle;
+
+//			HeadPan_State.MotionState = Motion_Breaking;
+//			HeadPan_State.BrakeTimer = 0;
 		}
 	}
+//	else if (HeadPan_State.MotionState == Motion_Breaking)
+//	{
+//		HeadPan_State.PWM_Output = (100 - abs(0));
+//		Generic_Head_HAL_Brake(True, HeadPan);
+//
+//		HeadPan_State.BrakeTimer += 1;
+//
+//		if (HeadPan_State.BrakeTimer >= 1 * UPDATE_20HZ)
+//		{
+//			HeadPan_State.MotionState = Motion_Idle;
+//		}
+//	}
 	else if (HeadPan_State.MotionState == Motion_Idle)
 	{
 		HeadPan_State.PWM_Output = (100 - abs(0));
@@ -156,96 +170,99 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	}
 
 	//--------------------------------------------------------------------------------
-	// Right arm
+	// Head Tilt
 	//--------------------------------------------------------------------------------
-//	RightArm_State.ActualPosition = EncoderData->Encoder[4];
+	int HeadTiltLimitNeg = HAL_GPIO_ReadPin(TiltNegSensor_GPIO_Port, TiltNegSensor_Pin);
+	int HeadTiltLimitPos = HAL_GPIO_ReadPin(TiltPosSensor_GPIO_Port, TiltPosSensor_Pin);
 
-//	// Read limit switches
-//	int RightLimitBack = HAL_GPIO_ReadPin(RightLimitBack_GPIO_Port, RightLimitBack_Pin);
-//	int RightLimitUp = HAL_GPIO_ReadPin(RightLimitUp_GPIO_Port, RightLimitUp_Pin);
-//
-//	//--------------------------------------------------------------------------------
-//	// Right arm
-//	//--------------------------------------------------------------------------------
-//	RightArm_State.ActualPosition = EncoderData->Encoder[4];
-//
-//	if (RightArm_State.HomeState == Arm_NotHomed)
-//	{
-//		RightArm_State.HomeCounter = 0;
-//
-//		RGBLeds_SetAllColors(RightArm, Red, LED_On);
-//	}
-//	else if (RightArm_State.HomeState == Arm_Homing)
-//	{
-//		GenericArms_HAL_Brake(False, RightArm);
-//		RightArm_State.HomeCounter += 1;
-//
-//		if (RightArm_State.HomeCounter <= 1 * UPDATE_20HZ)
-//		{
-//			RGBLeds_SetAllColors(RightArm, Red, LED_Blink_Slow);
-//			RightArm_State.Direction = Arm_Motion_MovingDown;
-//			RightArm_State.PWM_Output = (100 - abs(20));
-//
-//			if (RightLimitUp == 1) { RightArm_State.HomeCounter = 10 * UPDATE_20HZ;}
-//		}
-//		else
-//		{
-//			RightArm_State.Direction = Arm_Motion_MovingUp;
-//			RightArm_State.PWM_Output = (100 - abs(20));
-//
-//			if (RightLimitBack == 1)
-//			{
-//				EncoderData->Encoder[4] = 0;
-//				Arm_PositionSetpoint(RightArm, 1, 00);
-//				RightArm_State.HomeState = Arm_Homed;
-//
-//				RGBLeds_SetAllColors(RightArm, Green, LED_On);
-//			}
-//		}
-//	}
-//	else if (RightArm_State.HomeState == Arm_Homed)
-//	{
-//		RightArm_State.ErrorPosition = RightArm_State.TargetPosition - RightArm_State.ActualPosition;
-//
-//		RightSpeed = abs(RightArm_State.ErrorPosition/4);
-//
-//		if (RightSpeed < 15) {RightSpeed = 15;}
-//		if (RightSpeed > 50) {RightSpeed = 50;}
-//
-//		if (RightArm_State.ErrorPosition > 15)
-//		{
-//			RightArm_State.Direction = Arm_Motion_MovingDown;
-//			RightArm_State.PWM_Output = (100 - abs(35));
-//			GenericArms_HAL_Brake(False, RightArm);
-//		}
-//		else if (RightArm_State.ErrorPosition < -15)
-//		{
-//			RightArm_State.Direction = Arm_Motion_MovingUp;
-//			RightArm_State.PWM_Output = (100 - abs(35));
-//			GenericArms_HAL_Brake(False, RightArm);
-//		}
-//		else
-//		{
-//			RightArm_State.PWM_Output = (100 - abs(0));
-//			GenericArms_HAL_Brake(True, RightArm);
-//		}
-//	}
+	int TiltSpeed = 20;
 
-//	HAL_TIM_Base_Start(LeftArm_State.TIM );
-//	HAL_TIM_PWM_Start(LeftArm_State.TIM , TIM_CHANNEL_1);
+	HeadTilt_State.ActualPosition = EncoderData->Encoder[0];
 
-//	HAL_TIM_Base_Start(RightArm_State.TIM );
-//	HAL_TIM_PWM_Start(RightArm_State.TIM , TIM_CHANNEL_2);
+	if (HeadTilt_State.ActualPosition  < -32768)
+	{
+		HeadTilt_State.ActualPosition = EncoderData->Encoder[0] + 65536;
+	}
+
+	if (HeadTilt_State.HomeState < Homed)
+	{
+		if (HeadTilt_State.HomeState == NotHomed)
+		{
+			HeadTilt_State.HomeCounter = 0;
+		}
+		else if (HeadTilt_State.HomeState == Homing)
+		{
+			Generic_Head_HAL_Brake(False, HeadTilt);
+			HeadTilt_State.HomeCounter += 1;
+
+			HeadTilt_State.Direction = Move_Neg;
+			HeadTilt_State.PWM_Output = (100 - abs(30));
+
+			if (HeadTiltLimitNeg == 1)
+			{
+				// Set current encoder position to zero
+				__HAL_TIM_SET_COUNTER(EncoderData->TIM[0], 0);
+
+				Generic_Head_Position_Setpoint(HeadTilt, 0, 200);
+				HeadTilt_State.HomeState = Homed;
+
+				RGBLeds_SetAllColors(RightHead, Green, LED_On);
+			}
+		}
+	}
+	else if (HeadTilt_State.MotionState == Motion_Moving)
+	{
+		HeadTilt_State.ErrorPosition = HeadTilt_State.TargetPosition - HeadTilt_State.ActualPosition;
+
+		if (HeadTilt_State.ErrorPosition > 10)
+		{
+			HeadTilt_State.Direction = Move_Pos;
+			HeadTilt_State.PWM_Output = (100 - abs(TiltSpeed));
+			Generic_Head_HAL_Brake(False, HeadTilt);
+		}
+		else if (HeadTilt_State.ErrorPosition < -10)
+		{
+			HeadTilt_State.Direction = Move_Neg;
+			HeadTilt_State.PWM_Output = (100 - abs(TiltSpeed));
+			Generic_Head_HAL_Brake(False, HeadTilt);
+		}
+		else
+		{
+			HeadTilt_State.PWM_Output = (100 - abs(0));
+			Generic_Head_HAL_Brake(False, HeadTilt);
+
+			HeadTilt_State.MotionState = Motion_Idle;
+//			HeadTilt_State.MotionState = Motion_Breaking;
+//			HeadTilt_State.BrakeTimer = 0;
+		}
+	}
+//	else if (HeadTilt_State.MotionState == Motion_Breaking)
+//	{
+//		HeadTilt_State.PWM_Output = (100 - abs(0));
+//		Generic_Head_HAL_Brake(True, HeadTilt);
+//
+//		HeadTilt_State.BrakeTimer += 1;
+//
+//		if (HeadTilt_State.BrakeTimer >= 1 * UPDATE_20HZ)
+//		{
+//			HeadTilt_State.MotionState = Motion_Idle;
+//		}
+//	}
+	else if (HeadTilt_State.MotionState == Motion_Idle)
+	{
+		HeadTilt_State.PWM_Output = (100 - abs(0));
+		Generic_Head_HAL_Brake(False, HeadTilt);
+	}
 
 	GenericHead_HAL_Direction(HeadPan_State.Direction, HeadPan);
-//	GenericHead_HAL_Direction(HeadTilt_State.Direction, HeadTilt);
+	GenericHead_HAL_Direction(HeadTilt_State.Direction, HeadTilt);
 
 	Generic_Head_HAL_PWM(HeadPan_State.PWM_Output, HeadPan);
-//	Generic_Head_HAL_PWM(HeadTilt_State.PWM_Output, HeadTilt);
+	Generic_Head_HAL_PWM(HeadTilt_State.PWM_Output, HeadTilt);
 }
 
 //----------------------------------------------------------------
-//
+// Head Pan Init
 //----------------------------------------------------------------
 void Head_Pan_Init(TIM_HandleTypeDef *htim)
 {
@@ -280,33 +297,40 @@ void Head_Pan_SelfTest(enum ENUM_Booleans Enabled)
 {
 	// To do
 }
-//
-////----------------------------------------------------------------
-////
-////----------------------------------------------------------------
-//void RightArm_Init(TIM_HandleTypeDef *htim)
-//{
-//	RightArm_State.ArmDirection = Arm_Up;
-//	RightArm_State.MotionState = Arm_Motion_Disabled;
-//	RightArm_State.HomeState = Arm_NotHomed;
-//
-//	RightArm_State.TIM = htim;
-//	RightArm_State.TIM_CHANNEL = TIM_CHANNEL_2;
-//
-//	RightArm_State.TargetPosition = 0;
-//
-//	HAL_TIM_Base_Start(htim);
-//	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
-//}
-//
-//void RightArm_Home()
-//{
-//	// Move forward a litte
-//	RightArm_State.HomeState = Arm_Homing;
-//	RightArm_State.HomeCounter = 0;
-//}
-//
-//void RightArm_SelfTest(enum ENUM_Booleans Enabled)
-//{
-//	// To do
-//}
+
+//----------------------------------------------------------------
+// Head Tilt Init
+//----------------------------------------------------------------
+void Head_Tilt_Init(TIM_HandleTypeDef *htim)
+{
+	HeadTilt_State.MotionDirection = Move_Pos;
+	HeadTilt_State.MotionState = Motion_Idle;
+	HeadTilt_State.HomeState = NotHomed;
+
+	// Encoder counter timer
+	HeadTilt_State.TIM = htim;
+	HeadTilt_State.TIM_CHANNEL = TIM_CHANNEL_3;
+
+	HeadTilt_State.TargetPosition = 0;
+
+	// PWM generation timer
+	HAL_TIM_Base_Start(htim);
+	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3);
+
+	// 100 = not moving
+	__HAL_TIM_SET_COMPARE(HeadTilt_State.TIM, HeadTilt_State.TIM_CHANNEL, 100);
+}
+
+void Head_Tilt_Home()
+{
+	// Move forward a litte
+	HeadTilt_State.HomeState = Homing;
+	HeadTilt_State.HomeCounter = 0;
+
+	RGBLeds_SetAllColors(RightHead, Red, LED_On);
+}
+
+void Head_Tilt_SelfTest(enum ENUM_Booleans Enabled)
+{
+	// To do
+}

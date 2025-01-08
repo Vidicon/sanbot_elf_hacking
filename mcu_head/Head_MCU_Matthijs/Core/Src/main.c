@@ -105,13 +105,24 @@ void System_Initialize_Start()
 
 	Head_Pan_Init(&htim8);
 	Head_Pan_Home();
-//	Head_Tilt_Init(&htim8);
+
+	Head_Tilt_Init(&htim8);
+	Head_Tilt_Home();
+
+	HeadLed(False);
 }
 
 void System_Initialze_Update()
 {
-	if (HeadPan_State.HomeState != Homed) {return;}
-	if (HeadTilt_State.HomeState != Homed) {return;}
+	if (HeadPan_State.HomeState != Homed)
+	{
+		return;
+	}
+
+	if (HeadTilt_State.HomeState != Homed)
+	{
+		return;
+	}
 
 	System_Ready = True;
 	HeadLed(False);
@@ -162,7 +173,7 @@ int ReadHeadButton()
 
 void RunDemoProgram()
 {
-	if (System_Ready == 0)
+	if (System_Ready == True)
 	{
 		HeadButtonOld = HeadButton;
 		HeadButton = ReadHeadButton();
@@ -174,6 +185,10 @@ void RunDemoProgram()
 			HeadLed(True);
 
 			// Change eye to Nobleo + Sara logo
+
+//			Generic_Head_Position_Setpoint(HeadPan, 0, 0 );
+			Head_Tilt_Home();
+			Head_Pan_Home();
 		}
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
@@ -235,11 +250,9 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
 	System_Initialize_Start();
-	System_Initialze_Update(False);
+	System_Initialze_Update();
 
 	Protocol_0x55_Init();
-
-	HeadLed(False);
 
 	//------------------------------------------------------------------------------------
 	//	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
@@ -642,14 +655,15 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(USB_ENABLE_LOW_GPIO_Port, USB_ENABLE_LOW_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin|TIL_EN_Pin
+  HAL_GPIO_WritePin(GPIOE, LeftHeadRed_Pin|LeftHeadGreen_Pin|LeftHeadBlue_Pin|TiltEnable_Pin
                           |PanEnable_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, PanDirection_Pin|RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, TiltDirection_Pin|PanDirection_Pin|RightHeadRed_Pin|RightHeadGreen_Pin
+                          |RightHeadBlue_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PanPosSensor_Pin PanNegSensor_Pin */
-  GPIO_InitStruct.Pin = PanPosSensor_Pin|PanNegSensor_Pin;
+  /*Configure GPIO pins : PanPosSensor_Pin PanNegSensor_Pin TiltPosSensor_Pin TiltNegSensor_Pin */
+  GPIO_InitStruct.Pin = PanPosSensor_Pin|PanNegSensor_Pin|TiltPosSensor_Pin|TiltNegSensor_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
@@ -681,19 +695,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TIL_EN_Pin PanEnable_Pin */
-  GPIO_InitStruct.Pin = TIL_EN_Pin|PanEnable_Pin;
+  /*Configure GPIO pins : TiltEnable_Pin PanEnable_Pin */
+  GPIO_InitStruct.Pin = TiltEnable_Pin|PanEnable_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PanDirection_Pin */
-  GPIO_InitStruct.Pin = PanDirection_Pin;
+  /*Configure GPIO pins : TiltDirection_Pin PanDirection_Pin */
+  GPIO_InitStruct.Pin = TiltDirection_Pin|PanDirection_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(PanDirection_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RightHeadRed_Pin RightHeadGreen_Pin RightHeadBlue_Pin */
   GPIO_InitStruct.Pin = RightHeadRed_Pin|RightHeadGreen_Pin|RightHeadBlue_Pin;
