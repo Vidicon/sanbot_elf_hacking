@@ -30,6 +30,7 @@
 #include "HeadMotors.h"
 #include "SSD1305_eyes.h"
 #include "default_eyes.h"
+#include "fire_eyes.h"
 
 /* USER CODE END Includes */
 
@@ -137,8 +138,8 @@ void System_Initialize_Start()
 
 	  SSD1305_init(&left_eye, &right_eye);
 
-	SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-	SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+	  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+	  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
 }
 
 void System_Initialze_Update()
@@ -341,14 +342,20 @@ int main(void)
 
 		  if (Counter_2Hz == 0)
 		  {
-			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+
+			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
+			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
 		  }
 
 		  if (Counter_2Hz == 5)
 		  {
-			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+
+			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
+			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
 		  }
 
 		  Counter_2Hz = (Counter_2Hz + 1) % 6;
