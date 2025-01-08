@@ -85,6 +85,8 @@ void Error_Handler(void);
 #define TiltEnable_GPIO_Port GPIOE
 #define PanEnable_Pin GPIO_PIN_15
 #define PanEnable_GPIO_Port GPIOE
+#define OLED_L_CS_Pin GPIO_PIN_14
+#define OLED_L_CS_GPIO_Port GPIOB
 #define TiltDirection_Pin GPIO_PIN_11
 #define TiltDirection_GPIO_Port GPIOD
 #define PanDirection_Pin GPIO_PIN_12
@@ -95,6 +97,12 @@ void Error_Handler(void);
 #define RightHeadGreen_GPIO_Port GPIOD
 #define RightHeadBlue_Pin GPIO_PIN_15
 #define RightHeadBlue_GPIO_Port GPIOD
+#define OLED_R_CS_Pin GPIO_PIN_15
+#define OLED_R_CS_GPIO_Port GPIOA
+#define OLED_RESET_Pin GPIO_PIN_5
+#define OLED_RESET_GPIO_Port GPIOD
+#define OLED_DC_Pin GPIO_PIN_6
+#define OLED_DC_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 //#define TOP_BUTTON_Pin GPIO_PIN_0

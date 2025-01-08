@@ -28,6 +28,7 @@
 #include "RGBLeds_Head.h"
 #include "Encoders.h"
 #include "HeadMotors.h"
+#include "SSD1305_eyes.h"
 
 /* USER CODE END Includes */
 
@@ -49,6 +50,9 @@ void HeadLed(int LedOn);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi2;
+SPI_HandleTypeDef hspi3;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
@@ -78,6 +82,9 @@ int head_pan_max;
 
 int System_Ready = False;
 
+OLED_HandleTypeDef left_eye;
+OLED_HandleTypeDef right_eye;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,6 +95,8 @@ static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM8_Init(void);
+static void MX_SPI2_Init(void);
+static void MX_SPI3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -104,12 +113,27 @@ void System_Initialize_Start()
 	Encoders_Init(&htim1, &htim3);
 
 	Head_Pan_Init(&htim8);
-	Head_Pan_Home();
+//	Head_Pan_Home();
 
 	Head_Tilt_Init(&htim8);
-	Head_Tilt_Home();
+//	Head_Tilt_Home();
+
+	System_Ready = True;
 
 	HeadLed(False);
+
+
+	  left_eye.hspi = &hspi2;
+	  left_eye.cs = toGPIO(OLED_L_CS_GPIO_Port, OLED_L_CS_Pin);
+	  left_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+	  left_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
+
+	  right_eye.hspi = &hspi3;
+	  right_eye.cs = toGPIO(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin);
+	  right_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+	  right_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
+
+	  SSD1305_init(&left_eye, &right_eye);
 }
 
 void System_Initialze_Update()
@@ -186,9 +210,11 @@ void RunDemoProgram()
 
 			// Change eye to Nobleo + Sara logo
 
-//			Generic_Head_Position_Setpoint(HeadPan, 0, 0 );
-			Head_Tilt_Home();
-			Head_Pan_Home();
+//			Head_Tilt_Home();
+//			Head_Pan_Home();
+
+			  SSD1305_writeDisplay(&left_eye, nobleo_logo);
+			  SSD1305_writeDisplay(&right_eye, sara_logo);
 		}
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
@@ -198,6 +224,8 @@ void RunDemoProgram()
 			HeadLed(False);
 
 			// Change eye to normal eyes
+			  SSD1305_writeDisplay(&left_eye, nobleo_logo2);
+			  SSD1305_writeDisplay(&right_eye, image);
 		}
 	}
 }
@@ -244,6 +272,8 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_TIM8_Init();
+  MX_SPI2_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
 	TIM2->CCR2 = 0;
@@ -374,6 +404,82 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief SPI2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI2_Init(void)
+{
+
+  /* USER CODE BEGIN SPI2_Init 0 */
+
+  /* USER CODE END SPI2_Init 0 */
+
+  /* USER CODE BEGIN SPI2_Init 1 */
+
+  /* USER CODE END SPI2_Init 1 */
+  /* SPI2 parameter configuration*/
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI2_Init 2 */
+
+  /* USER CODE END SPI2_Init 2 */
+
+}
+
+/**
+  * @brief SPI3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI3_Init(void)
+{
+
+  /* USER CODE BEGIN SPI3_Init 0 */
+
+  /* USER CODE END SPI3_Init 0 */
+
+  /* USER CODE BEGIN SPI3_Init 1 */
+
+  /* USER CODE END SPI3_Init 1 */
+  /* SPI3 parameter configuration*/
+  hspi3.Instance = SPI3;
+  hspi3.Init.Mode = SPI_MODE_MASTER;
+  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.NSS = SPI_NSS_SOFT;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi3.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI3_Init 2 */
+
+  /* USER CODE END SPI3_Init 2 */
+
 }
 
 /**
@@ -646,6 +752,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
@@ -659,8 +766,14 @@ static void MX_GPIO_Init(void)
                           |PanEnable_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(OLED_L_CS_GPIO_Port, OLED_L_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, TiltDirection_Pin|PanDirection_Pin|RightHeadRed_Pin|RightHeadGreen_Pin
-                          |RightHeadBlue_Pin, GPIO_PIN_RESET);
+                          |RightHeadBlue_Pin|OLED_RESET_Pin|OLED_DC_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PanPosSensor_Pin PanNegSensor_Pin TiltPosSensor_Pin TiltNegSensor_Pin */
   GPIO_InitStruct.Pin = PanPosSensor_Pin|PanNegSensor_Pin|TiltPosSensor_Pin|TiltNegSensor_Pin;
@@ -702,8 +815,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TiltDirection_Pin PanDirection_Pin */
-  GPIO_InitStruct.Pin = TiltDirection_Pin|PanDirection_Pin;
+  /*Configure GPIO pin : OLED_L_CS_Pin */
+  GPIO_InitStruct.Pin = OLED_L_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(OLED_L_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : TiltDirection_Pin PanDirection_Pin OLED_RESET_Pin OLED_DC_Pin */
+  GPIO_InitStruct.Pin = TiltDirection_Pin|PanDirection_Pin|OLED_RESET_Pin|OLED_DC_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -715,6 +835,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : OLED_R_CS_Pin */
+  GPIO_InitStruct.Pin = OLED_R_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(OLED_R_CS_GPIO_Port, &GPIO_InitStruct);
 
 }
 
