@@ -26,6 +26,7 @@
 #include "string.h"
 #include <stdio.h>
 #include "SSD1305_eyes.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

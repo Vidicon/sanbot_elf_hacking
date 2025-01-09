@@ -18,10 +18,6 @@ struct Battery_Sensor_Type {
 	int16_t Voltage;
 };
 
-uint8_t	reg;
-uint8_t command[2];
-uint8_t response[10];
-
 struct Battery_Sensor_Type *Battery_GetPointer();
 
 void Battery_Init(I2C_HandleTypeDef *hI2C);

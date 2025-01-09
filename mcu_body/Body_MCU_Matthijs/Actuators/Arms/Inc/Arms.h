@@ -5,6 +5,9 @@
 #include "stm32f2xx_hal.h"
 #include "Encoders.h"
 
+extern struct Arm_State_Type LeftArm_State;
+extern struct Arm_State_Type RightArm_State;
+
 enum ENUM_ArmHomeState {
 	Arm_NotHomed,
 	Arm_Homing,

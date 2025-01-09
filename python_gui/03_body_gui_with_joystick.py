@@ -10,14 +10,19 @@ import numpy as np
 import platform
 import math
 
+# DEBUG = True
+DEBUG = False
+
 RESP_BIT = 0x80
 
 CMD_VERSION = 0x01
 CMD_LA_COLOR = 0x10
 CMD_RA_COLOR = 0x11
 CMD_BASE_COLOR = 0x12
-CMD_BA_COLOR = 0x13
-CMD_LARA_COLOR = 0x14
+CMD_BA_COLOR = 0x13  # ?
+CMD_LARA_COLOR = 0x14  # Left arm & Right arm
+CMD_LEFTHEAD_COLOR = 0x15
+CMD_RIGHTHEAD_COLOR = 0x16
 
 CMD_GET_ENCODERS = 0x20
 CMD_GET_MOTIONSENSORS = 0x21
@@ -132,6 +137,7 @@ def calculate_angle(x, y):
 # Define the receive callback function
 # ===============================================================================
 def my_receive_callback(data, stream_area):
+    global DEBUG
     # hex_values = " ".join([format(x, "02X") for x in data])
     # print("< " + hex_values)
 
@@ -151,9 +157,9 @@ def my_receive_callback(data, stream_area):
             new_byte_array = data[3:-2]
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-            # stream_area.insert(
-            #     tk.END, "< Encoders   : " + str(int16_array_5) + "\n"
-            # )
+            if DEBUG:
+                stream_area.insert(tk.END, "< Encoders   : " + str(int16_array_5) + "\n")
+
             stream_area.yview_moveto(1)  # Scrolling to the bottom
         except:
             print("Encoders bytes error")
@@ -164,18 +170,28 @@ def my_receive_callback(data, stream_area):
         try:
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
 
-            # stream_area.insert(
-            #     tk.END, "< Compass    : " + str(int16_array_5) + "\n"
-            # )
+            if DEBUG:
+                stream_area.insert(tk.END, "< Compass    : " + str(int16_array_5) + "\n")
+
             stream_area.yview_moveto(1)  # Scrolling to the bottom
-
             compass_angle, angle_degrees = calculate_angle(int16_array_5[0], int16_array_5[1])
-
             draw_arrow(angle_degrees + 90)
-
             compass_button.config(text=f"{compass_angle:.0f} Deg")
         except:
             print("Compass bytes error")
+
+    if response == (CMD_COMP_MOVE | RESP_BIT):
+        new_byte_array = data[3:-2]
+
+        try:
+            int16_array_5 = np.frombuffer(new_byte_array, dtype=">i1")
+
+            if DEBUG:
+                stream_area.insert(tk.END, "< Compass rotation result : " + str(int16_array_5) + "\n")
+
+            stream_area.yview_moveto(1)  # Scrolling to the bottom
+        except:
+            print("Compass rotation bytes error")
 
     if response == (CMD_GET_MOTIONSENSORS | RESP_BIT):
         new_byte_array = data[3:-2]
@@ -183,9 +199,9 @@ def my_receive_callback(data, stream_area):
         try:
             int8_array = np.frombuffer(new_byte_array, dtype=">i1")
 
-            # stream_area.insert(
-            #     tk.END, "< Motion     : " + str(int8_array) + "\n"
-            # )
+            if DEBUG:
+                stream_area.insert(tk.END, "< Motion     : " + str(int8_array) + "\n")
+
             stream_area.yview_moveto(1)  # Scrolling to the bottom
 
             if int8_array[0] == 1:
@@ -290,12 +306,6 @@ def my_receive_callback(data, stream_area):
         # 3x int16_t
         new_byte_array_uint16 = data[3 : 3 + 4 * 2]
         new_byte_array_int16 = data[3 + (4 * 2) : -2]
-
-        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_uint16])
-        # print("< " + hex_values)
-
-        # hex_values = " ".join([format(x, "02X") for x in new_byte_array_int16])
-        # print("< " + hex_values)
 
         try:
             unt16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
@@ -1056,7 +1066,7 @@ def main():
 
     if "LINUX" in platform.system().upper():
         print("Linux detected!")
-        mod_manager = ModManager(port1="/dev/ttyACM0", port2="/dev/ttyACM1", baudrate=115200)
+        mod_manager = ModManager(port1="/dev/ttyACM1", port2="/dev/ttyACM99", baudrate=115200)
     else:
         mod_manager = ModManager(port1="COM7", port2="COM10", baudrate=115200)
 

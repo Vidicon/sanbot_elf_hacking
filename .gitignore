@@ -6,3 +6,8 @@
 *.bak
 *.ini
 *.pyc
+/mcu_body/Body_MCU_Matthijs/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs
+/mcu_head/Head_MCU_Matthijs/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs
+/mcu_head/Head_MCU_Matthijs/Drivers/CMSIS/Device/ST/STM32F1xx/License.md
+/mcu_head/Head_MCU_Matthijs/Drivers/CMSIS/LICENSE.txt
+/mcu_head/Head_MCU_Matthijs/Drivers/STM32F1xx_HAL_Driver/License.md

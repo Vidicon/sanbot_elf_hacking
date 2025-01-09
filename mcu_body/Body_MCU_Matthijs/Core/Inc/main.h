@@ -34,17 +34,11 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "RobotGlobals.h"
 
+#define DEMO
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-int Update_25Hz;
-int Update_20Hz;
-int Update_16Hz;
-int Update_10Hz;
-int Update_5Hz;
-int Update_2Hz;
-int Update_1Hz;
 
 /* USER CODE END ET */
 
