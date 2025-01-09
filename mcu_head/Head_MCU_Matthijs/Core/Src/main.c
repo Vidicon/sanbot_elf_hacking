@@ -248,7 +248,7 @@ void RunDemoProgram()
 			{
 				DemoEyesMode = 0;
 				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
-				Generic_Head_Position_Setpoint(HeadTilt, 0, 128);
+				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
 			}
 		}
 
@@ -286,11 +286,15 @@ void Update_Eyes(int BlinkEye)
 		{
 			SSD1305_writeDisplay(&left_eye, &nobleo_logo);
 			SSD1305_writeDisplay(&right_eye, &sara_logo);
+
+			HeadLed(False);
 		}
 		else
 		{
 			SSD1305_writeDisplay(&left_eye, &sara_logo);
 			SSD1305_writeDisplay(&right_eye, &nobleo_logo);
+
+			HeadLed(False);
 		}
 	}
 
