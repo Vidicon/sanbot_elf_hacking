@@ -44,6 +44,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 void HeadLed(int LedOn);
+void Update_Eyes(int BlinkEye);
 
 /* USER CODE END PD */
 
@@ -85,6 +86,9 @@ int head_pan_max;
 int Counter_2Hz = 0;
 
 int System_Ready = False;
+
+int Demo_LedModeOld = 0;
+int DemoEyesMode = 0;
 
 OLED_HandleTypeDef left_eye;
 OLED_HandleTypeDef right_eye;
@@ -128,21 +132,20 @@ void System_Initialize_Start()
 
 	TouchSensors_Init();
 
+	left_eye.hspi = &hspi2;
+	left_eye.cs = toGPIO(OLED_L_CS_GPIO_Port, OLED_L_CS_Pin);
+	left_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+	left_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
 
-	  left_eye.hspi = &hspi2;
-	  left_eye.cs = toGPIO(OLED_L_CS_GPIO_Port, OLED_L_CS_Pin);
-	  left_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
-	  left_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
+	right_eye.hspi = &hspi3;
+	right_eye.cs = toGPIO(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin);
+	right_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
+	right_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
 
-	  right_eye.hspi = &hspi3;
-	  right_eye.cs = toGPIO(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin);
-	  right_eye.dc = toGPIO(OLED_DC_GPIO_Port, OLED_DC_Pin);
-	  right_eye.reset = toGPIO(OLED_RESET_GPIO_Port, OLED_RESET_Pin);
+	SSD1305_init(&left_eye, &right_eye);
 
-	  SSD1305_init(&left_eye, &right_eye);
-
-	  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-	  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+	SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+	SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
 }
 
 void System_Initialze_Update()
@@ -158,7 +161,6 @@ void System_Initialze_Update()
 	}
 
 	System_Ready = True;
-	HeadLed(False);
 }
 
 void Check_USB_Communication()
@@ -216,19 +218,93 @@ void RunDemoProgram()
 			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
 			RGBLeds_BlinkColor(RightHead, Green, LED_Blink_Fast);
 
-			SSD1305_writeDisplay(&left_eye, nobleo_logo);
-			SSD1305_writeDisplay(&right_eye, sara_logo);
+			DemoEyesMode = 1;
+			HeadLed(True);
 		}
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
 		{
 			RGBLeds_SetAllColors(LeftHead, Blue, LED_On);
 			RGBLeds_SetAllColors(RightHead, Blue, LED_On);
+
+			DemoEyesMode = 0;
 			HeadLed(False);
 
+			Head_Pan_Home();
+			Head_Tilt_Home();
+		}
+
+		if (TouchSensor_AnyPressed())
+		{
+			// Top right of head
+			if (TouchSensorData.Sensor[4] == 1)
+			{
+				DemoEyesMode = 2;
+				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
+				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+			}
+
+			if (TouchSensorData.Sensor[0] == 1)
+			{
+				DemoEyesMode = 0;
+				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
+				Generic_Head_Position_Setpoint(HeadTilt, 0, 128);
+			}
+		}
+
+		// Update eyes on change
+		if (DemoEyesMode != Demo_LedModeOld)
+		{
+			Update_Eyes(False);
+		}
+
+		Demo_LedModeOld = DemoEyesMode;
+	}
+}
+
+void Update_Eyes(int BlinkEye)
+{
+	if (DemoEyesMode == 0)
+	{
+		if (BlinkEye == True)
+		{
+			// Change eye to normal eyes
+			SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+			SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+		}
+		else
+		{
 			// Change eye to normal eyes
 			SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
 			SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+		}
+	}
+
+	if (DemoEyesMode == 1)
+	{
+		if (BlinkEye == True)
+		{
+			SSD1305_writeDisplay(&left_eye, &nobleo_logo);
+			SSD1305_writeDisplay(&right_eye, &sara_logo);
+		}
+		else
+		{
+			SSD1305_writeDisplay(&left_eye, &sara_logo);
+			SSD1305_writeDisplay(&right_eye, &nobleo_logo);
+		}
+	}
+
+	if (DemoEyesMode == 2)
+	{
+		if (BlinkEye == True)
+		{
+			SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
+			SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
+		}
+		else
+		{
+			SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
+			SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
 		}
 	}
 }
@@ -346,8 +422,9 @@ int main(void)
 
 		  if (Counter_2Hz == 0)
 		  {
-			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+			  Update_Eyes(False);
+//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
 
 //			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
 //			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
@@ -355,8 +432,9 @@ int main(void)
 
 		  if (Counter_2Hz == 5)
 		  {
-			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+			  Update_Eyes(True);
+//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
 
 //			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
 //			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
@@ -368,8 +446,6 @@ int main(void)
 	  if (Update_1Hz)
 	  {
 		  Update_1Hz = 0;
-
-
 	  }
 
 	  //--------------------------------------------------------
