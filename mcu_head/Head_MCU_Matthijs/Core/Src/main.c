@@ -31,6 +31,7 @@
 #include "SSD1305_eyes.h"
 #include "default_eyes.h"
 #include "fire_eyes.h"
+#include "TouchSensors.h"
 
 /* USER CODE END Includes */
 
@@ -124,6 +125,8 @@ void System_Initialize_Start()
 	System_Ready = True;
 
 	HeadLed(False);
+
+	TouchSensors_Init();
 
 
 	  left_eye.hspi = &hspi2;
@@ -325,6 +328,7 @@ int main(void)
 
 		  RGBLeds_Update10Hz();
 		  Encoders_Update();
+		  TouchSensors_Update();
 
 #ifdef DEMO
 		  RunDemoProgram();
@@ -342,20 +346,20 @@ int main(void)
 
 		  if (Counter_2Hz == 0)
 		  {
-//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
 
-			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
-			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
+//			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
+//			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
 		  }
 
 		  if (Counter_2Hz == 5)
 		  {
-//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
 
-			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
-			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
+//			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
+//			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
 		  }
 
 		  Counter_2Hz = (Counter_2Hz + 1) % 6;
@@ -769,11 +773,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
@@ -796,6 +800,14 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(OLED_R_CS_GPIO_Port, OLED_R_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : Touch2_Pin Touch3_Pin Touch4_Pin Touch5_Pin
+                           Touch6_Pin Touch0_Pin Touch1_Pin */
+  GPIO_InitStruct.Pin = Touch2_Pin|Touch3_Pin|Touch4_Pin|Touch5_Pin
+                          |Touch6_Pin|Touch0_Pin|Touch1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PanPosSensor_Pin PanNegSensor_Pin TiltPosSensor_Pin TiltNegSensor_Pin */
   GPIO_InitStruct.Pin = PanPosSensor_Pin|PanNegSensor_Pin|TiltPosSensor_Pin|TiltNegSensor_Pin;
@@ -864,6 +876,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(OLED_R_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Touch7_Pin */
+  GPIO_InitStruct.Pin = Touch7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(Touch7_GPIO_Port, &GPIO_InitStruct);
 
 }
 

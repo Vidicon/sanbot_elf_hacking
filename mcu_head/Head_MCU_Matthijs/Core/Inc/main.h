@@ -61,6 +61,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Touch2_Pin GPIO_PIN_2
+#define Touch2_GPIO_Port GPIOE
+#define Touch3_Pin GPIO_PIN_3
+#define Touch3_GPIO_Port GPIOE
+#define Touch4_Pin GPIO_PIN_4
+#define Touch4_GPIO_Port GPIOE
+#define Touch5_Pin GPIO_PIN_5
+#define Touch5_GPIO_Port GPIOE
+#define Touch6_Pin GPIO_PIN_6
+#define Touch6_GPIO_Port GPIOE
 #define PanPosSensor_Pin GPIO_PIN_2
 #define PanPosSensor_GPIO_Port GPIOF
 #define PanNegSensor_Pin GPIO_PIN_3
@@ -103,6 +113,12 @@ void Error_Handler(void);
 #define OLED_RESET_GPIO_Port GPIOD
 #define OLED_DC_Pin GPIO_PIN_6
 #define OLED_DC_GPIO_Port GPIOD
+#define Touch7_Pin GPIO_PIN_15
+#define Touch7_GPIO_Port GPIOG
+#define Touch0_Pin GPIO_PIN_0
+#define Touch0_GPIO_Port GPIOE
+#define Touch1_Pin GPIO_PIN_1
+#define Touch1_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
 //#define TOP_BUTTON_Pin GPIO_PIN_0
