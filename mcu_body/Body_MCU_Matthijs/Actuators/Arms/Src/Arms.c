@@ -15,15 +15,14 @@ void Generic_Arm_PositionSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, c
 	if (BodyPart == LeftArm)
 	{
 		LeftArm_State.TargetPosition = combined;
-		GenericArms_HAL_Brake(False, BodyPart);
+		GenericArms_HAL_Brake(False, LeftArm);
 		LeftArm_State.MotionState = Motion_Moving;
-
 	}
 
 	if (BodyPart == RightArm)
 	{
 		RightArm_State.TargetPosition = combined;
-		GenericArms_HAL_Brake(False, BodyPart);
+		GenericArms_HAL_Brake(False, RightArm);
 		RightArm_State.MotionState = Motion_Moving;
 	}
 }
@@ -163,7 +162,7 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		if (LeftLimitUp == 1)
 		{
 			LeftArm_State.PWM_Output = (100 - abs(0));
-			LeftArm_State.MotionState = Motion_Breaking;
+			LeftArm_State.MotionState = Motion_Idle;
 			LeftArm_State.BrakeTimer = 0;
 		}
 	}
@@ -260,7 +259,7 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		if (RightLimitUp == 1)
 		{
 			RightArm_State.PWM_Output = (100 - abs(0));
-			RightArm_State.MotionState = Motion_Breaking;
+			RightArm_State.MotionState = Motion_Idle;
 			RightArm_State.BrakeTimer = 0;
 		}
 	}

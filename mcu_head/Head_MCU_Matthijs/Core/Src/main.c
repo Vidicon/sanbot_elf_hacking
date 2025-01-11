@@ -216,7 +216,7 @@ void RunDemoProgram()
 		if ((HeadButtonOld == 0) && (HeadButton == 1))
 		{
 			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
-			RGBLeds_BlinkColor(RightHead, Green, LED_Blink_Fast);
+			RGBLeds_BlinkColor(RightHead, Blue, LED_Blink_Fast);
 
 			DemoEyesMode = 1;
 			HeadLed(True);
@@ -242,6 +242,10 @@ void RunDemoProgram()
 				DemoEyesMode = 2;
 				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
 				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+
+				RGBLeds_SetAllColors(LeftHead, Red, LED_Blink_Fast);
+				RGBLeds_SetAllColors(RightHead, Red, LED_Blink_Fast);
+
 			}
 
 			if (TouchSensorData.Sensor[0] == 1)
@@ -249,6 +253,9 @@ void RunDemoProgram()
 				DemoEyesMode = 0;
 				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
 				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+
+				RGBLeds_SetAllColors(LeftHead, White, LED_Blink_Slow);
+				RGBLeds_SetAllColors(RightHead, White, LED_Blink_Slow);
 			}
 		}
 

@@ -950,10 +950,10 @@ def handle_pygame_events():
                 button4_toggle = button4_toggle & 1
 
                 if button4_toggle == 1:
-                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -400]))
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 400]))
 
                 if button4_toggle == 0:
-                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, -200]))
+                    createMoveCommand(mod_manager, np.array([CMD_LA_MOVE, 200]))
 
             # Left forward
             if event.button == 5:

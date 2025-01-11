@@ -79,6 +79,10 @@ int Update_5Hz;
 int Update_2Hz;
 int Update_1Hz;
 
+int MotionFrontOld = 0;
+int MotionFront = 0;
+int DemoState[2];
+
 int System_Ready = False;
 /* USER CODE END PV */
 
@@ -189,13 +193,129 @@ void TracingUpdate()
 	CDC_Transmit_FS((uint8_t*)TextBuffer, strlen(TextBuffer));
 }
 
+int ReadMotionFront()
+{
+	struct MotionSensors_Data_Type *Tmp;
+	Tmp = MotionSensors_GetPointer();
+
+	return (Tmp->CurrentValue[0] == 1);
+}
+
+int ReadDistancesFrontLeft()
+{
+	struct Distance_Sensor_Type *Tmp;
+	Tmp = DistanceSensors_GetPointer();
+
+	int result = 0;
+
+	for (int i = 2; i < 4; i++)
+	{
+		if (Tmp->Distance[i] <= 50000) { result = 1;}
+	}
+
+	return result;
+}
+
+int ReadDistancesFrontRight()
+{
+	struct Distance_Sensor_Type *Tmp;
+	Tmp = DistanceSensors_GetPointer();
+
+	int result = 0;
+
+	for (int i = 4; i < 6; i++)
+	{
+		if (Tmp->Distance[i] <= 50000) { result = 1;}
+	}
+
+	return result;
+}
+
+int ReadDistancesLeftMid()
+{
+	struct Distance_Sensor_Type *Tmp;
+	Tmp = DistanceSensors_GetPointer();
+
+	return (Tmp->Distance[9] <= 60000);
+}
+
+int ReadDistancesRightMid()
+{
+	struct Distance_Sensor_Type *Tmp;
+	Tmp = DistanceSensors_GetPointer();
+
+	return (Tmp->Distance[10] <= 60000);
+}
+
 void RunDemoProgram()
 {
-	if (System_Ready == 0)
+	MotionFrontOld = MotionFront;
+	MotionFront = ReadMotionFront();
+
+	if (System_Ready == True)
 	{
+		//-----------------------------------------------------------------------------------
+		// Left arm
+		//-----------------------------------------------------------------------------------
+		if (DemoState[0] == 0)
+		{
+			if (ReadDistancesLeftMid() || ReadDistancesFrontLeft())
+			{
+				DemoState[0] = 1;
 
+				RGBLeds_SetAllColors(LeftArm, Blue, LED_Blink_VeryFast);
+				Generic_Arm_PositionSetpoint(LeftArm, 1, 150);
 
+				RGBLeds_SetAllColors(Base, Red, LED_Blink_VeryFast);
+			}
+		}
+		else if (DemoState[0] == 1)
+		{
+			if ((LeftArm_State.MotionState == Motion_Idle) && (ReadDistancesFrontLeft() == 0))
+			{
+				DemoState[0] = 2;
+				RGBLeds_SetAllColors(LeftArm, Green, LED_On);
+				Generic_Arm_PositionSetpoint(LeftArm, 1, 0);
+			}
+		}
+		else if (DemoState[0] == 2)
+		{
+			if (LeftArm_State.MotionState == Motion_Idle)
+			{
+				DemoState[0] = 0;
+			}
+		}
 
+		//-----------------------------------------------------------------------------------
+		// Right arm
+		//-----------------------------------------------------------------------------------
+		if (DemoState[1] == 0)
+		{
+			if (ReadDistancesRightMid() || ReadDistancesFrontRight())
+			{
+				DemoState[1] = 1;
+
+				RGBLeds_SetAllColors(RightArm, Blue, LED_Blink_VeryFast);
+				Generic_Arm_PositionSetpoint(RightArm, 1, 150);
+				RGBLeds_SetAllColors(Base, Blue, LED_Blink_VeryFast);
+			}
+		}
+		else if (DemoState[1] == 1)
+		{
+			if ((RightArm_State.MotionState == Motion_Idle) && (ReadDistancesFrontRight() == 0))
+			{
+				DemoState[1] = 2;
+				RGBLeds_SetAllColors(RightArm, Green, LED_On);
+				Generic_Arm_PositionSetpoint(RightArm, 1, 0);
+			}
+		}
+		else if (DemoState[1] == 2)
+		{
+			if (RightArm_State.MotionState == Motion_Idle)
+			{
+				DemoState[1] = 0;
+			}
+		}
 	}
 }
 
