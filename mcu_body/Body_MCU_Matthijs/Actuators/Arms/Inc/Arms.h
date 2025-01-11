@@ -9,9 +9,9 @@ extern struct Arm_State_Type LeftArm_State;
 extern struct Arm_State_Type RightArm_State;
 
 enum ENUM_ArmHomeState {
-	Arm_NotHomed,
-	Arm_Homing,
-	Arm_Homed
+	NotHomed,
+	Homing,
+	Homed
 };
 
 enum ENUM_ArmDirection {
@@ -20,11 +20,9 @@ enum ENUM_ArmDirection {
 };
 
 enum ENUM_ArmMotionState {
-	Arm_Motion_Disabled,
-	Arm_Motion_AtTarget,
-	Arm_Motion_Error,
-	Arm_Motion_MovingUp,
-	Arm_Motion_MovingDown,
+	Motion_Idle,
+	Motion_Moving,
+	Motion_Breaking
 };
 
 struct Arm_State_Type {
@@ -33,20 +31,6 @@ struct Arm_State_Type {
 	enum ENUM_ArmHomeState HomeState;
 
 	TIM_HandleTypeDef *TIM;
-
-//	int PrevError;
-//	int AmplifierSetpoint;
-//
-//	int SetpointDirection;
-//	int BrakeWindow;
-//
-//	int ErrorPositionPrev;
-//	int Integral;
-//	int Differential;
-//
-//	int Output;
-//
-//	int MainState;
 
 	int VelocitySetpoint;
 	int Direction;
@@ -59,17 +43,19 @@ struct Arm_State_Type {
 
 	int HomeCounter;
 
+	int BrakeTimer;
+
 	uint32_t TIM_CHANNEL;
 	struct Encoders_Data_Type *EncoderPtr;
 	};
 
-void Arm_PositionSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
+void Generic_Arm_PositionSetpoint(enum ENUM_BodyParts BodyPart, char HighByte, char LowByte);
 
 void GenericArms_HAL_Brake(enum ENUM_Booleans BrakeEnable, enum ENUM_BodyParts BodyPart);
 
 void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData);
 
-void GenericArms_HAL_Direction(enum ENUM_ArmMotionState Direction, enum ENUM_BodyParts BodyPart);
+void GenericArms_HAL_Direction(enum ENUM_ArmDirection Direction, enum ENUM_BodyParts BodyPart);
 
 void GenericArms_Init(struct Arm_State_Type LeftArm_State);
 

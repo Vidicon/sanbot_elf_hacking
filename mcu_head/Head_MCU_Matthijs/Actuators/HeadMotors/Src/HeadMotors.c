@@ -117,7 +117,6 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 				// Set current encoder position to zero
 				__HAL_TIM_SET_COUNTER(EncoderData->TIM[1], 0);
 
-				// 600 counts
 				Generic_Head_Position_Setpoint(HeadPan, 1, 170);
 				HeadPan_State.HomeState = Homed;
 
@@ -144,25 +143,22 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		else
 		{
 			HeadPan_State.PWM_Output = (100 - abs(0));
-			Generic_Head_HAL_Brake(False, HeadPan);
-			HeadPan_State.MotionState = Motion_Idle;
-
-//			HeadPan_State.MotionState = Motion_Breaking;
-//			HeadPan_State.BrakeTimer = 0;
+			HeadPan_State.MotionState = Motion_Breaking;
+			HeadPan_State.BrakeTimer = 0;
 		}
 	}
-//	else if (HeadPan_State.MotionState == Motion_Breaking)
-//	{
-//		HeadPan_State.PWM_Output = (100 - abs(0));
-//		Generic_Head_HAL_Brake(True, HeadPan);
-//
-//		HeadPan_State.BrakeTimer += 1;
-//
-//		if (HeadPan_State.BrakeTimer >= 1 * UPDATE_20HZ)
-//		{
-//			HeadPan_State.MotionState = Motion_Idle;
-//		}
-//	}
+	else if (HeadPan_State.MotionState == Motion_Breaking)
+	{
+		HeadPan_State.PWM_Output = (100 - abs(0));
+		Generic_Head_HAL_Brake(True, HeadPan);
+
+		HeadPan_State.BrakeTimer += 1;
+
+		if (HeadPan_State.BrakeTimer >= 1 * UPDATE_20HZ)
+		{
+			HeadPan_State.MotionState = Motion_Idle;
+		}
+	}
 	else if (HeadPan_State.MotionState == Motion_Idle)
 	{
 		HeadPan_State.PWM_Output = (100 - abs(0));
@@ -229,25 +225,22 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		else
 		{
 			HeadTilt_State.PWM_Output = (100 - abs(0));
-			Generic_Head_HAL_Brake(False, HeadTilt);
-
-			HeadTilt_State.MotionState = Motion_Idle;
-//			HeadTilt_State.MotionState = Motion_Breaking;
-//			HeadTilt_State.BrakeTimer = 0;
+			HeadTilt_State.MotionState = Motion_Breaking;
+			HeadTilt_State.BrakeTimer = 0;
 		}
 	}
-//	else if (HeadTilt_State.MotionState == Motion_Breaking)
-//	{
-//		HeadTilt_State.PWM_Output = (100 - abs(0));
-//		Generic_Head_HAL_Brake(True, HeadTilt);
-//
-//		HeadTilt_State.BrakeTimer += 1;
-//
-//		if (HeadTilt_State.BrakeTimer >= 1 * UPDATE_20HZ)
-//		{
-//			HeadTilt_State.MotionState = Motion_Idle;
-//		}
-//	}
+	else if (HeadTilt_State.MotionState == Motion_Breaking)
+	{
+		HeadTilt_State.PWM_Output = (100 - abs(0));
+		Generic_Head_HAL_Brake(True, HeadTilt);
+
+		HeadTilt_State.BrakeTimer += 1;
+
+		if (HeadTilt_State.BrakeTimer >= 1 * UPDATE_20HZ)
+		{
+			HeadTilt_State.MotionState = Motion_Idle;
+		}
+	}
 	else if (HeadTilt_State.MotionState == Motion_Idle)
 	{
 		HeadTilt_State.PWM_Output = (100 - abs(0));
