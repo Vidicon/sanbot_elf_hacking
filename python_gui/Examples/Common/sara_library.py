@@ -136,7 +136,7 @@ class RobotArmMotor:
             return
 
         if self.bodypart == SaraRobotPartNames.LEFTARM:
-            position *= -1
+            # position *= -1
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
             self.mod_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))

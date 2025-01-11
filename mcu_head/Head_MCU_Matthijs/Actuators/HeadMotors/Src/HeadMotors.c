@@ -117,7 +117,6 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 				// Set current encoder position to zero
 				__HAL_TIM_SET_COUNTER(EncoderData->TIM[1], 0);
 
-				// 600 counts
 				Generic_Head_Position_Setpoint(HeadPan, 1, 170);
 				HeadPan_State.HomeState = Homed;
 

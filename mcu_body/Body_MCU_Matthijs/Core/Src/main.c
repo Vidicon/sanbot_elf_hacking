@@ -127,8 +127,8 @@ void System_Initialize()
 
 void System_Initialze_Update()
 {
-	if (LeftArm_State.HomeState != Arm_Homed) {return;}
-	if (RightArm_State.HomeState != Arm_Homed) {return;}
+	if (LeftArm_State.HomeState != Homed) {return;}
+	if (RightArm_State.HomeState != Homed) {return;}
 
 	System_Ready = True;
 }
@@ -157,8 +157,8 @@ void Check_USB_Communication()
 			RGBLeds_SetAllColors(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
-		if (command == CMD_LA_MOVE) 	{ Arm_PositionSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
-		if (command == CMD_RA_MOVE) 	{ Arm_PositionSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_LA_MOVE) 	{ Generic_Arm_PositionSetpoint(LeftArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
+		if (command == CMD_RA_MOVE) 	{ Generic_Arm_PositionSetpoint(RightArm, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));}
 
 		if (command == CMD_BASE_MOVE)
 		{

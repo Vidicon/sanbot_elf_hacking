@@ -8,7 +8,7 @@ from Common.sara_common import RobotArmPositions
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM1", "/dev/ttyACM1")
 
     robot.getversion()
 

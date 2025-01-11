@@ -10,8 +10,8 @@ import numpy as np
 import platform
 import math
 
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 RESP_BIT = 0x80
 
@@ -439,7 +439,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Debug 1",
-        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, 500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
     )
     button_debug1.grid(row=0, column=9, sticky="w")
 
@@ -449,7 +449,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Debug 2",
-        command=lambda t=np.array([CMD_LA_MOVE, -150, CMD_RA_MOVE, 150]): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, 150, CMD_RA_MOVE, 150]): createDoubleMoveCommand(mod_manager, t),
     )
     button_debug2.grid(row=1, column=9, sticky="w")
 
@@ -652,7 +652,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Move 1",
-        command=lambda t=np.array([CMD_LA_MOVE, -500]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, 500]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_1.grid(row=0, column=3, sticky="w")
 
@@ -661,7 +661,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left Move 2",
-        command=lambda t=np.array([CMD_LA_MOVE, -350]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, 350]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_2.grid(row=1, column=3, sticky="w")
 
@@ -670,7 +670,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Left  Move 3",
-        command=lambda t=np.array([CMD_LA_MOVE, -150]): createMoveCommand(mod_manager, t),
+        command=lambda t=np.array([CMD_LA_MOVE, 150]): createMoveCommand(mod_manager, t),
     )
     button_LA_Move_3.grid(row=2, column=3, sticky="w")
 
@@ -844,7 +844,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Battery",
-        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([0, 0, 0, 0]): createDoubleMoveCommand(mod_manager, t),
     )
     button_battery_state.grid(row=0, column=8, sticky="w")
 
@@ -854,7 +854,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Battery",
-        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([0, 0, 0, 0]): createDoubleMoveCommand(mod_manager, t),
     )
     button_battery_voltage.grid(row=1, column=8, sticky="w")
 
@@ -864,7 +864,7 @@ def show_gui(mod_manager):
         height=1,
         width=10,
         text="Battery",
-        command=lambda t=np.array([CMD_LA_MOVE, -500, CMD_RA_MOVE, 500]): createDoubleMoveCommand(mod_manager, t),
+        command=lambda t=np.array([0, 0, 0, 0]): createDoubleMoveCommand(mod_manager, t),
     )
     button_battery_current.grid(row=2, column=8, sticky="w")
 
