@@ -143,25 +143,22 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		else
 		{
 			HeadPan_State.PWM_Output = (100 - abs(0));
-			Generic_Head_HAL_Brake(False, HeadPan);
-			HeadPan_State.MotionState = Motion_Idle;
-
-//			HeadPan_State.MotionState = Motion_Breaking;
-//			HeadPan_State.BrakeTimer = 0;
+			HeadPan_State.MotionState = Motion_Breaking;
+			HeadPan_State.BrakeTimer = 0;
 		}
 	}
-//	else if (HeadPan_State.MotionState == Motion_Breaking)
-//	{
-//		HeadPan_State.PWM_Output = (100 - abs(0));
-//		Generic_Head_HAL_Brake(True, HeadPan);
-//
-//		HeadPan_State.BrakeTimer += 1;
-//
-//		if (HeadPan_State.BrakeTimer >= 1 * UPDATE_20HZ)
-//		{
-//			HeadPan_State.MotionState = Motion_Idle;
-//		}
-//	}
+	else if (HeadPan_State.MotionState == Motion_Breaking)
+	{
+		HeadPan_State.PWM_Output = (100 - abs(0));
+		Generic_Head_HAL_Brake(True, HeadPan);
+
+		HeadPan_State.BrakeTimer += 1;
+
+		if (HeadPan_State.BrakeTimer >= 1 * UPDATE_20HZ)
+		{
+			HeadPan_State.MotionState = Motion_Idle;
+		}
+	}
 	else if (HeadPan_State.MotionState == Motion_Idle)
 	{
 		HeadPan_State.PWM_Output = (100 - abs(0));
@@ -228,25 +225,22 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		else
 		{
 			HeadTilt_State.PWM_Output = (100 - abs(0));
-			Generic_Head_HAL_Brake(False, HeadTilt);
-
-			HeadTilt_State.MotionState = Motion_Idle;
-//			HeadTilt_State.MotionState = Motion_Breaking;
-//			HeadTilt_State.BrakeTimer = 0;
+			HeadTilt_State.MotionState = Motion_Breaking;
+			HeadTilt_State.BrakeTimer = 0;
 		}
 	}
-//	else if (HeadTilt_State.MotionState == Motion_Breaking)
-//	{
-//		HeadTilt_State.PWM_Output = (100 - abs(0));
-//		Generic_Head_HAL_Brake(True, HeadTilt);
-//
-//		HeadTilt_State.BrakeTimer += 1;
-//
-//		if (HeadTilt_State.BrakeTimer >= 1 * UPDATE_20HZ)
-//		{
-//			HeadTilt_State.MotionState = Motion_Idle;
-//		}
-//	}
+	else if (HeadTilt_State.MotionState == Motion_Breaking)
+	{
+		HeadTilt_State.PWM_Output = (100 - abs(0));
+		Generic_Head_HAL_Brake(True, HeadTilt);
+
+		HeadTilt_State.BrakeTimer += 1;
+
+		if (HeadTilt_State.BrakeTimer >= 1 * UPDATE_20HZ)
+		{
+			HeadTilt_State.MotionState = Motion_Idle;
+		}
+	}
 	else if (HeadTilt_State.MotionState == Motion_Idle)
 	{
 		HeadTilt_State.PWM_Output = (100 - abs(0));

@@ -98,7 +98,7 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	//--------------------------------------------------------------------------------
 	// Invert direction. Make UP = +
 	//--------------------------------------------------------------------------------
-	LeftArm_State.ActualPosition = -1 * EncoderData->Encoder[3];
+	LeftArm_State.ActualPosition = EncoderData->Encoder[3];
 
 	if (LeftArm_State.HomeState < Homed)
 	{
@@ -153,6 +153,14 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 			GenericArms_HAL_Brake(False, LeftArm);
 		}
 		else
+		{
+			LeftArm_State.PWM_Output = (100 - abs(0));
+			LeftArm_State.MotionState = Motion_Breaking;
+			LeftArm_State.BrakeTimer = 0;
+		}
+
+		// Too high
+		if (LeftLimitUp == 1)
 		{
 			LeftArm_State.PWM_Output = (100 - abs(0));
 			LeftArm_State.MotionState = Motion_Breaking;
@@ -242,6 +250,14 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 			GenericArms_HAL_Brake(False, RightArm);
 		}
 		else
+		{
+			RightArm_State.PWM_Output = (100 - abs(0));
+			RightArm_State.MotionState = Motion_Breaking;
+			RightArm_State.BrakeTimer = 0;
+		}
+
+		// Too high
+		if (RightLimitUp == 1)
 		{
 			RightArm_State.PWM_Output = (100 - abs(0));
 			RightArm_State.MotionState = Motion_Breaking;

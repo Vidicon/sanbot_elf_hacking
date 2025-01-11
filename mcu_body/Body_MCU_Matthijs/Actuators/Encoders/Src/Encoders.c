@@ -69,13 +69,27 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     			TmpEncoder = (Encoder_Raw_Buffer[i*2 + 5] << 8) + Encoder_Raw_Buffer[i*2+4];
 
-    			EncoderData.Encoder[i] -= TmpEncoder;
+    			if (i == 3)
+    			{
+        			EncoderData.Encoder[i] += TmpEncoder;
+    			}
+    			else
+    			{
+    				EncoderData.Encoder[i] -= TmpEncoder;
+    			}
     		}
     		else
     		{
     			TmpEncoder = (Encoder_Raw_Buffer[i*2 + 5] << 8) + Encoder_Raw_Buffer[i*2+4];
 
-    			EncoderData.Encoder[i] += TmpEncoder;
+    			if (i == 3)
+    			{
+    				EncoderData.Encoder[i] -= TmpEncoder;
+    			}
+    			else
+    			{
+    				EncoderData.Encoder[i] += TmpEncoder;
+    			}
     		}
     	}
 
