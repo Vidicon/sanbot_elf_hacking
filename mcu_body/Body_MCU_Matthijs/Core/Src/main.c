@@ -275,6 +275,7 @@ void RunDemoProgram()
 			{
 				DemoState[0] = 2;
 				RGBLeds_SetAllColors(LeftArm, Green, LED_On);
+				RGBLeds_SetAllColors(Base, Blue, LED_On);
 				Generic_Arm_PositionSetpoint(LeftArm, 1, 0);
 			}
 		}
@@ -296,8 +297,8 @@ void RunDemoProgram()
 				DemoState[1] = 1;
 
 				RGBLeds_SetAllColors(RightArm, Blue, LED_Blink_VeryFast);
-				Generic_Arm_PositionSetpoint(RightArm, 1, 150);
 				RGBLeds_SetAllColors(Base, Blue, LED_Blink_VeryFast);
+				Generic_Arm_PositionSetpoint(RightArm, 1, 150);
 			}
 		}
 		else if (DemoState[1] == 1)
@@ -306,6 +307,7 @@ void RunDemoProgram()
 			{
 				DemoState[1] = 2;
 				RGBLeds_SetAllColors(RightArm, Green, LED_On);
+				RGBLeds_SetAllColors(Base, Blue, LED_On);
 				Generic_Arm_PositionSetpoint(RightArm, 1, 0);
 			}
 		}
