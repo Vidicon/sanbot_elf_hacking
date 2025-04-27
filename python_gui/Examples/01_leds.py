@@ -22,7 +22,8 @@ from Common.sara_library_bridged import *
 def main():
     robot = SaraRobot('saradev.local')
 
-    robot.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
     robot.left_arm.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_BLINK_VERYFAST)
     robot.right_arm.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_BLINK_SLOW)
@@ -41,7 +42,6 @@ def main():
     robot.stop()
 
     return
-
 
 if __name__ == "__main__":
     main()

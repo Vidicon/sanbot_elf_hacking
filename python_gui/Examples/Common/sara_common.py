@@ -40,6 +40,6 @@ class SaraRobotPartNames:
 
 
 class RobotArmPositions:
-    UP = 500
+    UP = 450
     FORWARD = 350
     DOWN = 150

@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 import math
 
-from Common.mod_manager import ModManager
+# from Common.mod_manager import ModManager
 from Common.colorled import ColorLed
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
@@ -52,7 +52,7 @@ class RobotBase:
     # Not sure if robot has brakes on base motors!!!
     def brake(self, ApplyBrake=False):
         Brake = 1 if ApplyBrake else 0
-        self.mod_manager.cmd_Generic(SaraRobotCommands.CMD_BASE_BRAKE, 1, np.array([Brake]))
+        self.mod_manager.cmd_Generic(SaraRobotCommands.CMD_BASE_BRAKE, 1, np.array([Brake]), bodypart=SaraRobotPartNames.BODY)
 
 
 class BaseMotors:

@@ -2,20 +2,19 @@ import sys
 import os
 import time
 
-from Common.sara_library import SaraRobot
-from Common.sara_library import SaraRobotPartNames
 from Common.sara_common import RobotArmPositions
-
+from Common.sara_library_bridged import *
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM1", "/dev/ttyACM1")
+    robot = SaraRobot('saradev.local')
 
-    robot.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
     robot.left_arm.motor.move(position=RobotArmPositions.UP)
     robot.right_arm.motor.move(position=RobotArmPositions.UP)
 
-    time.sleep(3)
+    time.sleep(5)
 
     robot.left_arm.motor.move(position=RobotArmPositions.FORWARD)
     robot.right_arm.motor.move(position=RobotArmPositions.FORWARD)

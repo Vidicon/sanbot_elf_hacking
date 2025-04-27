@@ -12,6 +12,7 @@ from Common.sara_common import SaraRobotCommands
 from Common.sara_common import RobotArmPositions
 
 from Common.bridge_manager import BridgeManager
+import time
 
 class SaraRobot:
     # LEFTARM = 0
@@ -33,6 +34,9 @@ class SaraRobot:
         self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
         self.battery = Battery(self.bridge_manager, SaraRobotPartNames.BATTERY)
         self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
+        self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)  
+
+        time.sleep(2)
 
         print("-" * 80)
 
@@ -49,11 +53,7 @@ class SaraRobot:
         self.base.brake(ApplyBrake=False)
         self.bridge_manager.disconnect()
 
-    def getversion(self):
-        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0)
-        return
-
-    def my_receive_callback(self, data, debug=True):
+    def my_receive_callback(self, data, debug=False):
         if debug:
             hex_values = " ".join([format(x, "02X") for x in data])
             print("< " + hex_values)
@@ -90,9 +90,18 @@ class Body:
         self.distancesensors = DistanceSensors(self.bridge_manager, bodypart)
         self.compass = Compass(self.bridge_manager, bodypart)
 
+    def getversion(self):
+        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.BODY)
+
+
+class Head:
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
+        self.full_bodypart_name = bodypart_to_string(bodypart)
+        print("Adding " + self.full_bodypart_name)
 
     def getversion(self):
-        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0)
+        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.HEAD)
 
 
 class RobotArm:
@@ -131,10 +140,10 @@ class RobotArmMotor:
             # position *= -1
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
-            self.mod_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))
+            self.bridge_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))
 
         if self.bodypart == SaraRobotPartNames.RIGHTARM:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 
-            self.mod_manager.cmd_Generic(RobotArmMotor.CMD_RA_MOVE, 2, np.array([high, low]))
+            self.bridge_manager.cmd_Generic(RobotArmMotor.CMD_RA_MOVE, 2, np.array([high, low]))

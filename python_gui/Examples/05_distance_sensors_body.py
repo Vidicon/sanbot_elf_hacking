@@ -1,12 +1,11 @@
 import time
-from Common.sara_library import SaraRobot
-
+from Common.sara_library_bridged import *
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
-    time.sleep(1)
+    robot = SaraRobot('saradev.local')
 
-    robot.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
     print("Press CTRL + C to stop.")
 
@@ -23,13 +22,15 @@ def main():
                 if distance_warning:
                     print("Distance sensors: Getting close!")
                     robot.body.distancesensors.print_values()
+                else:
+                    print("Distance sensors: All clear!")
+                    # robot.body.distancesensors.print_values()
 
             #------------------------------------------------------------------------
             # Safety measure. If cliff_warning == True, the programm will stop.
             #------------------------------------------------------------------------
             assert cliff_warning == False, "Cliff sensor triggered!"
 
-            print(".")
             time.sleep(0.5)
 
     except KeyboardInterrupt:

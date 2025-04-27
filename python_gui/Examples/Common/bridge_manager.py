@@ -1,6 +1,7 @@
 import socket
 import threading
 import numpy as np
+from time import sleep
 
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
@@ -18,14 +19,17 @@ class BridgeManager:
 
     def connect(self):
         print(f"Connecting to {self.remote_host}...")
-        self.tcp_connection_head = TCPConnection(self, self.remote_host, 5001, mainBoard=SaraRobotPartNames.HEAD)
-        self.tcp_connection_head.set_receive_callback(self.receive_callback)    
+        self.tcp_connection_head = TCPConnection(self, self.remote_host, 5000, mainBoard=SaraRobotPartNames.HEAD)
         self.tcp_connection_head.connect()
 
-        self.tcp_connection_body = TCPConnection(self, self.remote_host, 5000, mainBoard=SaraRobotPartNames.BODY)
-        self.tcp_connection_body.set_receive_callback(self.receive_callback)    
+        self.tcp_connection_body = TCPConnection(self, self.remote_host, 5001, mainBoard=SaraRobotPartNames.BODY)
         self.tcp_connection_body.connect()
 
+        sleep(1)
+
+        # Open all the ports before accepting any data
+        self.tcp_connection_head.set_receive_callback(self.receive_callback)    
+        self.tcp_connection_body.set_receive_callback(self.receive_callback)    
 
     def disconnect(self):
         print(f"Disconnecting from {self.remote_host}...")
@@ -65,7 +69,7 @@ class BridgeManager:
 
         return data
 
-    def cmd_Generic(self, cmd: int, datalength, payload: np.array):
+    def cmd_Generic(self, cmd: int, datalength, payload: np.array, bodypart=None):
         data = self.create_message(datalength)
 
         data[0] = 0x55
@@ -77,24 +81,33 @@ class BridgeManager:
 
         crc = self.generate_modbus_crc(data[:-2])  # skip empty CRC bytes
 
-        print("> Modbus CRC: 0x", format(crc, '04X'))
+        # print("> Modbus CRC: 0x", format(crc, '04X'))
 
         data[datalength + 3] = crc & 0xFF
         data[datalength + 4] = (crc >> 8) & 0xFF
 
         # determine which port to send the data to
-        if cmd == SaraRobotCommands.CMD_VERSION:
-            if self.tcp_connection_body:
-                self.tcp_connection_body.send_data(data)
-
-            if self.tcp_connection_head:
+        if bodypart is not None:
+            if bodypart == SaraRobotPartNames.HEAD and self.tcp_connection_head:
                 self.tcp_connection_head.send_data(data)
-
-
-        if cmd >= SaraRobotCommands.CMD_LA_COLOR and cmd <= SaraRobotCommands.CMD_LARA_COLOR:
-            print("!")
+            elif bodypart == SaraRobotPartNames.BODY and self.tcp_connection_body:
+                self.tcp_connection_body.send_data(data)
+            else:
+                print(f"Invalid bodypart specified: {bodypart}. Cannot send data.")
+        
+        elif cmd >= SaraRobotCommands.CMD_LA_COLOR and cmd <= SaraRobotCommands.CMD_LARA_COLOR:
             if self.tcp_connection_body:
                 self.tcp_connection_body.send_data(data)
+            else:
+                print("No connection to BODY. Cannot send data.")
+
+        elif cmd >= SaraRobotCommands.CMD_LA_MOVE and cmd <= SaraRobotCommands.CMD_BASE_BRAKE:
+            if self.tcp_connection_body:
+                self.tcp_connection_body.send_data(data)
+            else:
+                print("No connection to BODY. Cannot send data.")
+        else:  
+            print(f"No bodypart specified. Cannot send data with command {cmd}.")
 
         return
 
@@ -124,7 +137,7 @@ class TCPConnection:
     def send_data(self, data):
         if self.socket and self.running:
             try:
-                print(f"> Sending data: {data.hex()}")
+                # print(f"> Sending data: {data.hex()}")
                 self.socket.sendall(data)
             except Exception as e:
                 print(f"Failed to send data - {e}")
@@ -136,7 +149,8 @@ class TCPConnection:
             while self.running:
                 data = self.socket.recv(1024)
                 if data:
-                    print("+", end="")
+                    # print("+", end="")
+                    pass 
                 else:
                     print("Connection closed by the server.")
                     self.running = False

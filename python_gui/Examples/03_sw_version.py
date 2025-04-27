@@ -8,10 +8,10 @@ from Common.sara_library_bridged import *
 def main():
     robot = SaraRobot('saradev.local')
 
-    robot.getversion()
-    # robot.head.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
-    time.sleep(10)
+    time.sleep(5)
 
     robot.stop()
 

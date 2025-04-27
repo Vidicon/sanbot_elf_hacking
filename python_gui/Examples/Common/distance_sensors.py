@@ -2,7 +2,6 @@ import os
 import sys
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
@@ -98,7 +97,7 @@ class DistanceSensors:
             return np.any(self.sensors[0:-2] < threshold)
 
     def sensor_cliffwarning(self):
-        print(self.sensors[-2:])
+        # print(self.sensors[-2:])
         if self.valid_data == False:
             return True
         else:
