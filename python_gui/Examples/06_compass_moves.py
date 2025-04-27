@@ -1,11 +1,9 @@
 import time
-from Common.sara_library import SaraRobot
+from Common.sara_library_bridged import *
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
-
-    robot.getversion()
+    robot = SaraRobot('saradev.local')
 
     # Wait for first valid data
     time.sleep(1.0)

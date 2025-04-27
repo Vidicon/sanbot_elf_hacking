@@ -11,7 +11,7 @@ def main():
     robot.head.getversion()
     robot.body.getversion()
 
-    time.sleep(5)
+    time.sleep(25)
 
     robot.stop()
 

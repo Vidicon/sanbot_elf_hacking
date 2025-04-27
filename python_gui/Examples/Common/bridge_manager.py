@@ -63,6 +63,15 @@ class BridgeManager:
         return crc
 
 
+    def cmd_createCompassMoveCommand(self, cmd, angle, timeout):
+        high = (int(angle) >> 8) & 0xFF
+        low = int(angle) & 0xFF
+
+        # Parameter #3 = timeout
+        self.cmd_Generic(cmd, 3, np.array([high, low, timeout]))
+
+        return
+
     def create_message(self, datalength=0):
 
         data = bytearray([0x00] * (5 + datalength))
@@ -150,9 +159,8 @@ class TCPConnection:
     def _receive_data(self):
         try:
             while self.running:
-                data = self.socket.recv(1024)
+                data = self.socket.recv(2048)
                 if data:
-                    # print("+", end="")
                     pass 
                 else:
                     print("Connection closed by the server.")

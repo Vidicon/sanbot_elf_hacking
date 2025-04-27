@@ -57,11 +57,42 @@ class SaraRobot:
             hex_values = " ".join([format(x, "02X") for x in data])
             print("< " + hex_values)
 
-        response = data[1]
+        datalength_cmd = data[2]
+        datalength_data = len(data)   
+
+        self.process_response(data)
+
+        # # Check if we have a second command
+        # while (datalength_cmd + 5) < datalength_data:
+        #     data = data[datalength_cmd + 5:]
+        #     print("Copied remaining data to a new_buffer")
+
+        #     hex_values = " ".join([format(x, "02X") for x in data])
+        #     print("< " + hex_values)
+
+        #     datalength_cmd = data[2]
+        #     datalength_data = len(data)  
+
+        #     # Process first command
+        #     print(f"Command byte (data[1]): {data[1]:02X}")
+
+
+        #     # print(f"Byte 2+3+2 : {datalength_cmd+3+2}, {len(data)}")
+
+        #     self.process_response(data)
+        return
+
+    def process_response(self, new_buffer):
+        if (new_buffer[0] != 0xD5):
+            return
+
+        response = new_buffer[1]
+
+        # print(f"Response byte (new_buffer[1]): {response:02X}")
 
         if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
             try:
-                string_from_bytearray = data[3:-2].decode("utf-8")
+                string_from_bytearray = new_buffer[3:-2].decode("utf-8")
                 print("Software version : " + string_from_bytearray)
             except:
                 print("Version bytes error")
@@ -69,16 +100,16 @@ class SaraRobot:
             print("-" * 80)
 
         if response == (SaraRobotCommands.CMD_GET_BATTERY | SaraRobotCommands.RESP_BIT):
-            self.battery.new_data(data)
+            self.battery.new_data(new_buffer)
 
         if response == (SaraRobotCommands.CMD_GET_DISTANCESENSORS | SaraRobotCommands.RESP_BIT):
-            self.body.distancesensors.new_data(data)
+            self.body.distancesensors.new_data(new_buffer)
 
         if response == (SaraRobotCommands.CMD_GET_COMPASS | SaraRobotCommands.RESP_BIT):
-            self.body.compass.new_data(data)
+            self.body.compass.new_data(new_buffer)
 
         if response == (SaraRobotCommands.CMD_COMP_MOVE | SaraRobotCommands.RESP_BIT):
-            self.body.compass.rotate_absolute_ready(data)
+            self.body.compass.rotate_absolute_ready(new_buffer)
 
 class Body:
     def __init__(self, bridge_manager, bodypart):

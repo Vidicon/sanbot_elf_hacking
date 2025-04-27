@@ -43,8 +43,12 @@ class Battery:
 
     def new_data(self, data):
         try:
-            new_byte_array_uint16 = data[3:3 + 4 * 2]
-            new_byte_array_int16 = data[3 + (4 * 2):-2]
+            datalength = data[2]
+            
+            assert datalength == 14, self.full_bodypart_name + " data length not correct!"
+
+            new_byte_array_uint16 = data[3 : 3+4*2]
+            new_byte_array_int16 = data[3 + (4 * 2):datalength + 3]
 
             uint16_array = np.frombuffer(new_byte_array_uint16, dtype=">u2")
             int16_array = np.frombuffer(new_byte_array_int16, dtype=">i2")

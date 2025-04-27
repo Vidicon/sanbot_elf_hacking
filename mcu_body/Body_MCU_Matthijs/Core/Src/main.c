@@ -421,6 +421,7 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
+		  HAL_Delay(1);
 		  SendCompass(Compass_GetPointer());
 	  }
 

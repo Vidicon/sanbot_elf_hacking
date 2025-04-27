@@ -1,7 +1,6 @@
 import os
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 import math
 import time
 
@@ -9,11 +8,11 @@ from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
 from Common.sara_common import SaraRobotCommands
-
+from Common.bridge_manager import BridgeManager
 
 class Compass:
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".compass"
 
         self.sensors = np.zeros(1)
@@ -34,7 +33,7 @@ class Compass:
             assert datalength == 6, self.full_bodypart_name + " data length not correct!"
 
             # for i in range(11):
-            new_byte_array = data[3:-2]
+            new_byte_array = data[3:6+3]
 
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
             compass_angle, angle_degrees = self.calculate_angle(int16_array_5[0], int16_array_5[1])
@@ -43,7 +42,12 @@ class Compass:
             self.valid_data = True
             self.error_counter = 0
 
+            print(f"Compass angle: {self.abs_angle:.0f} Deg ")
+
         except:
+            hex_values = " ".join([format(x, "02X") for x in data])
+            print("< " + hex_values)
+
             print("Compass data processing error")
 
             self.error_counter += 1
@@ -82,7 +86,7 @@ class Compass:
         print(f"Compass rotation to {self.target_rotation :.0f} Deg ", end="")
 
         # Send command
-        self.mod_manager.cmd_createCompassMoveCommand(
+        self.bridge_manager.cmd_createCompassMoveCommand(
             SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation, rotation_tmo_threshold
         )
 

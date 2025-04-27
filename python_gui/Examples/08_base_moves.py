@@ -1,18 +1,18 @@
 import time
-from Common.sara_library import SaraRobot
-
+from Common.sara_library_bridged import *
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot('saradev.local')
 
-    robot.getversion()
 
     # Wait for first valid data
-    time.sleep(1.0)
+    time.sleep(3.0)
 
     # Some move examples.
     # +100 = max positive sepeed
     # -100 = max negative speed
+
+    print(f"Compass angle: {robot.body.compass.read_abs_angle()}") 
 
     # Start with an absolute rotation angle
     robot.body.compass.rotate_absolute(abs_rotation_angle=160, wait_for_finish=True)
@@ -55,6 +55,8 @@ def main():
     # robot.base.brake(ApplyBrake=True)
     time.sleep(1.0)
 
+    robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=60)
+    time.sleep(1.0)
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=60)
     time.sleep(1.0)
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=60)
