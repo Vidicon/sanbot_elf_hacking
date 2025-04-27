@@ -1,7 +1,6 @@
 import os
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 import math
 import time
 
@@ -12,8 +11,8 @@ from Common.sara_common import SaraRobotCommands
 
 
 class Compass:
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".compass"
 
         self.sensors = np.zeros(1)
@@ -54,6 +53,9 @@ class Compass:
     def read_abs_angle(self):
         return self.abs_angle
 
+    def print_values(self):
+        print(f"Angle      : {self.abs_angle:.0f} Degree")
+
     # Function to calculate the angle
     def calculate_angle(self, x, y):
         # atan2(y, x) returns the angle in radians
@@ -82,7 +84,7 @@ class Compass:
         print(f"Compass rotation to {self.target_rotation :.0f} Deg ", end="")
 
         # Send command
-        self.mod_manager.cmd_createCompassMoveCommand(
+        self.bridge_manager.cmd_createCompassMoveCommand(
             SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation, rotation_tmo_threshold
         )
 

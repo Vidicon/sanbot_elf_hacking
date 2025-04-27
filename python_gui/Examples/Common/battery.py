@@ -3,7 +3,6 @@ import platform
 import numpy as np
 from datetime import datetime
 
-from Common.mod_manager import ModManager
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
@@ -21,8 +20,8 @@ class Battery:
     # Set SW limits to 3.25 * 4 = 13000 mV
     state_names = ["Empty", "Error", "Unknown", "Discharging", "Charging"]
 
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + self.full_bodypart_name)
 
@@ -32,7 +31,7 @@ class Battery:
         self.Current = 0
 
     def print_state(self):
-        txt = "Battery : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
+        txt = "Battery    : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
         txt += Battery.state_names[self.batterystate]
         print(txt)
 

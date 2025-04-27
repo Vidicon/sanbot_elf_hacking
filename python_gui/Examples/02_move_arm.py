@@ -8,9 +8,10 @@ from Common.sara_common import RobotArmPositions
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM1", "/dev/ttyACM1")
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
 
-    robot.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
     robot.left_arm.motor.move(position=RobotArmPositions.UP)
     robot.right_arm.motor.move(position=RobotArmPositions.UP)
@@ -25,11 +26,7 @@ def main():
     robot.left_arm.motor.move(position=RobotArmPositions.DOWN)
     robot.right_arm.motor.move(position=RobotArmPositions.DOWN)
 
-    time.sleep(3)
-
-    # robot.left_arm.motor.move(position=220)
-    # robot.right_arm.motor.move(position=300)
-
+    time.sleep(2)
     robot.stop()
 
     return

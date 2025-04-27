@@ -3,9 +3,8 @@ from Common.sara_library import SaraRobot
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
 
-    robot.getversion()
 
     # Wait for first valid data
     time.sleep(1.0)
@@ -65,6 +64,7 @@ def main():
 
     # Turn back to an absolute angle
     robot.body.compass.rotate_absolute(abs_rotation_angle=160, wait_for_finish=True)
+    time.sleep(1.0)
 
     robot.base.brake(ApplyBrake=False)
     robot.stop()

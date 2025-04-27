@@ -3,11 +3,9 @@ import platform
 import numpy as np
 from datetime import datetime
 
-from Common.mod_manager import ModManager
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
-
 
 class ColorLed:
     NOCOLOR = 0
@@ -29,8 +27,8 @@ class ColorLed:
     CMD_RA_COLOR = 0x11
     CMD_BASE_COLOR = 0x12
 
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
         self.bodypart = bodypart
         print("Adding " + bodypart_to_string(bodypart) + ".led")
 
@@ -45,6 +43,6 @@ class ColorLed:
         if self.bodypart == SaraRobotPartNames.BASE:
             Parameters = np.array([ColorLed.CMD_BASE_COLOR, color, blink])
 
-        self.mod_manager.cmd_Generic(Parameters[0], 2, np.array(Parameters[1:]))
+        self.bridge_manager.cmd_Generic(Parameters[0], 2, np.array(Parameters[1:]))
 
         return

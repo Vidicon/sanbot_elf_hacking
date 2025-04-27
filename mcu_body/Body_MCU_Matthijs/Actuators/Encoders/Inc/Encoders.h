@@ -18,6 +18,7 @@ void Encoders_Init(UART_HandleTypeDef *huart);
 
 void Encoders_SelfTest();
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void HAL_UART_RxCpltCallback_Encoders(UART_HandleTypeDef *huart);
 
 #endif

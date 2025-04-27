@@ -12,6 +12,7 @@ static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
 
 // volatile to indicate this variable can be changed at any time.
 static volatile uint8_t RxMutex;
+static UART_HandleTypeDef *Uart_0x55;
 
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()
@@ -39,7 +40,7 @@ void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len)
 	//--------------------------------------------------------------------------------------------------
 }
 
-void Protocol_0x55_Init()
+void Protocol_0x55_Init(UART_HandleTypeDef *huart)
 {
 	PROTOCOL_0X55_RxData.BytesInBuffer = 0;
 	PROTOCOL_0X55_TxData.BytesInBuffer = 0;
@@ -47,6 +48,8 @@ void Protocol_0x55_Init()
 	// Clear the buffers
 	memset(&PROTOCOL_0X55_RxData.FIFO_Data[0], 0, FIFO_SIZE);
 	memset(&PROTOCOL_0X55_TxData.FIFO_Data[0], 0, FIFO_SIZE);
+
+	Uart_0x55 = huart;
 }
 
 uint8_t Protocol_0x55_CheckFifo()
@@ -230,7 +233,11 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 
 void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+	// USB DMA tx
+	//	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+
+	// Uart 1 DMA tx
+	HAL_UART_Transmit_DMA(Uart_0x55, (uint8_t *)data, 3 + payloadLen + 2);
 }
 
 signed char Protocol_0x55_GetData(int Index)

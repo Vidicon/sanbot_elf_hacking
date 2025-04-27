@@ -4,25 +4,11 @@ import time
 
 from Common.sara_library import *
 
-# NOCOLOR = 0
-# RED = 1
-# GREEN = 2
-# BLUE = 3
-# WHITE = 4
-
-# LED_NONE = 0
-# LED_OFF = 1
-# LED_ON = 2
-# LED_BLINK_OFF = 3
-# LED_BLINK_SLOW = 4
-# LED_BLINK_FAST = 5
-# LED_BLINK_VERYFAST = 6
-
-
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0")
 
-    robot.getversion()
+    robot.head.getversion()
+    robot.body.getversion()
 
     robot.left_arm.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_BLINK_VERYFAST)
     robot.right_arm.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_BLINK_SLOW)

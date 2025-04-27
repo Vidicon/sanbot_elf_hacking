@@ -6,9 +6,7 @@ from Common.sara_library import *
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
-
-    robot.getversion()
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
 
     # Wait 2 seconds for the robot to connect and receive the first data
     time.sleep(2)
@@ -16,10 +14,10 @@ def main():
     while 1:
         time.sleep(1)
         # Print some battery information to the console
-        robot.battery.printstate()
+        robot.battery.print_state()
 
         # Check if the battery is full enough to use.
-        batteryNotEmpty = robot.battery.checkNotEmpty()
+        batteryNotEmpty = robot.battery.check_not_empty()
         print(batteryNotEmpty)
 
     robot.stop()

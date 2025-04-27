@@ -46,7 +46,7 @@ struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer();
 
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetTxPointer();
 
-void Protocol_0x55_Init();
+void Protocol_0x55_Init(UART_HandleTypeDef *huart);
 
 void Protocol_0x55_NewData(uint8_t* Buf, uint32_t *Len);
 

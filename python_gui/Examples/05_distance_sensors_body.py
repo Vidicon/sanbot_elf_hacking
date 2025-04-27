@@ -3,10 +3,9 @@ from Common.sara_library import SaraRobot
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
-    time.sleep(1)
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
 
-    robot.getversion()
+    time.sleep(1)
 
     print("Press CTRL + C to stop.")
 
@@ -29,7 +28,7 @@ def main():
             #------------------------------------------------------------------------
             assert cliff_warning == False, "Cliff sensor triggered!"
 
-            print(".")
+            # print(".")
             time.sleep(0.5)
 
     except KeyboardInterrupt:

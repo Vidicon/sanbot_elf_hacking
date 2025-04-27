@@ -2,7 +2,6 @@ import os
 import sys
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
@@ -33,8 +32,8 @@ class DistanceSensors:
         ]
     )
 
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
+    def __init__(self, bridge_manager, bodypart):
+        self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".distancesensors"
 
         self.sensors = np.ones(13) * 65295
@@ -96,14 +95,13 @@ class DistanceSensors:
             return np.any(self.sensors[0:-2] < threshold)
 
     def sensor_cliffwarning(self):
-        print(self.sensors[-2:])
         if self.valid_data == False:
             return True
         else:
             return (self.sensors[11] >= 40000) or self.sensors[12] >= 40000
 
     def print_values(self):
-        print(self.sensors)
+        print("Distances  :", [int(value) for value in self.sensors])
 
     def get_all_values(self):
         return self.sensors

@@ -89,9 +89,8 @@ def main():
     ax2.set_theta_offset(np.pi / 2)  # Rotate plot so 0 is at the top
     ax2.set_theta_direction(-1)  # Clockwise direction
 
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
 
-    robot.getversion()
     time.sleep(1)
 
     # Set up the animation
