@@ -226,8 +226,8 @@ void RunDemoProgram1()
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
 		{
-			RGBLeds_SetAllColors(LeftHead, Blue, LED_On);
-			RGBLeds_SetAllColors(RightHead, Blue, LED_On);
+			RGBLeds_SetAllColors(LeftHead, Blue, LED_Blink_VeryFast);
+			RGBLeds_SetAllColors(RightHead, Blue, LED_Blink_VeryFast);
 
 			DemoEyesMode = 0;
 			HeadLed(False);
@@ -339,6 +339,7 @@ void setPanMotor(int8_t setSpeed)
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -373,6 +374,8 @@ int main(void)
 
 	TIM2->CCR2 = 0;
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+
 
 	System_Initialize_Start();
 	System_Initialze_Update();
@@ -461,8 +464,8 @@ int main(void)
 //			Generic_Head_Position_Setpoint(HeadPan, 2, 128);
 //			Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
 
-			RGBLeds_SetAllColors(LeftHead, Red, LED_Blink_Fast);
-			RGBLeds_SetAllColors(RightHead, Red, LED_Blink_Fast);
+			RGBLeds_SetAllColors(LeftHead, Red, LED_On);
+			RGBLeds_SetAllColors(RightHead, Red, LED_On);
 
 			DemoEyesMode = 0;
 		}
@@ -472,8 +475,8 @@ int main(void)
 //			Generic_Head_Position_Setpoint(HeadPan, 1, 64);
 //			Generic_Head_Position_Setpoint(HeadTilt, 0, 128);
 
-			RGBLeds_SetAllColors(LeftHead, White, LED_Blink_Slow);
-			RGBLeds_SetAllColors(RightHead, White, LED_Blink_Slow);
+			RGBLeds_SetAllColors(LeftHead, White, LED_On);
+			RGBLeds_SetAllColors(RightHead, White, LED_On);
 
 			DemoEyesMode = 1;
 		}
@@ -530,6 +533,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -890,6 +894,8 @@ static void MX_TIM8_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
@@ -1002,6 +1008,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(Touch7_GPIO_Port, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -1039,5 +1047,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

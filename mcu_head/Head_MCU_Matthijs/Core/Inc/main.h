@@ -120,6 +120,7 @@ void Error_Handler(void);
 #define Touch0_GPIO_Port GPIOE
 #define Touch1_Pin GPIO_PIN_1
 #define Touch1_GPIO_Port GPIOE
+
 /* USER CODE BEGIN Private defines */
 
 //#define TOP_BUTTON_Pin GPIO_PIN_0
@@ -131,5 +132,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

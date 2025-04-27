@@ -25,6 +25,14 @@
 /* USER CODE BEGIN INCLUDE */
 #include "protocol_0x55.h"
 
+USBD_CDC_LineCodingTypeDef linecoding =
+{
+  115200, /* baud rate*/
+  0x00,   /* stop bits-1*/
+  0x00,   /* parity - none*/
+  0x08    /* nb. of bits 8*/
+};
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +42,6 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 struct PROTOCOL_0X55_Data_Type *TmpPointer;
-static uint8_t lineCoding[7];
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -220,13 +227,35 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /*                                        4 - Space                            */
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
-    case CDC_SET_LINE_CODING:
-    	memcpy(lineCoding, pbuf, sizeof(lineCoding));
-	break;
+//    case CDC_SET_LINE_CODING:
+//    	memcpy(lineCoding, pbuf, sizeof(lineCoding));
+//	break;
+//
+//	case CDC_GET_LINE_CODING:
+//		memcpy(pbuf, lineCoding, sizeof(lineCoding));
+//	break;
 
-	case CDC_GET_LINE_CODING:
-		memcpy(pbuf, lineCoding, sizeof(lineCoding));
-	break;
+    case CDC_SET_LINE_CODING:
+      linecoding.bitrate    = (uint32_t)(pbuf[0] | (pbuf[1] << 8) | \
+                                         (pbuf[2] << 16) | (pbuf[3] << 24));
+      linecoding.format     = pbuf[4];
+      linecoding.paritytype = pbuf[5];
+      linecoding.datatype   = pbuf[6];
+
+      /* Add your code here */
+      break;
+
+    case CDC_GET_LINE_CODING:
+      pbuf[0] = (uint8_t)(linecoding.bitrate);
+      pbuf[1] = (uint8_t)(linecoding.bitrate >> 8);
+      pbuf[2] = (uint8_t)(linecoding.bitrate >> 16);
+      pbuf[3] = (uint8_t)(linecoding.bitrate >> 24);
+      pbuf[4] = linecoding.format;
+      pbuf[5] = linecoding.paritytype;
+      pbuf[6] = linecoding.datatype;
+
+      /* Add your code here */
+      break;
 
     case CDC_SET_CONTROL_LINE_STATE:
 
@@ -306,5 +335,3 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
