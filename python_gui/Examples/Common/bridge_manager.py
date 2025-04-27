@@ -19,11 +19,12 @@ class BridgeManager:
 
     def connect(self):
         print(f"Connecting to {self.remote_host}...")
-        self.tcp_connection_head = TCPConnection(self, self.remote_host, 5000, mainBoard=SaraRobotPartNames.HEAD)
-        self.tcp_connection_head.connect()
 
-        self.tcp_connection_body = TCPConnection(self, self.remote_host, 5001, mainBoard=SaraRobotPartNames.BODY)
-        self.tcp_connection_body.connect()
+        self.tcp_connection_head = TCPConnection(self, self.remote_host, 5001, mainBoard=SaraRobotPartNames.HEAD)
+        assert self.tcp_connection_head.connect() == True, "Not connected to HEAD"
+        
+        self.tcp_connection_body = TCPConnection(self, self.remote_host, 5000, mainBoard=SaraRobotPartNames.BODY)
+        assert self.tcp_connection_body.connect() == True, "Not connected to HEAD"
 
         sleep(1)
 
@@ -131,8 +132,10 @@ class TCPConnection:
             self.running = True
             print(f"Connected to {bodypart_to_string(self.mainBoard)} at {self.host}:{self.port}")
             threading.Thread(target=self._receive_data, daemon=True).start()
+            return True
         except Exception as e:
             print(f"Failed to connect to {self.host}:{self.port} - {e}")
+            return False
 
     def send_data(self, data):
         if self.socket and self.running:

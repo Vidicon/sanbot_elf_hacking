@@ -46,7 +46,6 @@ class SaraRobot:
         self.bridge_manager = BridgeManager(self.remote_host)
         self.bridge_manager.set_receive_callback(self.my_receive_callback)
         self.bridge_manager.connect()
-
         return
 
     def stop(self):
@@ -137,7 +136,6 @@ class RobotArmMotor:
             return
 
         if self.bodypart == SaraRobotPartNames.LEFTARM:
-            # position *= -1
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
             self.bridge_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))
