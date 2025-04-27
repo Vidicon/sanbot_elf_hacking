@@ -115,6 +115,9 @@ static void MX_SPI3_Init(void);
 /* USER CODE BEGIN 0 */
 void System_Initialize_Start()
 {
+	// Enable USB power.
+	HAL_GPIO_WritePin(USB_ENABLE_LOW_GPIO_Port, USB_ENABLE_LOW_Pin, GPIO_PIN_RESET);
+
 	// Main timer
 	HAL_TIM_Base_Start_IT(&htim7);
 

@@ -2,7 +2,7 @@ import sys
 import os
 import time
 
-from Common.sara_library import *
+from Common.sara_library_bridged import *
 
 # NOCOLOR = 0
 # RED = 1
@@ -20,7 +20,7 @@ from Common.sara_library import *
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
+    robot = SaraRobot('saradev.local')
 
     robot.getversion()
 

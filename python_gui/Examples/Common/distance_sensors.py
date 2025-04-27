@@ -65,6 +65,8 @@ class DistanceSensors:
             self.valid_data = True
             self.error_counter = 0
             self.rx_counter += 1
+
+            # print("Distance sensors data received: ", self.sensors)
         except:
             print("Distance sensors data processing error")
 

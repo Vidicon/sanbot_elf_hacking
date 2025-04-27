@@ -5,6 +5,7 @@ class SaraRobotCommands:
     RESP_BIT = 0x80
 
     CMD_VERSION = 0x01
+    
     CMD_LA_COLOR = 0x10
     CMD_RA_COLOR = 0x11
     CMD_BASE_COLOR = 0x12

@@ -2,15 +2,16 @@ import sys
 import os
 import time
 
-from Common.sara_library import *
+from Common.sara_library_bridged import *
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM1", "/dev/ttyACM2")
+    robot = SaraRobot('saradev.local')
 
     robot.getversion()
+    # robot.head.getversion()
 
-    time.sleep(3)
+    time.sleep(10)
 
     robot.stop()
 
