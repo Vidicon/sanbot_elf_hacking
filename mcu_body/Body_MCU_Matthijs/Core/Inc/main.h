@@ -34,7 +34,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "RobotGlobals.h"
 
-#define DEMO
+//#define DEMO
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -174,6 +174,7 @@ void Error_Handler(void);
 #define EN3_Distance_J18_GPIO_Port GPIOI
 #define EN4_Distance_J18_Pin GPIO_PIN_7
 #define EN4_Distance_J18_GPIO_Port GPIOI
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -183,5 +184,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

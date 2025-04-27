@@ -7,13 +7,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2025 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -66,8 +65,8 @@
 #define USBD_VID     1155
 #define USBD_LANGID_STRING     1033
 #define USBD_MANUFACTURER_STRING     "STMicroelectronics"
-#define USBD_PID_FS     22336
-#define USBD_PRODUCT_STRING_FS     "STM32 Virtual ComPort"
+#define USBD_PID_FS     14162
+#define USBD_PRODUCT_STRING_FS     "Sara Body MCU"
 #define USBD_CONFIGURATION_STRING_FS     "CDC Config"
 #define USBD_INTERFACE_STRING_FS     "CDC Interface"
 
@@ -182,7 +181,7 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   #pragma data_alignment=4
 #endif /* defined ( __ICCARM__ ) */
 
-/** USB lang indentifier descriptor. */
+/** USB lang identifier descriptor. */
 __ALIGN_BEGIN uint8_t USBD_LangIDDesc[USB_LEN_LANGID_STR_DESC] __ALIGN_END =
 {
      USB_LEN_LANGID_STR_DESC,
@@ -337,7 +336,9 @@ uint8_t * USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *leng
   */
 static void Get_SerialNum(void)
 {
-  uint32_t deviceserial0, deviceserial1, deviceserial2;
+  uint32_t deviceserial0;
+  uint32_t deviceserial1;
+  uint32_t deviceserial2;
 
   deviceserial0 = *(uint32_t *) DEVICE_ID1;
   deviceserial1 = *(uint32_t *) DEVICE_ID2;
@@ -391,4 +392,3 @@ static void IntToUnicode(uint32_t value, uint8_t * pbuf, uint8_t len)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

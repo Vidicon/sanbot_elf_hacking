@@ -85,6 +85,8 @@ int tmp2;
 int head_pan_max;
 int Counter_2Hz = 0;
 
+int SlowCounter = 0;
+
 int System_Ready = False;
 
 int Demo_LedModeOld = 0;
@@ -206,7 +208,7 @@ int ReadHeadButton()
 	return (HAL_GPIO_ReadPin(HeadTopButton_GPIO_Port, HeadTopButton_Pin) == GPIO_PIN_RESET);
 }
 
-void RunDemoProgram()
+void RunDemoProgram1()
 {
 	if (System_Ready == True)
 	{
@@ -224,8 +226,8 @@ void RunDemoProgram()
 
 		if ((HeadButtonOld == 1) && (HeadButton == 0))
 		{
-			RGBLeds_SetAllColors(LeftHead, Blue, LED_On);
-			RGBLeds_SetAllColors(RightHead, Blue, LED_On);
+			RGBLeds_SetAllColors(LeftHead, Blue, LED_Blink_VeryFast);
+			RGBLeds_SetAllColors(RightHead, Blue, LED_Blink_VeryFast);
 
 			DemoEyesMode = 0;
 			HeadLed(False);
@@ -240,6 +242,7 @@ void RunDemoProgram()
 			if (TouchSensorData.Sensor[4] == 1)
 			{
 				DemoEyesMode = 2;
+
 				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
 				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
 
@@ -248,9 +251,11 @@ void RunDemoProgram()
 
 			}
 
+			// Top left of head
 			if (TouchSensorData.Sensor[0] == 1)
 			{
 				DemoEyesMode = 0;
+
 				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
 				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
 
@@ -334,6 +339,7 @@ void setPanMotor(int8_t setSpeed)
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -368,6 +374,8 @@ int main(void)
 
 	TIM2->CCR2 = 0;
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+
 
 	System_Initialize_Start();
 	System_Initialze_Update();
@@ -417,8 +425,8 @@ int main(void)
 		  Encoders_Update();
 		  TouchSensors_Update();
 
-#ifdef DEMO
-		  RunDemoProgram();
+#ifdef DEMO1
+		  RunDemoProgram1();
 #endif
 	  }
 
@@ -434,29 +442,56 @@ int main(void)
 		  if (Counter_2Hz == 0)
 		  {
 			  Update_Eyes(False);
-//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
-
-//			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
-//			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
 		  }
 
 		  if (Counter_2Hz == 5)
 		  {
 			  Update_Eyes(True);
-//			  SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-//			  SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
-
-//			  SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
-//			  SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
 		  }
 
 		  Counter_2Hz = (Counter_2Hz + 1) % 6;
 	  }
 
-	  if (Update_1Hz)
-	  {
-		  Update_1Hz = 0;
+	if (Update_1Hz)
+	{
+		Update_1Hz = 0;
+
+		SlowCounter += 1;
+
+#ifdef DEMO2
+		if (SlowCounter % 10 == 0)
+		{
+//			Generic_Head_Position_Setpoint(HeadPan, 2, 128);
+//			Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+
+			RGBLeds_SetAllColors(LeftHead, Red, LED_On);
+			RGBLeds_SetAllColors(RightHead, Red, LED_On);
+
+			DemoEyesMode = 0;
+		}
+
+		if (SlowCounter % 20 == 0)
+		{
+//			Generic_Head_Position_Setpoint(HeadPan, 1, 64);
+//			Generic_Head_Position_Setpoint(HeadTilt, 0, 128);
+
+			RGBLeds_SetAllColors(LeftHead, White, LED_On);
+			RGBLeds_SetAllColors(RightHead, White, LED_On);
+
+			DemoEyesMode = 1;
+		}
+
+		if (SlowCounter % 30 == 0)
+		{
+//			Generic_Head_Position_Setpoint(HeadPan, 0, 100);
+//			Generic_Head_Position_Setpoint(HeadTilt, 2, 0);
+
+			RGBLeds_SetAllColors(LeftHead, Green, LED_On);
+			RGBLeds_SetAllColors(RightHead, Green, LED_On);
+
+			DemoEyesMode = 2;
+		}
+#endif
 	  }
 
 	  //--------------------------------------------------------
@@ -498,6 +533,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -858,6 +894,8 @@ static void MX_TIM8_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
@@ -970,6 +1008,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(Touch7_GPIO_Port, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -1007,5 +1047,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

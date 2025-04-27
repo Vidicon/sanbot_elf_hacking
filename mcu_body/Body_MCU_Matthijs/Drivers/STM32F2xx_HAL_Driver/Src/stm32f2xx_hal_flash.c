@@ -9,6 +9,17 @@
   *           + Memory Control functions 
   *           + Peripheral Errors functions
   *         
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file in
+  * the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
   @verbatim
   ==============================================================================
                         ##### FLASH peripheral features #####
@@ -60,17 +71,6 @@
        (+) Monitor the FLASH flags status
           
   @endverbatim
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
   ******************************************************************************
   */
 
@@ -215,9 +215,6 @@ HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t Address, uint
 HAL_StatusTypeDef HAL_FLASH_Program_IT(uint32_t TypeProgram, uint32_t Address, uint64_t Data)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  
-  /* Process Locked */
-  __HAL_LOCK(&pFlash);
 
   /* Check the parameters */
   assert_param(IS_FLASH_TYPEPROGRAM(TypeProgram));
@@ -362,9 +359,7 @@ void HAL_FLASH_IRQHandler(void)
     
     /* Disable Error source interrupt */
     __HAL_FLASH_DISABLE_IT(FLASH_IT_ERR);
-    
-    /* Process Unlocked */
-    __HAL_UNLOCK(&pFlash);
+
   }
 }
 
@@ -758,4 +753,3 @@ static void FLASH_SetErrorCode(void)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
