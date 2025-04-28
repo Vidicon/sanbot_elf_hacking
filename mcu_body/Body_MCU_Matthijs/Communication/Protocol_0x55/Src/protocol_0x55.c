@@ -236,7 +236,6 @@ void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 	// USB DMA tx
 	//	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
 
-	// Uart 1 DMA tx
 	HAL_UART_Transmit_DMA(Uart_0x55, (uint8_t *)data, 3 + payloadLen + 2);
 }
 

@@ -134,66 +134,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if (huart->Instance == USART1)
 	{
 		Protocol_0x55_NewData((uint8_t*) &uart1RxChar, (uint32_t*) &datalen);
-
-//		// Start character was received.
-//		if (uart1RxCounter >= 1)
-//		{
-//			uart1RxData[uart1RxCounter] = uart1RxChar;
-//
-//			// message type
-//			if (uart1RxCounter == 1)
-//			{
-//				msgType = uart1RxChar;
-//			}
-//
-//			// message length --> message size
-//			if (uart1RxCounter == 2)
-//			{
-//				payloadSize = uart1RxChar;
-//				msgSize = payloadSize + 5;	// +0x55 + CMD + Length + CRC Low + CRC High
-//			}
-//
-//			uart1RxCounter += 1;
-//
-//			// Enough data received
-//			if ((uart1RxCounter >= 4) && (uart1RxCounter >= msgSize))
-//			{
-//				uint16_t CRC_Value = MSG_CalculateCRC16((uint8_t *) uart1RxData, msgSize);
-//
-//				// For now only check low byte.
-//				if ((CRC_Value & 0xff) == uart1RxData[msgSize-2])
-//				{
-//					// OK
-//					msgValid = 1;
-//					memcpy(&payloadData[0], &uart1RxData[3], payloadSize);
-//				}
-//				else
-//				{
-//					// NOK
-//					msgValid = 0;
-//				}
-//
-//				// Restart receive
-//				uart1RxCounter = 0;
-//			}
-//		}
-//		else
-//		{
-//			// Wait for start character
-//			if (uart1RxChar == 0x55)
-//			{
-//				memset(uart1RxData, 0, sizeof(uart1RxData));
-//
-//				uart1RxData[uart1RxCounter] = uart1RxChar;
-//				uart1RxCounter = 1;
-//
-//				payloadSize	= 0;
-//				msgSize 	= 0;
-//				msgType 	= 0;
-//				memset(&payloadData[0], 0, RXBUFFER);
-//			}
-//		}
-//
 		HAL_UART_Receive_IT(&huart1, &uart1RxChar, 1);	// Enable next character reception
 	}
 }
@@ -517,7 +457,9 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
+		  HAL_Delay(1);
 		  SendCompass(Compass_GetPointer());
+		  HAL_Delay(1);
 	  }
 
 	  if (Update_1Hz)
