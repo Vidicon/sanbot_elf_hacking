@@ -69,13 +69,25 @@ class SaraRobot:
 
     def my_receive_callback(self, data):
         response = data[1]
+        datalength = data[2]
 
-        # if (data[2] + 5) != len(data):
-        #     print("Error: data length mismatch")
-        #     print("Expected length: " + str(data[2] + 5))
-        #     print("Received length: " + str(len(data)))
-        #     print("Data: " + data.hex())
+        self.process_callback(data)
 
+        # Check if the data contains a second message
+        if (datalength + 5) != len(data):
+            # print("Error: data length mismatch")
+            # print("Expected length: " + str(data[2] + 5))
+            # print("Received length: " + str(len(data)))
+            # print("Data: " + data.hex())
+            
+            newdata = data[datalength + 5:]
+            # print("2nd message : " + newdata.hex())
+            self.process_callback(newdata)
+
+
+    def process_callback(self, data):
+        response = data[1]
+        
         if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
             self.new_version_data(data)
             return
