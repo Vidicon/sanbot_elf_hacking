@@ -43,6 +43,18 @@ class SaraGUI:
         )
         self.button_version_body.grid(row=row_count, column=col_count, sticky="w")
 
+        row_count += 1
+        self.button_stop = tk.Button(
+            self.frame,
+            height=4,  # Adjust the height to span multiple rows
+            width=button_width,
+            text="STOP",
+            # bg="lightcoral",  # Set background color to light red
+        )
+        self.button_stop.grid(
+            row=row_count, column=col_count, rowspan=4, sticky="w"
+        )  # Use rowspan to span multiple rows
+
         # --------------------------------------------------------------------------------------
         # Left arm
         # --------------------------------------------------------------------------------------
@@ -241,23 +253,23 @@ class SaraGUI:
         row_count = 0
         col_count += 1
 
-        self.button_HEAD_Left_White = tk.Button(
+        self.button_HEAD_Red = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Head Left Red",
+        )
+        self.button_HEAD_Red.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_HEAD_White = tk.Button(
             self.frame,
             height=1,
             width=button_width,
             text="Head Left White",
         )
-        self.button_HEAD_Left_White.grid(row=row_count, column=col_count, sticky="w")
-
-        row_count += 1
-
-        self.button_HEAD_Left_Red = tk.Button(
-            self.frame,
-            height=1,
-            width=button_width,
-            text="Head Right Red",
-        )
-        self.button_HEAD_Left_Red.grid(row=row_count, column=col_count, sticky="w")
+        self.button_HEAD_White.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
@@ -271,25 +283,13 @@ class SaraGUI:
 
         row_count += 1
 
-        self.button_HEAD_Left_Blue = tk.Button(
+        self.button_HEAD_Right_Blue = tk.Button(
             self.frame,
             height=1,
             width=button_width,
             text="Head Right Blue",
         )
-        self.button_HEAD_Left_Blue.grid(row=row_count, column=col_count, sticky="w")
-
-        row_count += 1
-
-        self.button_HEAD_Left_White_Blink = tk.Button(
-            self.frame,
-            height=1,
-            width=button_width,
-            text="Head Right White Blink",
-        )
-        self.button_HEAD_Left_White_Blink.grid(
-            row=row_count, column=col_count, sticky="w"
-        )
+        self.button_HEAD_Right_Blue.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
@@ -297,22 +297,19 @@ class SaraGUI:
             self.frame,
             height=1,
             width=button_width,
-            text="Head Right Off",
+            text="Head Left Off",
         )
         self.button_HEAD_Left_Off.grid(row=row_count, column=col_count, sticky="w")
-        # --------------------------------------------------------------------------------------
-        # Head Right
-        # --------------------------------------------------------------------------------------
-        row_count = 0
-        col_count = 4
 
-        self.button_HEAD_Right_White = tk.Button(
+        row_count += 1
+
+        self.button_HEAD_Right_Off = tk.Button(
             self.frame,
             height=1,
             width=button_width,
-            text="Head Right White",
+            text="Head Right Off",
         )
-        self.button_HEAD_Right_White.grid(row=row_count, column=col_count, sticky="w")
+        self.button_HEAD_Right_Off.grid(row=row_count, column=col_count, sticky="w")
 
         # --------------------------------------------------------------------------------------
         # streaming data area
