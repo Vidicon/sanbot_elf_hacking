@@ -89,7 +89,7 @@ def main():
     ax2.set_theta_offset(np.pi / 2)  # Rotate plot so 0 is at the top
     ax2.set_theta_direction(-1)  # Clockwise direction
 
-    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
+    robot = SaraRobot(logging=False)
 
     time.sleep(1)
 

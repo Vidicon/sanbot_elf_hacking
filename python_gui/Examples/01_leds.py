@@ -4,8 +4,9 @@ import time
 
 from Common.sara_library import *
 
+
 def main():
-    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0")
+    robot = SaraRobot(logging=True)
 
     robot.head.getversion()
     robot.body.getversion()
@@ -17,7 +18,7 @@ def main():
     # Add HEAD LEFT
     # Add HEAD RIGHT
 
-    time.sleep(5)
+    time.sleep(15)
 
     robot.left_arm.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_ON)
     robot.right_arm.led.setcolor(color=ColorLed.WHITE, blink=ColorLed.LED_ON)

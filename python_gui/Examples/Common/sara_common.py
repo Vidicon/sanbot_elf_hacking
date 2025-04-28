@@ -1,4 +1,4 @@
-body_parts_names = ["left_arm", "right_arm", "base", "head", "body", "battery", "distance_sensors"]
+body_parts_names = ["left_arm", "right_arm", "base", "head", "body", "battery", "distance_sensors", "motion_sensors"]
 
 
 class SaraRobotCommands:
@@ -36,6 +36,7 @@ class SaraRobotPartNames:
     BODY = 4
     BATTERY = 5
     BODYDISTANCESENSORS = 6
+    MOTIONSENSORS = 7
 
 
 class RobotArmPositions:

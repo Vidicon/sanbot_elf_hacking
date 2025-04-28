@@ -7,7 +7,7 @@ from Common.battery import Battery
 from Common.colorled import ColorLed
 from Common.robot_base import RobotBase
 from Common.encoders import Encoders
-
+from Common.motionsensors import MotionSensors
 
 # from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
@@ -16,14 +16,19 @@ from Common.sara_common import SaraRobotCommands
 from Common.sara_common import RobotArmPositions
 
 from Common.bridge_manager import BridgeManager
+from Common.sara_ports import SaraRobotPorts
+
 
 class SaraRobot:
-    def __init__(self, com_windows1, com_windows2, com_linux1, com_linux2, logging=True):
+    def __init__(
+        self,
+        logging=True,
+    ):
         print("-" * 80)
-        self.com_windows1 = com_windows1
-        self.com_windows2 = com_windows2
-        self.com_linux1 = com_linux1
-        self.com_linux2 = com_linux2
+        self.com_windows1 = SaraRobotPorts.COM_HEAD_WINDOWS
+        self.com_windows2 = SaraRobotPorts.COM_BODY_WINDOWS
+        self.com_linux1 = SaraRobotPorts.COM_HEAD_LINUX
+        self.com_linux2 = SaraRobotPorts.COM_BODY_LINUX
         self.logging = logging
 
         self.start()
@@ -33,7 +38,7 @@ class SaraRobot:
         self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
         self.battery = Battery(self.bridge_manager, SaraRobotPartNames.BATTERY)
         self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
-        self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)  
+        self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
 
         print("-" * 80)
 
@@ -42,57 +47,77 @@ class SaraRobot:
 
         if "LINUX" in platform.system().upper():
             print("Linux detected")
-            self.bridge_manager = BridgeManager(port1=self.com_linux1, port2=self.com_linux2, baudrate=115200)
+            self.bridge_manager = BridgeManager(
+                port1=self.com_linux1, port2=self.com_linux2, baudrate=115200
+            )
         else:
             print("Windows detected")
-            self.bridge_manager = BridgeManager(port1=self.com_windows1, port2=self.com_windows2, baudrate=115200)
-        
+            self.bridge_manager = BridgeManager(
+                port1=self.com_windows1, port2=self.com_windows2, baudrate=115200
+            )
+
         self.bridge_manager.set_receive_callback(self.my_receive_callback)
         self.bridge_manager.connect()
-        
+
         print("-" * 80)
 
         return
-
 
     def stop(self):
         self.base.brake(ApplyBrake=False)
         self.bridge_manager.disconnect()
 
-
     def my_receive_callback(self, data):
         response = data[1]
 
+        # if (data[2] + 5) != len(data):
+        #     print("Error: data length mismatch")
+        #     print("Expected length: " + str(data[2] + 5))
+        #     print("Received length: " + str(len(data)))
+        #     print("Data: " + data.hex())
+
         if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
             self.new_version_data(data)
-            return 
+            return
 
         if response == (SaraRobotCommands.CMD_GET_BATTERY | SaraRobotCommands.RESP_BIT):
             self.battery.new_data(data)
-            if (self.logging):
+            if self.logging:
                 self.battery.print_state()
             return
 
-        if response == (SaraRobotCommands.CMD_GET_DISTANCESENSORS | SaraRobotCommands.RESP_BIT):
+        if response == (
+            SaraRobotCommands.CMD_GET_DISTANCESENSORS | SaraRobotCommands.RESP_BIT
+        ):
             self.body.distancesensors.new_data(data)
-            if (self.logging):
+            if self.logging:
                 self.body.distancesensors.print_values()
             return
 
         if response == (SaraRobotCommands.CMD_GET_COMPASS | SaraRobotCommands.RESP_BIT):
             self.body.compass.new_data(data)
-            if (self.logging):
-                self.body.compass.print_values()    
+            if self.logging:
+                self.body.compass.print_values()
             return
 
         if response == (SaraRobotCommands.CMD_COMP_MOVE | SaraRobotCommands.RESP_BIT):
             self.body.compass.rotate_absolute_ready(data)
             return
 
-        if response == (SaraRobotCommands.CMD_GET_ENCODERS | SaraRobotCommands.RESP_BIT):
+        if response == (
+            SaraRobotCommands.CMD_GET_ENCODERS | SaraRobotCommands.RESP_BIT
+        ):
             self.body.encoders.new_data(data)
-            if (self.logging):
-                self.body.encoders.print_values()   
+            if self.logging:
+                self.body.encoders.print_values()
+            return
+
+        if response == (
+            SaraRobotCommands.CMD_GET_MOTIONSENSORS | SaraRobotCommands.RESP_BIT
+        ):
+            self.body.motionsensors.new_data(data)
+            if self.logging:
+                self.body.motionsensors.print_values()
             return
 
         # If not decoded, print the data
@@ -109,7 +134,7 @@ class SaraRobot:
 
         print("-" * 80)
         return
-    
+
 
 class Body:
     def __init__(self, bridge_manager, bodypart):
@@ -120,9 +145,13 @@ class Body:
         self.distancesensors = DistanceSensors(self.bridge_manager, bodypart)
         self.compass = Compass(self.bridge_manager, bodypart)
         self.encoders = Encoders(self.bridge_manager, bodypart)
+        self.motionsensors = MotionSensors(
+            self.bridge_manager, bodypart)
 
     def getversion(self):
-        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.BODY)
+        self.bridge_manager.cmd_Generic(
+            SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.BODY
+        )
 
 
 class Head:
@@ -132,7 +161,9 @@ class Head:
         print("Adding " + self.full_bodypart_name)
 
     def getversion(self):
-        self.bridge_manager.cmd_Generic(SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.HEAD)
+        self.bridge_manager.cmd_Generic(
+            SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.HEAD
+        )
 
 
 class RobotArm:
@@ -170,10 +201,14 @@ class RobotArmMotor:
         if self.bodypart == SaraRobotPartNames.LEFTARM:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
-            self.bridge_manager.cmd_Generic(RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low]))
+            self.bridge_manager.cmd_Generic(
+                RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low])
+            )
 
         if self.bodypart == SaraRobotPartNames.RIGHTARM:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 
-            self.bridge_manager.cmd_Generic(RobotArmMotor.CMD_RA_MOVE, 2, np.array([high, low]))
+            self.bridge_manager.cmd_Generic(
+                RobotArmMotor.CMD_RA_MOVE, 2, np.array([high, low])
+            )

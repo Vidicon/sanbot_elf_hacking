@@ -1,6 +1,6 @@
-class SaraRobotPort:
-    COM_HEAD_WINDOWS = "COM1"
-    COM_BODY_WINDOWS = "COM2"
+class SaraRobotPorts:
+    COM_HEAD_WINDOWS = "COM11"
+    COM_BODY_WINDOWS = "COM10"
 
-    COM_HEAD_LINUX = "ttyACM1"
-    COM_BODY_LINUX = "ttyACM0"
+    COM_HEAD_LINUX = "/dev/ttyACM1"
+    COM_BODY_LINUX = "/dev/ttyACM0"

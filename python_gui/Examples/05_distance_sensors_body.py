@@ -3,7 +3,7 @@ from Common.sara_library import SaraRobot
 
 
 def main():
-    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
+    robot = SaraRobot(logging=False)
 
     time.sleep(1)
 
