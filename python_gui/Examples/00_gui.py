@@ -3,11 +3,14 @@ from tkinter import scrolledtext
 from tkinter import font
 import time
 
+from Common.sara_library import *
+from Common.sara_common import *
+
 DEBUG = True
 
-
 class SaraGUI:
-    def __init__(self):
+    def __init__(self, robot):
+        self.robot = robot
         self.root = tk.Tk()
         self.root.title("Sara Development User Interface - BODY")
 
@@ -30,6 +33,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Version Head",
+            command=lambda :self.robot.head.getversion()
         )
         self.button_version_head.grid(row=row_count, column=col_count, sticky="w")
 
@@ -40,6 +44,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Version Body",
+            command=lambda :self.robot.head.getversion()
         )
         self.button_version_body.grid(row=row_count, column=col_count, sticky="w")
 
@@ -66,6 +71,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left White",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.WHITE, blink=ColorLed.LED_ON)  
         )
         self.button_LA_White.grid(row=row_count, column=col_count, sticky="w")
 
@@ -76,6 +82,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Red",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_ON)  
         )
         self.button_LA_Red.grid(row=row_count, column=col_count, sticky="w")
 
@@ -86,6 +93,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Green",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_ON)  
         )
         self.button_LA_Green.grid(row=row_count, column=col_count, sticky="w")
 
@@ -96,6 +104,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Blue",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_ON)  
         )
         self.button_LA_Blue.grid(row=row_count, column=col_count, sticky="w")
 
@@ -106,6 +115,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Blue Blink",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_BLINK_VERYFAST)  
         )
         self.button_LA_Blue_Blink.grid(row=row_count, column=col_count, sticky="w")
 
@@ -116,6 +126,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Off",
+            command=lambda :self.robot.left_arm.led.setcolor(color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF)  
         )
         self.button_LA_Off.grid(row=row_count, column=col_count, sticky="w")
 
@@ -130,6 +141,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right White",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.WHITE, blink=ColorLed.LED_ON)  
         )
         self.button_RA_White.grid(row=row_count, column=col_count, sticky="w")
 
@@ -140,6 +152,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Red",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_ON)  
         )
         self.button_RA_Red.grid(row=row_count, column=col_count, sticky="w")
 
@@ -150,6 +163,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Green",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_ON)  
         )
         self.button_RA_Green.grid(row=row_count, column=col_count, sticky="w")
 
@@ -160,6 +174,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Blue",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_ON)  
         )
         self.button_RA_Blue.grid(row=row_count, column=col_count, sticky="w")
 
@@ -170,6 +185,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Green Blink",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_BLINK_FAST)  
         )
         self.button_RA_Green_Blink.grid(row=row_count, column=col_count, sticky="w")
 
@@ -180,6 +196,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Off",
+            command=lambda :self.robot.right_arm.led.setcolor(color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF)  
         )
         self.button_RA_Off.grid(row=row_count, column=col_count, sticky="w")
 
@@ -194,6 +211,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base White",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.WHITE, blink=ColorLed.LED_ON)  
         )
         self.button_BASE_White.grid(row=row_count, column=col_count, sticky="w")
 
@@ -204,6 +222,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base Red",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_ON)  
         )
         self.button_BASE_Red.grid(row=row_count, column=col_count, sticky="w")
 
@@ -214,6 +233,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base Green",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.GREEN, blink=ColorLed.LED_ON)  
         )
         self.button_BASE_Green.grid(row=row_count, column=col_count, sticky="w")
 
@@ -224,6 +244,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base Blue",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_ON)  
         )
         self.button_BASE_Blue.grid(row=row_count, column=col_count, sticky="w")
 
@@ -234,6 +255,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base Blink Red",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.RED, blink=ColorLed.LED_BLINK_FAST)  
         )
         self.button_BASE_Blink_Red.grid(row=row_count, column=col_count, sticky="w")
 
@@ -244,6 +266,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Base Off",
+            command=lambda :self.robot.base.led.setcolor(color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF)  
         )
         self.button_BASE_Off.grid(row=row_count, column=col_count, sticky="w")
 
@@ -327,8 +350,10 @@ class SaraGUI:
         self.root.mainloop()
 
 
+
 def main():
-    gui = SaraGUI()
+    robot = SaraRobot(logging=True)
+    gui = SaraGUI(robot)
     gui.run()
 
 
