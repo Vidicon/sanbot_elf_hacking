@@ -335,6 +335,76 @@ class SaraGUI:
         self.button_HEAD_Right_Off.grid(row=row_count, column=col_count, sticky="w")
 
         # --------------------------------------------------------------------------------------
+        # Arms
+        # --------------------------------------------------------------------------------------
+        row_count = 0
+        col_count += 1
+
+        self.button_LeftArm_Up = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Left Arm Up",
+            command=lambda : robot.left_arm.motor.move(position=RobotArmPositions.UP)
+        )
+        self.button_LeftArm_Up.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_LeftArm_Forward = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Left Arm Forward",
+            command=lambda : robot.left_arm.motor.move(position=RobotArmPositions.FORWARD)
+        )
+        self.button_LeftArm_Forward.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+        
+        self.button_LeftArm_Down = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Left Arm Down",
+            command=lambda : robot.left_arm.motor.move(position=RobotArmPositions.DOWN)
+        )
+        self.button_LeftArm_Down.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_RightArm_Up = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Right Arm Up",
+            command=lambda : robot.right_arm.motor.move(position=RobotArmPositions.UP)
+        )
+        self.button_RightArm_Up.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_RightArm_Forward = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Right Arm Forward",
+            command=lambda : robot.right_arm.motor.move(position=RobotArmPositions.FORWARD)
+        )
+        self.button_RightArm_Forward.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+        
+        self.button_RightArm_Down = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Right Arm Down",
+            command=lambda : robot.right_arm.motor.move(position=RobotArmPositions.DOWN)
+        )
+        self.button_RightArm_Down.grid(row=row_count, column=col_count, sticky="w")
+
+        # --------------------------------------------------------------------------------------
         # streaming data area
         # --------------------------------------------------------------------------------------
         self.stream_area = scrolledtext.ScrolledText(
