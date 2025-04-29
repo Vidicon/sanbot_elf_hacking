@@ -10,6 +10,7 @@ from Common.sara_common import SaraRobotPartNames
 from Common.sara_common import SaraRobotCommands
 from Common.sara_common import RobotArmPositions
 
+
 class BridgeManager:
     def __init__(self, port1, port2, baudrate=115200):
         self.port1 = port1
@@ -18,25 +19,27 @@ class BridgeManager:
         print(f"BridgeManager initializing")
 
         # print(f"Port1: {self.port1}")
-        # print(f"Port2: {self.port2}")   
-
+        # print(f"Port2: {self.port2}")
 
     def set_receive_callback(self, callback):
         self.receive_callback = callback
 
-
     def connect(self):
-        self.com_connection_head = COMConnection(self, self.port1, mainBoard=SaraRobotPartNames.HEAD, baudrate=self.baudrate)
-        assert self.com_connection_head.connect() == True, "Not connected to HEAD"
+        self.com_connection_head = COMConnection(
+            self, self.port1, mainBoard=SaraRobotPartNames.HEAD, baudrate=self.baudrate
+        )
+        # assert self.com_connection_head.connect() == True, "Not connected to HEAD"
 
-        self.com_connection_body = COMConnection(self, self.port2, mainBoard=SaraRobotPartNames.BODY, baudrate=self.baudrate)
-        assert self.com_connection_body.connect() == True, "Not connected to BODY"
+        self.com_connection_body = COMConnection(
+            self, self.port2, mainBoard=SaraRobotPartNames.BODY, baudrate=self.baudrate
+        )
+        # assert self.com_connection_body.connect() == True, "Not connected to BODY"
 
         sleep(1)
 
         # Open all the ports before accepting any data
-        self.com_connection_head.set_receive_callback(self.receive_callback)    
-        self.com_connection_body.set_receive_callback(self.receive_callback)    
+        self.com_connection_head.set_receive_callback(self.receive_callback)
+        self.com_connection_body.set_receive_callback(self.receive_callback)
 
     def disconnect(self):
         print(f"Disconnecting")
@@ -46,7 +49,6 @@ class BridgeManager:
 
         if self.com_connection_body:
             self.com_connection_body.disconnect()
-
 
     def generate_modbus_crc(self, data):
         # Convert the data array to uint8 if it's not already
@@ -67,7 +69,6 @@ class BridgeManager:
         # Swap bytes
         # crc = ((crc << 8) & 0xFF00) | ((crc >> 8) & 0x00FF)
         return crc
-
 
     def cmd_createCompassMoveCommand(self, cmd, angle, timeout):
         high = (int(angle) >> 8) & 0xFF
@@ -110,25 +111,32 @@ class BridgeManager:
                 self.com_connection_body.send_data(data)
             else:
                 print(f"Invalid bodypart specified: {bodypart}. Cannot send data.")
-        
-        elif cmd >= SaraRobotCommands.CMD_LA_COLOR and cmd <= SaraRobotCommands.CMD_LARA_COLOR:
+
+        elif (
+            cmd >= SaraRobotCommands.CMD_LA_COLOR
+            and cmd <= SaraRobotCommands.CMD_LARA_COLOR
+        ):
             if self.com_connection_body:
                 self.com_connection_body.send_data(data)
             else:
                 print("No connection to BODY. Cannot send data.")
 
-        elif cmd >= SaraRobotCommands.CMD_LA_MOVE and cmd <= SaraRobotCommands.CMD_BASE_BRAKE:
+        elif (
+            cmd >= SaraRobotCommands.CMD_LA_MOVE
+            and cmd <= SaraRobotCommands.CMD_BASE_BRAKE
+        ):
             if self.com_connection_body:
                 self.com_connection_body.send_data(data)
             else:
                 print("No connection to BODY. Cannot send data.")
-        else:  
+        else:
             print(f"No bodypart specified. Cannot send data with command {cmd}.")
 
         return
 
+
 class COMConnection:
-    def __init__(self, parent, port, mainBoard="", baudrate=115200):  
+    def __init__(self, parent, port, mainBoard="", baudrate=115200):
         self.running = False
         self.receive_callback = None
         self.mainBoard = mainBoard
@@ -140,10 +148,10 @@ class COMConnection:
         self.receive_callback = None
         self.receive_thread = None
         self.receive_thread_stop = threading.Event()
-    
+
     def set_receive_callback(self, callback):
         self.receive_callback = callback
-    
+
     def start_receive_thread(self):
         self.receive_thread_stop.clear()
         self.receive_thread = threading.Thread(target=self.receive_serial_data)
@@ -155,12 +163,14 @@ class COMConnection:
             if self.serial_port.in_waiting > 0:
                 data = self.serial_port.read(self.serial_port.in_waiting)
                 if self.receive_callback:
-                    self.receive_callback(data)        
+                    self.receive_callback(data)
 
     def connect(self):
         # print(f"Connecting to port {self.port} at baudrate {self.baudrate}")
         try:
-            self.serial_port = serial.Serial(port=self.port, baudrate=self.baudrate, timeout=self.timeout)
+            self.serial_port = serial.Serial(
+                port=self.port, baudrate=self.baudrate, timeout=self.timeout
+            )
             print(f"Serial port {self.port} opened successfully.")
             self.start_receive_thread()
             return True
@@ -175,7 +185,6 @@ class COMConnection:
             self.serial_port.close()
             print(f"Serial port closed.")
         return True
-    
 
     def send_data(self, data):
         if self.serial_port:
@@ -229,7 +238,7 @@ class COMConnection:
 #             while self.running:
 #                 data = self.socket.recv(2048)
 #                 if data:
-#                     pass 
+#                     pass
 #                 else:
 #                     print("Connection closed by the server.")
 #                     self.running = False

@@ -79,15 +79,14 @@ class SaraRobot:
             # print("Expected length: " + str(data[2] + 5))
             # print("Received length: " + str(len(data)))
             # print("Data: " + data.hex())
-            
-            newdata = data[datalength + 5:]
+
+            newdata = data[datalength + 5 :]
             # print("2nd message : " + newdata.hex())
             self.process_callback(newdata)
 
-
     def process_callback(self, data):
         response = data[1]
-        
+
         if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
             self.new_version_data(data)
             return
@@ -157,12 +156,11 @@ class Body:
         self.distancesensors = DistanceSensors(self.bridge_manager, bodypart)
         self.compass = Compass(self.bridge_manager, bodypart)
         self.encoders = Encoders(self.bridge_manager, bodypart)
-        self.motionsensors = MotionSensors(
-            self.bridge_manager, bodypart)
+        self.motionsensors = MotionSensors(self.bridge_manager, bodypart)
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
-            SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.BODY
+            SaraRobotCommands.CMD_VERSION_BODY, 0, 0, SaraRobotPartNames.BODY
         )
 
 
@@ -174,7 +172,7 @@ class Head:
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
-            SaraRobotCommands.CMD_VERSION, 0, 0, SaraRobotPartNames.HEAD
+            SaraRobotCommands.CMD_VERSION_HEAD, 0, 0, SaraRobotPartNames.HEAD
         )
 
 
