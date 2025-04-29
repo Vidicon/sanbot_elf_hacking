@@ -46,13 +46,15 @@ class DistanceSensors:
         self.error_counter = 0
         self.rx_counter = 0
 
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
     def new_data(self, data):
         try:
             datalength = data[2]
 
-            assert datalength == 26, self.full_bodypart_name + " data length not correct!"
+            assert datalength == 26, (
+                self.full_bodypart_name + " data length not correct!"
+            )
 
             for i in range(13):
                 new_byte_array = data[3 + i * 2 : -2]
@@ -72,9 +74,9 @@ class DistanceSensors:
             if self.error_counter > 3:
                 self.valid_data = False
 
-        #------------------------------------------------------------------------
+        # ------------------------------------------------------------------------
         # Cliff sensors
-        #------------------------------------------------------------------------
+        # ------------------------------------------------------------------------
         if self.sensors[11] >= 40000:
             print("Left cliff sensor too large value!")
 

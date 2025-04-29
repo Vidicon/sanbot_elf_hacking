@@ -22,8 +22,8 @@ class Battery:
 
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + self.full_bodypart_name)
+        self.full_bodypart_name = bodypart_to_string(bodypart) + ".battery"
+        print("Adding " + "robot." + self.full_bodypart_name)
 
         self.batterystate = Battery.ERROR
         self.oldstate = Battery.ERROR
@@ -31,7 +31,9 @@ class Battery:
         self.Current = 0
 
     def print_state(self):
-        txt = "Battery    : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
+        txt = "Battery    : Voltage {} mV, Current {} mA, State = ".format(
+            self.Voltage, self.Current
+        )
         txt += Battery.state_names[self.batterystate]
         print(txt)
 

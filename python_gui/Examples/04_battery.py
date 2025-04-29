@@ -14,10 +14,10 @@ def main():
     while 1:
         time.sleep(1)
         # Print some battery information to the console
-        robot.battery.print_state()
+        robot.body.battery.print_state()
 
         # Check if the battery is full enough to use.
-        batteryNotEmpty = robot.battery.check_not_empty()
+        batteryNotEmpty = robot.body.battery.check_not_empty()
         print(batteryNotEmpty)
 
     robot.stop()

@@ -7,6 +7,7 @@ from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
 
+
 class ColorLed:
     NOCOLOR = 0
     RED = 1
@@ -30,7 +31,7 @@ class ColorLed:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
         self.bodypart = bodypart
-        print("Adding " + bodypart_to_string(bodypart) + ".led")
+        print("Adding " + "robot." + bodypart_to_string(bodypart) + ".led")
 
     def setcolor(self, color=0, blink=0):
 

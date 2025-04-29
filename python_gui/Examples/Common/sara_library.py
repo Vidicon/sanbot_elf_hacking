@@ -36,7 +36,6 @@ class SaraRobot:
         self.left_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.LEFTARM)
         self.right_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.RIGHTARM)
         self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
-        self.battery = Battery(self.bridge_manager, SaraRobotPartNames.BATTERY)
         self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
         self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
 
@@ -151,12 +150,13 @@ class Body:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
         self.distancesensors = DistanceSensors(self.bridge_manager, bodypart)
         self.compass = Compass(self.bridge_manager, bodypart)
         self.encoders = Encoders(self.bridge_manager, bodypart)
         self.motionsensors = MotionSensors(self.bridge_manager, bodypart)
+        self.battery = Battery(self.bridge_manager, bodypart)
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
@@ -168,7 +168,7 @@ class Head:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
@@ -181,7 +181,7 @@ class RobotArm:
         self.bridge_manager = bridge_manager
         self.bodypart = bodypart
         self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
         self.led = ColorLed(self.bridge_manager, self.bodypart)
         self.motor = RobotArmMotor(self.bridge_manager, self.bodypart)
@@ -196,7 +196,7 @@ class RobotArmMotor:
         self.bridge_manager = bridge_manager
         self.bodypart = bodypart
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".motor"
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
     def move(self, position):
 

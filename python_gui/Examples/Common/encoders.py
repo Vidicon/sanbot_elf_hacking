@@ -7,11 +7,12 @@ from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
 
+
 class Encoders:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart) + ".encoders"
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
         self.encoders = np.zeros(5)
 
@@ -22,7 +23,9 @@ class Encoders:
     def new_data(self, data):
         try:
             datalength = data[2]
-            assert datalength == 10, self.full_bodypart_name + " data length not correct!"
+            assert datalength == 10, (
+                self.full_bodypart_name + " data length not correct!"
+            )
 
             for i in range(5):
                 new_byte_array = data[3 + i * 2 : -2]
@@ -37,7 +40,6 @@ class Encoders:
         except:
             print("Encoders data processing error")
             self.valid_data = False
-
 
     def print_values(self):
         print("Encoders   :", [int(value) for value in self.encoders])

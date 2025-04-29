@@ -24,19 +24,23 @@ class Compass:
         self.rotation_tmo_counter = 0
         self.rotation_tmo_threshold = 100
 
-        print("Adding " + self.full_bodypart_name)
+        print("Adding " + "robot." + self.full_bodypart_name)
 
     def new_data(self, data):
         try:
             datalength = data[2]
 
-            assert datalength == 6, self.full_bodypart_name + " data length not correct!"
+            assert datalength == 6, (
+                self.full_bodypart_name + " data length not correct!"
+            )
 
             # for i in range(11):
             new_byte_array = data[3:-2]
 
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
-            compass_angle, angle_degrees = self.calculate_angle(int16_array_5[0], int16_array_5[1])
+            compass_angle, angle_degrees = self.calculate_angle(
+                int16_array_5[0], int16_array_5[1]
+            )
 
             self.abs_angle = float(compass_angle)
             self.valid_data = True
@@ -72,9 +76,15 @@ class Compass:
         return compass_degree, angle_degrees
 
     # Rotate to an absolute angle using the compass
-    def rotate_absolute(self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=10):
-        assert abs_rotation_angle < 360, "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
-        assert abs_rotation_angle >= 0, "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
+    def rotate_absolute(
+        self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=10
+    ):
+        assert (
+            abs_rotation_angle < 360
+        ), "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
+        assert (
+            abs_rotation_angle >= 0
+        ), "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
 
         self.target_rotation = int(abs_rotation_angle)
         self.rotate_ready = False
@@ -85,12 +95,16 @@ class Compass:
 
         # Send command
         self.bridge_manager.cmd_createCompassMoveCommand(
-            SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation, rotation_tmo_threshold
+            SaraRobotCommands.CMD_COMP_MOVE,
+            self.target_rotation,
+            rotation_tmo_threshold,
         )
 
         # Wait for the response message or a timeout of 20 seconds
         while self.rotate_ready == False:
-            assert self.rotation_tmo_counter < (rotation_tmo_threshold * 10), "Rotate absolute timeout!"
+            assert self.rotation_tmo_counter < (
+                rotation_tmo_threshold * 10
+            ), "Rotate absolute timeout!"
 
             time.sleep(0.1)
             self.rotation_tmo_counter += 1
@@ -109,7 +123,9 @@ class Compass:
             datalength = data[2]
 
             try:
-                assert datalength == 1, self.full_bodypart_name + " data length not correct!"
+                assert datalength == 1, (
+                    self.full_bodypart_name + " data length not correct!"
+                )
 
                 self.rotate_result = data[3] == 1
             except AssertionError as e:

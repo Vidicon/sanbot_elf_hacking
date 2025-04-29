@@ -1,6 +1,7 @@
 import numpy as np
 from Common.sara_common import bodypart_to_string
 
+
 class MotionSensors:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
@@ -11,13 +12,15 @@ class MotionSensors:
         self.valid_data = False
         self.error_counter = 0
 
-        print(f"Adding {self.full_bodypart_name}")
+        print(f"Adding robot.{self.full_bodypart_name}")
 
     def new_data(self, data):
         try:
             datalength = data[2]
 
-            assert datalength == 2, f"{self.full_bodypart_name} data length not correct!"
+            assert (
+                datalength == 2
+            ), f"{self.full_bodypart_name} data length not correct!"
 
             new_byte_array = data[3:-2]
             uint8_array = np.frombuffer(new_byte_array, dtype=">u1")
@@ -36,4 +39,3 @@ class MotionSensors:
 
     def print_values(self):
         print("Motion     :", [int(value) for value in self.sensors])
-
