@@ -33,8 +33,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#define DEMO1
-#define DEMO2
+//#define DEMO1
+//#define DEMO2
 
 /* USER CODE END Includes */
 

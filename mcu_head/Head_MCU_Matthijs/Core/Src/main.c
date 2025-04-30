@@ -171,20 +171,31 @@ void Check_USB_Communication()
 	{
 		int command = Protocol_0x55_GetCommand();
 
-		if (command == CMD_VERSION)
+		if (command == CMD_VERSION_HEAD)
 		{
 			SendVersion();
 		}
 
-		if (command == CMD_LEFTHEAD_COLOR)
+		if (command == CMD_HEAD_LEFT_COLOR)
 		{
 			RGBLeds_SetAllColors(LeftHead, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
-		if (command == CMD_RIGHTHEAD_COLOR)
+		if (command == CMD_HEAD_RIGHT_COLOR)
 		{
 			RGBLeds_SetAllColors(RightHead, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
+
+		if (command == CMD_HEAD_TILT_HOME)
+		{
+			Head_Tilt_Home();
+		}
+
+		if (command == CMD_HEAD_PAN_HOME)
+		{
+			Head_Pan_Home();
+		}
+
 
 		Protocol_0x55_MarkProcessed();
 	}

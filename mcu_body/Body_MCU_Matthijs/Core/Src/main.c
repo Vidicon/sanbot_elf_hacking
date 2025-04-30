@@ -218,6 +218,16 @@ void Check_USB_Communication()
 			Base_NewCompassRotation(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
+		if (command == CMD_LA_HOME)
+		{
+			LeftArm_Home();
+		}
+
+		if (command == CMD_RA_HOME)
+		{
+			RightArm_Home();
+		}
+
 		Protocol_0x55_MarkProcessed();
 	}
 }

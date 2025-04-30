@@ -31,6 +31,19 @@
 #define CMD_COMP_MOVE			0x33
 #define CMD_BASE_BRAKE	 		0x34
 
+
+#define CMD_VERSION_HEAD 		0x40
+#define CMD_HEAD_PAN_MOVE 		0x41
+#define CMD_HEAD_PAN_BRAKE 		0x42
+#define CMD_HEAD_TILT_MOVE 		0x43
+#define CMD_HEAD_TILT_BRAKE 	0x44
+#define CMD_HEAD_LEFT_COLOR 	0x45
+#define CMD_HEAD_RIGHT_COLOR 	0x46
+#define CMD_HEAD_TILT_HOME 		0x47
+#define CMD_HEAD_PAN_HOME 		0x48
+
+#define CMD_HEAD_LAST 			0x4F
+
 #define RESP_BIT 				0x80
 
 
