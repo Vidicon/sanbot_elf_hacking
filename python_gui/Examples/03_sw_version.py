@@ -5,7 +5,7 @@ import time
 from Common.sara_library import *
 
 def main():
-    robot = SaraRobot(logging=False)
+    robot = SaraRobot(logging=True)
 
     time.sleep(1)
 

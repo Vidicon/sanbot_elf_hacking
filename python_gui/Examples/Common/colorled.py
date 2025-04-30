@@ -24,12 +24,7 @@ class ColorLed:
     LED_BLINK_FAST = 5
     LED_BLINK_VERYFAST = 6
 
-    # def __init__(self, bridge_manager, bodypart, option=""):
     def __init__(self, bridge_manager, parent_name, instance_ENUM):
-        # self.bridge_manager = bridge_manager
-        # self.bodypart = bodypart
-        # self.option = option
-
         self.bridge_manager = bridge_manager
         self.parent_name = parent_name
         self.instance_ENUM = instance_ENUM
@@ -37,19 +32,6 @@ class ColorLed:
 
         print("Adding " + self.instance_name)
 
-        # if (len(self.option) == 0):
-        #     self.bodypart = bodypart
-        #     print("Adding " + "robot." + bodypart_to_string(bodypart) + ".led")
-        # else:   
-        #     if (self.option == "left_led"):
-        #         self.bodypart = SaraRobotPartNames.LEFT_LED
-        #         print("Adding " + "robot." + bodypart_to_string(bodypart) + ".left_led")
-        #     elif (self.option == "right_led"):
-        #         self.bodypart = SaraRobotPartNames.RIGHT_LED
-        #         print("Adding " + "robot." + bodypart_to_string(bodypart) + ".right_led")
-        #     else:
-        #         print("Invalid option for ColorLed: " + self.option)
-        #         return  
 
     def setcolor(self, color=0, blink=0):
 

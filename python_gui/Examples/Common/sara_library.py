@@ -51,11 +51,13 @@ class SaraRobot:
                               instance_ENUM=SaraRobotPartNames.BASE)
 
 
-        self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
+        # self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
+        self.body = Body(self.bridge_manager,
+                         parent_name=self.parent_name, 
+                         instance_ENUM=SaraRobotPartNames.BODY)
 
         # self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
         self.head = Head(self.bridge_manager, 
-                         SaraRobotPartNames.HEAD, 
                          parent_name=self.parent_name, 
                          instance_ENUM=SaraRobotPartNames.HEAD)
 
@@ -158,20 +160,39 @@ class SaraRobot:
 
         # If not decoded, print the data
         hex_values = " ".join([format(x, "02X") for x in data])
-        print("< " + hex_values)
+        print("< NOT DECODED: " + hex_values)
 
 
 class Body:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + "robot." + self.full_bodypart_name)
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
 
-        self.distancesensors = DistanceSensors(self.bridge_manager, bodypart)
-        self.compass = Compass(self.bridge_manager, bodypart)
-        self.encoders = Encoders(self.bridge_manager, bodypart)
-        self.motionsensors = MotionSensors(self.bridge_manager, bodypart)
-        self.battery = Battery(self.bridge_manager, bodypart)
+        print("Adding " + self.instance_name)
+
+        self.distancesensors = DistanceSensors(self.bridge_manager, 
+                                                parent_name=self.instance_name, 
+                                                instance_ENUM=SaraRobotPartNames.BODYDISTANCESENSORS)
+        
+        self.encoders = Encoders(self.bridge_manager,
+                                                parent_name=self.instance_name, 
+                                                instance_ENUM=SaraRobotPartNames.ENCODERS)
+        
+        self.compass = Compass(self.bridge_manager,
+                                                parent_name=self.instance_name, 
+                                                instance_ENUM=SaraRobotPartNames.COMPASS)
+        
+        self.battery = Battery(self.bridge_manager,
+                                                parent_name=self.instance_name, 
+                                                instance_ENUM=SaraRobotPartNames.BATTERY)
+
+        self.motionsensors = MotionSensors(self.bridge_manager, 
+                                                parent_name=self.instance_name, 
+                                                instance_ENUM=SaraRobotPartNames.MOTIONSENSORS)
+    
+
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
@@ -191,16 +212,13 @@ class Body:
     
 
 class Head:
-    def __init__(self, bridge_manager, bodypart, parent_name, instance_ENUM):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + "robot." + self.full_bodypart_name)
-
-
-
         self.parent_name = parent_name
         self.instance_ENUM = instance_ENUM
         self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.pan_motor = RobotArmMotor(self.bridge_manager, 
                                         parent_name=self.instance_name, 
@@ -212,9 +230,6 @@ class Head:
                                         instance_ENUM=SaraRobotPartNames.TILT_MOTOR
                                         )
 
-        # self.left_led = ColorLed(self.bridge_manager, bodypart, option="left_led")
-        # self.right_led = ColorLed(self.bridge_manager, bodypart, option="right_led")
-
         self.left_led = ColorLed(self.bridge_manager, 
                                         parent_name=self.instance_name, 
                                         instance_ENUM=SaraRobotPartNames.HEAD_LEFT_LED
@@ -224,8 +239,6 @@ class Head:
                                         parent_name=self.instance_name, 
                                         instance_ENUM=SaraRobotPartNames.HEAD_RIGHT_LED
                                         )
-         
-
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
@@ -243,8 +256,6 @@ class Head:
         print("-" * 80)
         return
     
-
-
 class RobotArm:
     def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager

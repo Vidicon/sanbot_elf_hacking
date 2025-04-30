@@ -3,8 +3,7 @@ from Common.sara_library import SaraRobot
 
 
 def main():
-    robot = SaraRobot("COM10", "COM11", "/dev/ttyACM1", "/dev/ttyACM0", logging=False)
-
+    robot = SaraRobot(logging=False)
 
     # Wait for first valid data
     time.sleep(1.0)
@@ -22,7 +21,7 @@ def main():
     # In this case, send every 1 second.
     # ==================================================================================================
     # Do some XYR moves
-    robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
+    robot.base.motors.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)

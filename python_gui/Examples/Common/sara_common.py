@@ -59,6 +59,9 @@ body_parts_names = [
     "motor",
     "motor",
     "motors",
+    "encoders",
+    "compass",
+    "battery",
 ]   
 
 class SaraRobotPartNames:
@@ -83,6 +86,10 @@ class SaraRobotPartNames:
     LEFT_ARM_MOTOR = 16
     RIGHT_ARM_MOTOR = 17
     BASE_MOTORS = 18
+
+    ENCODERS = 19
+    COMPASS = 20
+    BATTERY = 21
 
 class RobotArmPositions:
     UP = 450

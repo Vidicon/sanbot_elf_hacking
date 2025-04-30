@@ -9,10 +9,13 @@ from Common.sara_common import SaraRobotPartNames
 
 
 class Encoders:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".encoders"
-        print("Adding " + "robot." + self.full_bodypart_name)
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.encoders = np.zeros(5)
 

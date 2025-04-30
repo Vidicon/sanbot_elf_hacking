@@ -3,16 +3,19 @@ from Common.sara_common import bodypart_to_string
 
 
 class MotionSensors:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".motionsensors"
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.sensors = np.zeros(2)
         self.abs_angle = 0.0
         self.valid_data = False
         self.error_counter = 0
 
-        print(f"Adding robot.{self.full_bodypart_name}")
 
     def new_data(self, data):
         try:

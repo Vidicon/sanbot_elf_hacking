@@ -11,9 +11,13 @@ from Common.sara_common import SaraRobotCommands
 
 
 class Compass:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".compass"
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.sensors = np.zeros(1)
         self.abs_angle = 0
@@ -24,7 +28,6 @@ class Compass:
         self.rotation_tmo_counter = 0
         self.rotation_tmo_threshold = 100
 
-        print("Adding " + "robot." + self.full_bodypart_name)
 
     def new_data(self, data):
         try:
