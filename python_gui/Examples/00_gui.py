@@ -318,6 +318,9 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Left Red",
+            command=lambda: self.robot.head.left_led.setcolor(
+                color=ColorLed.RED, blink=ColorLed.LED_ON
+            ),
         )
         self.button_HEAD_Red.grid(row=row_count, column=col_count, sticky="w")
 
@@ -328,18 +331,24 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Left White",
+            command=lambda: self.robot.head.left_led.setcolor(
+                color=ColorLed.WHITE, blink=ColorLed.LED_ON
+            ),
         )
         self.button_HEAD_White.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
-        self.button_HEAD_Left_Green = tk.Button(
+        self.button_HEAD_Right_Green = tk.Button(
             self.frame,
             height=1,
             width=button_width,
             text="Head Right Green",
+            command=lambda: self.robot.head.right_led.setcolor(
+                color=ColorLed.GREEN, blink=ColorLed.LED_ON
+            ),
         )
-        self.button_HEAD_Left_Green.grid(row=row_count, column=col_count, sticky="w")
+        self.button_HEAD_Right_Green.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
@@ -348,6 +357,9 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Right Blue",
+            command=lambda: self.robot.head.right_led.setcolor(
+                color=ColorLed.BLUE, blink=ColorLed.LED_ON
+            ),
         )
         self.button_HEAD_Right_Blue.grid(row=row_count, column=col_count, sticky="w")
 
@@ -358,6 +370,9 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Left Off",
+            command=lambda: self.robot.head.left_led.setcolor(
+                color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF
+            ),
         )
         self.button_HEAD_Left_Off.grid(row=row_count, column=col_count, sticky="w")
 
@@ -368,6 +383,9 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Right Off",
+            command=lambda: self.robot.head.right_led.setcolor(
+                color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF
+            ),
         )
         self.button_HEAD_Right_Off.grid(row=row_count, column=col_count, sticky="w")
 

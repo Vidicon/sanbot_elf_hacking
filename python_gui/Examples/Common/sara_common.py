@@ -76,7 +76,7 @@ class RobotArmPositions:
     UP = 450
     FORWARD = 350
     DOWN = 150
-    LEFT = 100
-    RIGHT = 200
-    UP = 100
-    DOWN = 200
+    PAN_LEFT = 100
+    PAN_RIGHT = 200
+    TILT_UP = 100
+    TILT_DOWN = 200
