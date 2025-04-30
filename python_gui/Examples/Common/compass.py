@@ -38,7 +38,7 @@ class Compass:
             )
 
             # for i in range(11):
-            new_byte_array = data[3:-2]
+            new_byte_array = data[3 : 3+6]
 
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
             compass_angle, angle_degrees = self.calculate_angle(
@@ -61,7 +61,7 @@ class Compass:
         return self.abs_angle
 
     def print_values(self):
-        print(f"Angle      : {self.abs_angle:.0f} Degree")
+        print(f"Compass    : {self.abs_angle:.0f} Degree")
 
     # Function to calculate the angle
     def calculate_angle(self, x, y):

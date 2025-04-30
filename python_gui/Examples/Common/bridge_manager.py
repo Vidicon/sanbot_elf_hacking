@@ -21,8 +21,11 @@ class BridgeManager:
         # print(f"Port1: {self.port1}")
         # print(f"Port2: {self.port2}")
 
-    def set_receive_callback(self, callback):
-        self.receive_callback = callback
+    def set_receive_callback_body(self, callback):
+        self.receive_callback_body = callback
+
+    def set_receive_callback_head(self, callback):
+        self.receive_callback_head = callback
 
     def connect(self):
         self.com_connection_head = COMConnection(
@@ -38,8 +41,8 @@ class BridgeManager:
         sleep(1)
 
         # Open all the ports before accepting any data
-        self.com_connection_head.set_receive_callback(self.receive_callback)
-        self.com_connection_body.set_receive_callback(self.receive_callback)
+        self.com_connection_head.set_receive_callback(self.receive_callback_head)
+        self.com_connection_body.set_receive_callback(self.receive_callback_body)
 
     def disconnect(self):
         print(f"Disconnecting")

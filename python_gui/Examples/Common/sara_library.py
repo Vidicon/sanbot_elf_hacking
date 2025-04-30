@@ -25,6 +25,8 @@ class SaraRobot:
         logging=True,
     ):
         self.parent_name = "robot"
+        self.buffer1 = "".encode("utf-8")
+        self.bridge_manager = None
         
         print("-" * 80)
         self.com_windows1 = SaraRobotPorts.COM_HEAD_WINDOWS
@@ -77,7 +79,8 @@ class SaraRobot:
                 port1=self.com_windows1, port2=self.com_windows2, baudrate=115200
             )
 
-        self.bridge_manager.set_receive_callback(self.my_receive_callback)
+        self.bridge_manager.set_receive_callback_body(self.my_receive_callback_body)
+        self.bridge_manager.set_receive_callback_head(self.my_receive_callback_head)
         self.bridge_manager.connect()
 
         print("-" * 80)
@@ -88,24 +91,64 @@ class SaraRobot:
         self.base.brake(ApplyBrake=False)
         self.bridge_manager.disconnect()
 
-    def my_receive_callback(self, data):
+    def my_receive_callback_body(self, data):
         response = data[1]
         datalength = data[2]
 
-        self.process_callback(data)
+        # Combine the left over with the new data
+        self.buffer1 += data 
+        # print("--> 1st message data: " + self.buffer.hex())
 
-        # Check if the data contains a second message
-        if (datalength + 5) != len(data):
-            # print("Error: data length mismatch")
-            # print("Expected length: " + str(data[2] + 5))
-            # print("Received length: " + str(len(data)))
-            # print("Data: " + data.hex())
+        # if the start byte is correct, process.
+        if (self.buffer1[0] == 0xD5):
+            # print("--> 1st message process ")
+            self.process_callback(self.buffer1)
+        else:
+            print("--> 1st message error start byte")
+            # Clear the entire buffer
+            self.buffer1 = "".encode("utf-8")
+            return
 
-            newdata = data[datalength + 5 :]
+        # Remove processed message from buffer
+        self.buffer1 = self.buffer1[datalength + 5: ]
 
-            if (len(newdata) > 5):  
-                # print("2nd message : " + newdata.hex())
-                self.process_callback(newdata)
+        if (len(self.buffer1) == 0):
+            # print("--> no data left over")
+            return
+        else:
+            # print("--> left over data: " + self.buffer1.hex())
+            
+            # if the start byte is correct, process.
+            if (self.buffer1[0] == 0xD5):
+                # print("--> left over data starts with 0xd5")
+
+                if (len(self.buffer1) >= 5):
+                    # if enough data in the buffer, process it
+                    # print("--> left over data processing")
+                    self.process_callback(self.buffer1)
+                    
+                    # Assumes that there is NO 3rd message.
+                    # Clear the buffer
+                    self.buffer1 = "".encode("utf-8")
+                    
+                    return
+                else:
+                    # Partial message which starts with 0xd5
+                    # print("--> keeping some left over data")
+                    return  
+            else:
+                # Clear the buffer because left over data does not start with 0xd5
+                print("--> left over data error")
+                self.buffer1 = "".encode("utf-8")
+                return
+
+        # option 1: complete 2nd message --> 0xd5
+        # option 2: some bytes of the 2nd message --> 0xd5
+        # option 3: random junk --> clear all.
+
+    def my_receive_callback_head(self, data):
+        return
+    
 
     def process_callback(self, data):
         response = data[1]
