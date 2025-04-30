@@ -113,8 +113,8 @@ class BridgeManager:
                 print(f"Invalid bodypart specified: {bodypart}. Cannot send data.")
 
         elif (
-            cmd >= SaraRobotCommands.CMD_LA_COLOR
-            and cmd <= SaraRobotCommands.CMD_LARA_COLOR
+            cmd >= SaraRobotCommands.CMD_VERSION_BODY
+            and cmd <= SaraRobotCommands.CMD_COLOR_LAST
         ):
             if self.com_connection_body:
                 self.com_connection_body.send_data(data)
@@ -123,12 +123,22 @@ class BridgeManager:
 
         elif (
             cmd >= SaraRobotCommands.CMD_LA_MOVE
-            and cmd <= SaraRobotCommands.CMD_BASE_BRAKE
+            and cmd <= SaraRobotCommands.CMD_BODY_LAST
         ):
             if self.com_connection_body:
                 self.com_connection_body.send_data(data)
             else:
                 print("No connection to BODY. Cannot send data.")
+
+        elif (
+            cmd >= SaraRobotCommands.CMD_VERSION_HEAD
+            and cmd <= SaraRobotCommands.CMD_HEAD_LAST
+        ):
+            if self.com_connection_head:
+                self.com_connection_head.send_data(data)
+            else:
+                print("No connection to HEAD. Cannot send data.")
+
         else:
             print(f"No bodypart specified. Cannot send data with command {cmd}.")
 
@@ -196,64 +206,3 @@ class COMConnection:
 
         else:
             assert False, "Serial port is not open. Cannot send data."
-
-
-# class TCPConnection:
-#     def __init__(self, parent, host, port, mainBoard=""):
-#         self.parent = parent
-#         self.host = host
-#         self.port = port
-#         self.socket = None
-#         self.running = False
-#         self.receive_callback = None
-#         self.mainBoard = mainBoard
-
-#     def set_receive_callback(self, callback):
-#         self.receive_callback = callback
-
-#     def connect(self):
-#         try:
-#             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#             self.socket.connect((self.host, self.port))
-#             self.running = True
-#             print(f"Connected to {bodypart_to_string(self.mainBoard)} at {self.host}:{self.port}")
-#             threading.Thread(target=self._receive_data, daemon=True).start()
-#             return True
-#         except Exception as e:
-#             print(f"Failed to connect to {self.host}:{self.port} - {e}")
-#             return False
-
-#     def send_data(self, data):
-#         if self.socket and self.running:
-#             try:
-#                 # print(f"> Sending data: {data.hex()}")
-#                 self.socket.sendall(data)
-#             except Exception as e:
-#                 print(f"Failed to send data - {e}")
-#         else:
-#             print("Connection is not active. Cannot send data.")
-
-#     def _receive_data(self):
-#         try:
-#             while self.running:
-#                 data = self.socket.recv(2048)
-#                 if data:
-#                     pass
-#                 else:
-#                     print("Connection closed by the server.")
-#                     self.running = False
-
-#                 if self.receive_callback:
-#                     self.receive_callback(data)
-
-#         except Exception as e:
-#             print(f"Error receiving data - {e}")
-#         finally:
-#             self.disconnect()
-
-#     def disconnect(self):
-#         if self.socket:
-#             self.running = False
-#             self.socket.close()
-#             self.socket = None
-#             print(f"Disconnected from {self.host}:{self.port}")

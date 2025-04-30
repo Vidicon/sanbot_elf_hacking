@@ -80,8 +80,10 @@ class SaraRobot:
             # print("Data: " + data.hex())
 
             newdata = data[datalength + 5 :]
-            # print("2nd message : " + newdata.hex())
-            self.process_callback(newdata)
+
+            if (len(newdata) > 5):  
+                # print("2nd message : " + newdata.hex())
+                self.process_callback(newdata)
 
     def process_callback(self, data):
         response = data[1]
@@ -174,6 +176,12 @@ class Head:
         self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + "robot." + self.full_bodypart_name)
 
+        self.left_led = ColorLed(self.bridge_manager, bodypart, option="left_led")
+        self.right_led = ColorLed(self.bridge_manager, bodypart, option="right_led")
+
+        self.pan_motor = RobotArmMotor(self.bridge_manager, bodypart, option="pan_motor")
+        self.tilt_motor = RobotArmMotor(self.bridge_manager, bodypart, option="tilt_motor")
+
     def getversion(self):
         self.bridge_manager.cmd_Generic(
             SaraRobotCommands.CMD_VERSION_HEAD, 0, 0, SaraRobotPartNames.HEAD
@@ -190,6 +198,8 @@ class Head:
         print("-" * 80)
         return
     
+
+
 class RobotArm:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager
@@ -202,18 +212,28 @@ class RobotArm:
 
 
 class RobotArmMotor:
-    CMD_LA_MOVE = 0x30
-    CMD_RA_MOVE = 0x31
-    CMD_BASE_MOVE = 0x32
-
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, bodypart, option=""):
         self.bridge_manager = bridge_manager
         self.bodypart = bodypart
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".motor"
-        print("Adding " + "robot." + self.full_bodypart_name)
+        self.option = option
+        
+        
+        if (len(self.option) == 0):
+            self.bodypart = bodypart
+            self.full_bodypart_name = bodypart_to_string(bodypart) + ".motor"
+            print("Adding " + "robot." + self.full_bodypart_name)
+        else:
+            if (self.option == "pan_motor"):
+                self.bodypart = SaraRobotPartNames.PAN_MOTOR
+                print("Adding " + "robot." + bodypart_to_string(bodypart) + ".pan_motor")
+            elif (self.option == "tilt_motor"):
+                self.bodypart = SaraRobotPartNames.TILT_MOTOR
+                print("Adding " + "robot." + bodypart_to_string(bodypart) + ".tilt_motor")
+            else:
+                print("Invalid option for RobotArmMotor: " + self.option)
+                return  
 
     def move(self, position):
-
         if position < 0:
             print(self.full_bodypart_name + " : Error --> Position < 0")
             return
@@ -226,7 +246,7 @@ class RobotArmMotor:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
             self.bridge_manager.cmd_Generic(
-                RobotArmMotor.CMD_LA_MOVE, 2, np.array([high, low])
+                SaraRobotCommands.CMD_LA_MOVE, 2, np.array([high, low])
             )
 
         if self.bodypart == SaraRobotPartNames.RIGHTARM:
@@ -234,5 +254,42 @@ class RobotArmMotor:
             low = int(position) & 0xFF
 
             self.bridge_manager.cmd_Generic(
-                RobotArmMotor.CMD_RA_MOVE, 2, np.array([high, low])
+                SaraRobotCommands.CMD_RA_MOVE, 2, np.array([high, low])
+            )
+
+        if self.bodypart == SaraRobotPartNames.PAN_MOTOR:
+            high = (int(position) >> 8) & 0xFF
+            low = int(position) & 0xFF
+
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_HEAD_PAN_MOVE, 2, np.array([high, low])
+            )
+
+        if self.bodypart == SaraRobotPartNames.TILT_MOTOR:
+            high = (int(position) >> 8) & 0xFF
+            low = int(position) & 0xFF
+
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_HEAD_TILT_MOVE, 2, np.array([high, low])
+            )
+
+    def home(self):
+        if self.bodypart == SaraRobotPartNames.LEFTARM:
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_LA_HOME, 0, np.array([0, 0])
+            )
+
+        if self.bodypart == SaraRobotPartNames.RIGHTARM:
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_RA_HOME, 0, np.array([0, 0])
+            )
+
+        if self.bodypart == SaraRobotPartNames.PAN_MOTOR:
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_HEAD_PAN_HOME, 0, np.array([0, 0])
+            )
+
+        if self.bodypart == SaraRobotPartNames.TILT_MOTOR:
+            self.bridge_manager.cmd_Generic(
+                SaraRobotCommands.CMD_HEAD_TILT_HOME, 0, np.array([0, 0])
             )
