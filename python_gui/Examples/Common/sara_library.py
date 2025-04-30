@@ -86,14 +86,18 @@ class SaraRobot:
     def process_callback(self, data):
         response = data[1]
 
-        if response == (SaraRobotCommands.CMD_VERSION | SaraRobotCommands.RESP_BIT):
-            self.new_version_data(data)
+        if response == (SaraRobotCommands.CMD_VERSION_BODY | SaraRobotCommands.RESP_BIT):
+            self.body.new_version_data(data)
+            return
+
+        if response == (SaraRobotCommands.CMD_VERSION_HEAD | SaraRobotCommands.RESP_BIT):
+            self.head.new_version_data(data)
             return
 
         if response == (SaraRobotCommands.CMD_GET_BATTERY | SaraRobotCommands.RESP_BIT):
-            self.battery.new_data(data)
+            self.body.battery.new_data(data)
             if self.logging:
-                self.battery.print_state()
+                self.body.battery.print_state()
             return
 
         if response == (
@@ -134,17 +138,6 @@ class SaraRobot:
         hex_values = " ".join([format(x, "02X") for x in data])
         print("< " + hex_values)
 
-    def new_version_data(self, data):
-        try:
-            string_from_bytearray = data[3:-2].decode("utf-8")
-            print("-" * 80)
-            print("Software version : " + string_from_bytearray)
-        except:
-            print("Version bytes error")
-
-        print("-" * 80)
-        return
-
 
 class Body:
     def __init__(self, bridge_manager, bodypart):
@@ -163,6 +156,17 @@ class Body:
             SaraRobotCommands.CMD_VERSION_BODY, 0, 0, SaraRobotPartNames.BODY
         )
 
+    def new_version_data(self, data):
+        try:
+            string_from_bytearray = data[3:-2].decode("utf-8")
+            print("-" * 80)
+            print("Software version : " + string_from_bytearray)
+        except:
+            print("Version bytes error")
+
+        print("-" * 80)
+        return
+    
 
 class Head:
     def __init__(self, bridge_manager, bodypart):
@@ -175,7 +179,17 @@ class Head:
             SaraRobotCommands.CMD_VERSION_HEAD, 0, 0, SaraRobotPartNames.HEAD
         )
 
+    def new_version_data(self, data):
+        try:
+            string_from_bytearray = data[3:-2].decode("utf-8")
+            print("-" * 80)
+            print("Software version : " + string_from_bytearray)
+        except:
+            print("Version bytes error")
 
+        print("-" * 80)
+        return
+    
 class RobotArm:
     def __init__(self, bridge_manager, bodypart):
         self.bridge_manager = bridge_manager

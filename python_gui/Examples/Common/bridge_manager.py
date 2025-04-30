@@ -28,12 +28,12 @@ class BridgeManager:
         self.com_connection_head = COMConnection(
             self, self.port1, mainBoard=SaraRobotPartNames.HEAD, baudrate=self.baudrate
         )
-        # assert self.com_connection_head.connect() == True, "Not connected to HEAD"
+        assert self.com_connection_head.connect() == True, "Not connected to HEAD"
 
         self.com_connection_body = COMConnection(
             self, self.port2, mainBoard=SaraRobotPartNames.BODY, baudrate=self.baudrate
         )
-        # assert self.com_connection_body.connect() == True, "Not connected to BODY"
+        assert self.com_connection_body.connect() == True, "Not connected to BODY"
 
         sleep(1)
 
