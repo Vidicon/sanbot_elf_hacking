@@ -1,20 +1,3 @@
-body_parts_names = [
-    "left_arm",
-    "right_arm",
-    "base",
-    "head",
-    "body",
-    "battery",
-    "distance_sensors",
-    "motion_sensors",
-    "head",
-    "left_led",
-    "right_led",
-    "pan_motor",
-    "tilt_motor",
-]   
-
-
 class SaraRobotCommands:
     RESP_BIT = 0x80
 
@@ -56,10 +39,31 @@ class SaraRobotCommands:
 def bodypart_to_string(bodypart):
     return body_parts_names[bodypart]
 
+body_parts_names = [
+    "left_arm",
+    "right_arm",
+    "base",
+    "head",
+    "body",
+    "battery",
+    "distance_sensors",
+    "motion_sensors",
+    "head",
+    "led",
+    "led",
+    "led",
+    "left_led",
+    "right_led",
+    "pan_motor",
+    "tilt_motor",
+    "motor",
+    "motor",
+    "motors",
+]   
 
 class SaraRobotPartNames:
-    LEFTARM = 0
-    RIGHTARM = 1
+    LEFT_ARM = 0
+    RIGHT_ARM = 1
     BASE = 2
     HEAD = 3
     BODY = 4
@@ -67,10 +71,18 @@ class SaraRobotPartNames:
     BODYDISTANCESENSORS = 6
     MOTIONSENSORS = 7
     HEAD = 8
-    LEFT_LED = 9
-    RIGHT_LED = 10
-    PAN_MOTOR = 11
-    TILT_MOTOR = 12
+    
+    LEFT_ARM_LED = 9
+    RIGHT_ARM_LED = 10
+    BASE_LED = 11
+    HEAD_LEFT_LED = 12
+    HEAD_RIGHT_LED = 13
+
+    PAN_MOTOR = 14
+    TILT_MOTOR = 15
+    LEFT_ARM_MOTOR = 16
+    RIGHT_ARM_MOTOR = 17
+    BASE_MOTORS = 18
 
 class RobotArmPositions:
     UP = 450

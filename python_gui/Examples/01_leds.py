@@ -6,7 +6,7 @@ from Common.sara_library import *
 
 
 def main():
-    robot = SaraRobot(logging=True)
+    robot = SaraRobot(logging=False)
 
     robot.head.getversion()
     robot.body.getversion()
@@ -22,7 +22,7 @@ def main():
         color=ColorLed.GREEN, blink=ColorLed.LED_BLINK_SLOW
     )  
 
-    time.sleep(10)
+    time.sleep(5)
 
     robot.left_arm.led.setcolor(color=ColorLed.BLUE, blink=ColorLed.LED_ON)
     robot.right_arm.led.setcolor(color=ColorLed.WHITE, blink=ColorLed.LED_ON)

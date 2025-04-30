@@ -24,6 +24,8 @@ class SaraRobot:
         self,
         logging=True,
     ):
+        self.parent_name = "robot"
+        
         print("-" * 80)
         self.com_windows1 = SaraRobotPorts.COM_HEAD_WINDOWS
         self.com_windows2 = SaraRobotPorts.COM_BODY_WINDOWS
@@ -33,11 +35,29 @@ class SaraRobot:
 
         self.start()
 
-        self.left_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.LEFTARM)
-        self.right_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.RIGHTARM)
-        self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
+        # self.left_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.LEFTARM)
+        self.left_arm = RobotArm(self.bridge_manager, 
+                                 parent_name=self.parent_name, 
+                                 instance_ENUM=SaraRobotPartNames.LEFT_ARM)
+
+        # self.right_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.RIGHTARM)
+        self.right_arm = RobotArm(self.bridge_manager, 
+                                 parent_name=self.parent_name, 
+                                 instance_ENUM=SaraRobotPartNames.RIGHT_ARM)
+
+        # self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
+        self.base = RobotBase(self.bridge_manager, 
+                              parent_name=self.parent_name,
+                              instance_ENUM=SaraRobotPartNames.BASE)
+
+
         self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
-        self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
+
+        # self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
+        self.head = Head(self.bridge_manager, 
+                         SaraRobotPartNames.HEAD, 
+                         parent_name=self.parent_name, 
+                         instance_ENUM=SaraRobotPartNames.HEAD)
 
         print("-" * 80)
 
@@ -171,16 +191,41 @@ class Body:
     
 
 class Head:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, bodypart, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
         self.full_bodypart_name = bodypart_to_string(bodypart)
         print("Adding " + "robot." + self.full_bodypart_name)
 
-        self.left_led = ColorLed(self.bridge_manager, bodypart, option="left_led")
-        self.right_led = ColorLed(self.bridge_manager, bodypart, option="right_led")
 
-        self.pan_motor = RobotArmMotor(self.bridge_manager, bodypart, option="pan_motor")
-        self.tilt_motor = RobotArmMotor(self.bridge_manager, bodypart, option="tilt_motor")
+
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        self.pan_motor = RobotArmMotor(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.PAN_MOTOR
+                                        )
+
+        self.tilt_motor = RobotArmMotor(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.TILT_MOTOR
+                                        )
+
+        # self.left_led = ColorLed(self.bridge_manager, bodypart, option="left_led")
+        # self.right_led = ColorLed(self.bridge_manager, bodypart, option="right_led")
+
+        self.left_led = ColorLed(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.HEAD_LEFT_LED
+                                        )
+        
+        self.right_led = ColorLed(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.HEAD_RIGHT_LED
+                                        )
+         
+
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(
@@ -201,37 +246,44 @@ class Head:
 
 
 class RobotArm:
-    def __init__(self, bridge_manager, bodypart):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.bodypart = bodypart
-        self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + "robot." + self.full_bodypart_name)
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
 
-        self.led = ColorLed(self.bridge_manager, self.bodypart)
-        self.motor = RobotArmMotor(self.bridge_manager, self.bodypart)
+        print("Adding " + self.instance_name)
+
+        if (instance_ENUM == SaraRobotPartNames.LEFT_ARM):
+            self.motor = RobotArmMotor(self.bridge_manager, 
+                                       parent_name=self.instance_name, 
+                                       instance_ENUM= SaraRobotPartNames.LEFT_ARM_MOTOR)
+
+            self.led = ColorLed(self.bridge_manager,
+                               parent_name=self.instance_name, 
+                               instance_ENUM= SaraRobotPartNames.LEFT_ARM_LED
+                               )
+
+        if (instance_ENUM == SaraRobotPartNames.RIGHT_ARM):
+            self.motor = RobotArmMotor(self.bridge_manager, 
+                                       parent_name=self.instance_name, 
+                                       instance_ENUM= SaraRobotPartNames.RIGHT_ARM_MOTOR)
+            
+            self.led = ColorLed(self.bridge_manager,
+                               parent_name=self.instance_name, 
+                               instance_ENUM= SaraRobotPartNames.RIGHT_ARM_LED
+                               )
 
 
 class RobotArmMotor:
-    def __init__(self, bridge_manager, bodypart, option=""):
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
         self.bridge_manager = bridge_manager
-        self.bodypart = bodypart
-        self.option = option
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
         
-        
-        if (len(self.option) == 0):
-            self.bodypart = bodypart
-            self.full_bodypart_name = bodypart_to_string(bodypart) + ".motor"
-            print("Adding " + "robot." + self.full_bodypart_name)
-        else:
-            if (self.option == "pan_motor"):
-                self.bodypart = SaraRobotPartNames.PAN_MOTOR
-                print("Adding " + "robot." + bodypart_to_string(bodypart) + ".pan_motor")
-            elif (self.option == "tilt_motor"):
-                self.bodypart = SaraRobotPartNames.TILT_MOTOR
-                print("Adding " + "robot." + bodypart_to_string(bodypart) + ".tilt_motor")
-            else:
-                print("Invalid option for RobotArmMotor: " + self.option)
-                return  
 
     def move(self, position):
         if position < 0:
@@ -242,14 +294,14 @@ class RobotArmMotor:
             print(self.full_bodypart_name + " : Error --> Position > 500")
             return
 
-        if self.bodypart == SaraRobotPartNames.LEFTARM:
+        if self.instance_ENUM == SaraRobotPartNames.LEFT_ARM_MOTOR:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
             self.bridge_manager.cmd_Generic(
                 SaraRobotCommands.CMD_LA_MOVE, 2, np.array([high, low])
             )
 
-        if self.bodypart == SaraRobotPartNames.RIGHTARM:
+        if self.instance_ENUM == SaraRobotPartNames.RIGHT_ARM_MOTOR:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 
@@ -257,7 +309,7 @@ class RobotArmMotor:
                 SaraRobotCommands.CMD_RA_MOVE, 2, np.array([high, low])
             )
 
-        if self.bodypart == SaraRobotPartNames.PAN_MOTOR:
+        if self.instance_ENUM == SaraRobotPartNames.PAN_MOTOR:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 
@@ -265,7 +317,7 @@ class RobotArmMotor:
                 SaraRobotCommands.CMD_HEAD_PAN_MOVE, 2, np.array([high, low])
             )
 
-        if self.bodypart == SaraRobotPartNames.TILT_MOTOR:
+        if self.instance_ENUM == SaraRobotPartNames.TILT_MOTOR:
             high = (int(position) >> 8) & 0xFF
             low = int(position) & 0xFF
 
@@ -274,22 +326,22 @@ class RobotArmMotor:
             )
 
     def home(self):
-        if self.bodypart == SaraRobotPartNames.LEFTARM:
+        if self.instance_ENUM == SaraRobotPartNames.LEFT_ARM_MOTOR:
             self.bridge_manager.cmd_Generic(
                 SaraRobotCommands.CMD_LA_HOME, 0, np.array([0, 0])
             )
 
-        if self.bodypart == SaraRobotPartNames.RIGHTARM:
+        if self.instance_ENUM == SaraRobotPartNames.RIGHT_ARM_MOTOR:
             self.bridge_manager.cmd_Generic(
                 SaraRobotCommands.CMD_RA_HOME, 0, np.array([0, 0])
             )
 
-        if self.bodypart == SaraRobotPartNames.PAN_MOTOR:
+        if self.instance_ENUM == SaraRobotPartNames.PAN_MOTOR:
             self.bridge_manager.cmd_Generic(
                 SaraRobotCommands.CMD_HEAD_PAN_HOME, 0, np.array([0, 0])
             )
 
-        if self.bodypart == SaraRobotPartNames.TILT_MOTOR:
+        if self.instance_ENUM == SaraRobotPartNames.TILT_MOTOR:
             self.bridge_manager.cmd_Generic(
                 SaraRobotCommands.CMD_HEAD_TILT_HOME, 0, np.array([0, 0])
             )

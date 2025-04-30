@@ -8,10 +8,11 @@ from Common.sara_common import RobotArmPositions
 
 
 def main():
-    robot = SaraRobot()
+    robot = SaraRobot(logging=False)
 
     robot.head.getversion()
     robot.body.getversion()
+
 
     robot.left_arm.motor.move(position=RobotArmPositions.UP)
     robot.right_arm.motor.move(position=RobotArmPositions.UP)
