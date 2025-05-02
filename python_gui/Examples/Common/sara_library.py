@@ -35,38 +35,36 @@ class SaraRobot:
         self.com_linux2 = SaraRobotPorts.COM_BODY_LINUX
         self.logging = logging
 
+        print("Starting robot")
+
         self.start()
 
-        # self.left_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.LEFTARM)
         self.left_arm = RobotArm(self.bridge_manager, 
                                  parent_name=self.parent_name, 
                                  instance_ENUM=SaraRobotPartNames.LEFT_ARM)
 
-        # self.right_arm = RobotArm(self.bridge_manager, SaraRobotPartNames.RIGHTARM)
         self.right_arm = RobotArm(self.bridge_manager, 
                                  parent_name=self.parent_name, 
                                  instance_ENUM=SaraRobotPartNames.RIGHT_ARM)
 
-        # self.base = RobotBase(self.bridge_manager, SaraRobotPartNames.BASE)
         self.base = RobotBase(self.bridge_manager, 
                               parent_name=self.parent_name,
                               instance_ENUM=SaraRobotPartNames.BASE)
 
-
-        # self.body = Body(self.bridge_manager, SaraRobotPartNames.BODY)
         self.body = Body(self.bridge_manager,
                          parent_name=self.parent_name, 
                          instance_ENUM=SaraRobotPartNames.BODY)
 
-        # self.head = Head(self.bridge_manager, SaraRobotPartNames.HEAD)
         self.head = Head(self.bridge_manager, 
                          parent_name=self.parent_name, 
                          instance_ENUM=SaraRobotPartNames.HEAD)
-
+        
         print("-" * 80)
 
+        self.bridge_manager.connect()
+
+
     def start(self):
-        print("Starting robot communication")
 
         if "LINUX" in platform.system().upper():
             print("Linux detected")
@@ -81,7 +79,6 @@ class SaraRobot:
 
         self.bridge_manager.set_receive_callback_body(self.process_callback)
         self.bridge_manager.set_receive_callback_head(self.process_callback)
-        self.bridge_manager.connect()
 
         print("-" * 80)
 

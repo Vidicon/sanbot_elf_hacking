@@ -11,6 +11,8 @@ from Common.sara_common import RobotHeadPositions
 def main():
     robot = SaraRobot(logging=False)
 
+    time.sleep(1)
+
     robot.head.getversion()
     robot.body.getversion()
 

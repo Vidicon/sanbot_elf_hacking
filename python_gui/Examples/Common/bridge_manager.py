@@ -16,10 +16,6 @@ class BridgeManager:
         self.port1 = port1
         self.port2 = port2
         self.baudrate = baudrate
-        print(f"BridgeManager initializing")
-
-        # print(f"Port1: {self.port1}")
-        # print(f"Port2: {self.port2}")
 
     def set_receive_callback_body(self, callback):
         self.receive_callback_body = callback
@@ -31,18 +27,18 @@ class BridgeManager:
         self.com_connection_head = COMConnection(
             self, self.port1, mainBoard=SaraRobotPartNames.HEAD, baudrate=self.baudrate
         )
+        self.com_connection_head.set_receive_callback(self.receive_callback_head)
         assert self.com_connection_head.connect() == True, "Not connected to HEAD"
 
         self.com_connection_body = COMConnection(
             self, self.port2, mainBoard=SaraRobotPartNames.BODY, baudrate=self.baudrate
         )
+        self.com_connection_body.set_receive_callback(self.receive_callback_body)
         assert self.com_connection_body.connect() == True, "Not connected to BODY"
 
         sleep(1)
 
         # Open all the ports before accepting any data
-        self.com_connection_head.set_receive_callback(self.receive_callback_head)
-        self.com_connection_body.set_receive_callback(self.receive_callback_body)
 
     def disconnect(self):
         print(f"Disconnecting")
