@@ -465,7 +465,7 @@ class SaraGUI:
         self.button_RightArm_Down.grid(row=row_count, column=col_count, sticky="w")
 
         # --------------------------------------------------------------------------------------
-        # Head buttons sensors
+        # Head moves
         # --------------------------------------------------------------------------------------
         row_count += 1
         row_count += 1
@@ -475,9 +475,20 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Up",
-            # command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
+            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_UP),
         )
         self.button_Head_Up.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Head_Mid = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Head Tilt Mid",
+            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_MID),
+        )
+        self.button_Head_Mid.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
@@ -485,8 +496,8 @@ class SaraGUI:
             self.frame,
             height=1,
             width=button_width,
-            text="Head Down",
-            # command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
+            text="Head Tilt Down",
+            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_DOWN),
         )
         self.button_Head_Down.grid(row=row_count, column=col_count, sticky="w")
 
@@ -496,10 +507,21 @@ class SaraGUI:
             self.frame,
             height=1,
             width=button_width,
-            text="Head Left",
-            # command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
+            text="Head Pan Left",
+            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_LEFT),
         )
         self.button_Head_Left.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Head_Mid = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Head Pan Mid",
+            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_MID),
+        )
+        self.button_Head_Mid.grid(row=row_count, column=col_count, sticky="w")
 
         row_count += 1
 
@@ -507,8 +529,8 @@ class SaraGUI:
             self.frame,
             height=1,
             width=button_width,
-            text="Head Right",
-            # command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
+            text="Head Pan Right",
+            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_RIGHT),
         )
         self.button_Head_Right.grid(row=row_count, column=col_count, sticky="w")
 

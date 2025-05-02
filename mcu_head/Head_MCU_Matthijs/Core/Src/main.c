@@ -196,6 +196,15 @@ void Check_USB_Communication()
 			Head_Pan_Home();
 		}
 
+		if (command == CMD_HEAD_PAN_MOVE)
+		{
+			Generic_Head_Position_Setpoint(HeadPan, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
+		if (command == CMD_HEAD_TILT_MOVE)
+		{
+			Generic_Head_Position_Setpoint(HeadTilt, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
 
 		Protocol_0x55_MarkProcessed();
 	}

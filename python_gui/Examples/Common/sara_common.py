@@ -95,7 +95,11 @@ class RobotArmPositions:
     UP = 450
     FORWARD = 350
     DOWN = 150
-    PAN_LEFT = 100
-    PAN_RIGHT = 200
-    TILT_UP = 100
-    TILT_DOWN = 200
+
+class RobotHeadPositions:
+    PAN_LEFT = 10
+    PAN_RIGHT = 970
+    PAN_MID = PAN_LEFT + (PAN_RIGHT - PAN_LEFT) / 2
+    TILT_UP = 350
+    TILT_DOWN = 10
+    TILT_MID = TILT_UP + (TILT_DOWN - TILT_UP) / 2
