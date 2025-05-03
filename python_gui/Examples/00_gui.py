@@ -144,6 +144,70 @@ class SaraGUI:
         self.button_LA_Off.grid(row=row_count, column=col_count, sticky="w")
 
         # --------------------------------------------------------------------------------------
+        # Eyes
+        # --------------------------------------------------------------------------------------
+        row_count += 1
+        row_count += 1
+
+        self.button_Eyes0 = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Eyes 0",
+            command=lambda: robot.head.eyes.set_eyes(left_eye=0, right_eye=0
+            ),
+        )
+        self.button_Eyes0.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Eyes1 = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Eyes 1",
+            command=lambda: robot.head.eyes.set_eyes(left_eye=1, right_eye=1
+            ),
+        )
+        self.button_Eyes1.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Eyes2 = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Eyes 2",
+            command=lambda: robot.head.eyes.set_eyes(left_eye=2, right_eye=2
+            ),
+        )
+        self.button_Eyes2.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Eyes3 = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Eyes 3",
+            command=lambda: robot.head.eyes.set_eyes(left_eye=3, right_eye=3
+            ),
+        )
+        self.button_Eyes3.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Eyes4 = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Eyes 4",
+            command=lambda: robot.head.eyes.set_eyes(left_eye=4, right_eye=4
+            ),
+        )
+        self.button_Eyes4.grid(row=row_count, column=col_count, sticky="w")
+
+        # --------------------------------------------------------------------------------------
         # Right arm
         # --------------------------------------------------------------------------------------
         row_count = 0
