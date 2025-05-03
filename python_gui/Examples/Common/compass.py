@@ -31,13 +31,14 @@ class Compass:
 
     def new_data(self, data):
         try:
+            # print("--> compass: " + data.hex())
+
             datalength = data[2]
 
             assert datalength == 6, (
                 self.full_bodypart_name + " data length not correct!"
             )
 
-            # for i in range(11):
             new_byte_array = data[3 : 3+6]
 
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")

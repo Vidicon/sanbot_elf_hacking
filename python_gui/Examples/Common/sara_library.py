@@ -9,6 +9,7 @@ from Common.robot_base import RobotBase
 from Common.encoders import Encoders
 from Common.motionsensors import MotionSensors
 from Common.robotarmmotor import RobotArmMotor
+from Common.eyes import HeadEyes
 from Common.bridge_manager import BridgeManager
 from Common.sara_ports import SaraRobotPorts
 
@@ -230,6 +231,11 @@ class Head:
                                         parent_name=self.instance_name, 
                                         instance_ENUM=SaraRobotPartNames.HEAD_RIGHT_LED
                                         )
+        self.eyes = HeadEyes(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.HEAD_EYES
+                                        )
+
 
     def getversion(self):
         self.bridge_manager.cmd_Generic(

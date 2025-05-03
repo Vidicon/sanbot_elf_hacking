@@ -33,6 +33,7 @@ class SaraRobotCommands:
     CMD_HEAD_RIGHT_COLOR = 0x46
     CMD_HEAD_TILT_HOME = 0x47
     CMD_HEAD_PAN_HOME = 0x48
+    CMD_HEAD_EYES = 0x49
     CMD_HEAD_LAST = 0x4F
 
 
@@ -62,6 +63,7 @@ body_parts_names = [
     "encoders",
     "compass",
     "battery",
+    "eyes",
 ]   
 
 class SaraRobotPartNames:
@@ -90,6 +92,7 @@ class SaraRobotPartNames:
     ENCODERS = 19
     COMPASS = 20
     BATTERY = 21
+    HEAD_EYES = 22
 
 class RobotArmPositions:
     UP = 450

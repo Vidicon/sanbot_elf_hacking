@@ -170,11 +170,13 @@ class COMConnection:
 
     def receive_serial_data(self):
         while not self.receive_thread_stop.is_set():
-            if self.serial_port.in_waiting > 0:
-                data = self.serial_port.read(self.serial_port.in_waiting)
+            number_of_bytes = self.serial_port.in_waiting
+            
+            if number_of_bytes > 0:
+                data = self.serial_port.read(number_of_bytes)
                 # if self.receive_callback:
                 #     self.receive_callback(data)
-                self.process_data_callback(data)
+                self.process_data_callback(data, number_of_bytes)
 
     def connect(self):
         # print(f"Connecting to port {self.port} at baudrate {self.baudrate}")
@@ -208,62 +210,65 @@ class COMConnection:
         else:
             assert False, "Serial port is not open. Cannot send data."
 
-    def process_data_callback(self, data):
-        response = data[1]
-        datalength = data[2]
+    #--------------------------------------------------------
+    # option 1: complete 1st message --> 0xd5
+    # option 2: and complete 2nd message --> 0xd5
+    # option 3: and some bytes of the 2nd message --> 0xd5
+    # option 4: random junk --> clear all.
+    #--------------------------------------------------------
+    def process_data_callback(self, data, number_of_bytes):
+        # print("-" * 80)
+        # print("--> Buffer data on entry : " + self.buffer.hex())
+
 
         # Combine the left over with the new data
-        self.buffer += data 
-        # print("--> 1st message data: " + self.buffer.hex())
+        self.buffer += data[:number_of_bytes] 
+        # print("--> Number of new bytes  : " + str(number_of_bytes))  
+        # print("--> Buffer data with new : " + self.buffer.hex())
 
-        # if the start byte is correct, process.
-        if (self.buffer[0] == 0xD5):
-            # print("--> 1st message process ")
-            # self.process_callback(self.buffer)
-            if self.receive_callback:
-                self.receive_callback(self.buffer)
-        else:
-            print(f"{bodypart_to_string(self.mainBoard)} --> 1st message error start byte")
+        # Not very nice, but it works to process more than 1 message at a time
+        self.process_message()
+        self.process_message()
+        self.process_message()
+
+        return
+
+
+    def process_message(self):
+
+        # empty buffer
+        if (len(self.buffer) == 0):
+            # print("--> Buffer is empty.")
+            return
+
+        # if the start byte is NOT correct, clear the buffer
+        if (self.buffer[0] != 0xD5):
             # Clear the entire buffer
+            print("--> Incorrect start byte. Clear the entire buffer.")
             self.buffer = "".encode("utf-8")
             return
+
+        # message too short to process, but correct start byte
+        if (len(self.buffer) < 5):
+            # print("--> Less that 5 bytes in the buffer. Wait for more data.")
+            return
+
+        response = self.buffer[1]
+        datalength = self.buffer[2]
+        
+        # total message not long enough yet
+        if (len(self.buffer) < (datalength + 5)):
+            print("--> >= 5 bytes but not a complete message yet.")
+            return
+
+        # print("--> Complete message ready to process.")
+
+        if self.receive_callback:
+            self.receive_callback(self.buffer)
 
         # Remove processed message from buffer
         self.buffer = self.buffer[datalength + 5: ]
 
-        if (len(self.buffer) == 0):
-            # print("--> no data left over")
-            return
-        else:
-            # print("--> left over data: " + self.buffer1.hex())
-            
-            # if the start byte is correct, process.
-            if (self.buffer[0] == 0xD5):
-                # print("--> left over data starts with 0xd5")
+        # print("--> Buffer on exit : " + self.buffer.hex())
 
-                if (len(self.buffer) >= 5):
-                    # if enough data in the buffer, process it
-                    # print("--> left over data processing")
-                    # self.process_callback(self.buffer)
-                    if self.receive_callback:
-                        self.receive_callback(self.buffer)
-                    
-                    # Assumes that there is NO 3rd message.
-                    # Clear the buffer
-                    self.buffer = "".encode("utf-8")
-                    
-                    return
-                else:
-                    # Partial message which starts with 0xd5
-                    # print("--> keeping some left over data")
-                    return  
-            else:
-                # Clear the buffer because left over data does not start with 0xd5
-                print(f"{bodypart_to_string(self.mainBoard)} --> left over data error")
-                self.buffer = "".encode("utf-8")
-                return
-
-        # option 1: complete 2nd message --> 0xd5
-        # option 2: some bytes of the 2nd message --> 0xd5
-        # option 3: random junk --> clear all.
-
+        return
