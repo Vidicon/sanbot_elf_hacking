@@ -32,6 +32,7 @@
 #include "default_eyes.h"
 #include "fire_eyes.h"
 #include "TouchSensors.h"
+#include "Eyes.h"
 
 /* USER CODE END Includes */
 
@@ -44,7 +45,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 void HeadLed(int LedOn);
-void Update_Eyes(int BlinkEye);
+//void Update_Eyes(int BlinkEye);
 
 /* USER CODE END PD */
 
@@ -123,10 +124,10 @@ void System_Initialize_Start()
 	Encoders_Init(&htim1, &htim3);
 
 	Head_Pan_Init(&htim8);
-	Head_Pan_Home();
+//	Head_Pan_Home();
 
 	Head_Tilt_Init(&htim8);
-	Head_Tilt_Home();
+//	Head_Tilt_Home();
 
 	System_Ready = True;
 
@@ -148,19 +149,21 @@ void System_Initialize_Start()
 
 	SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
 	SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+
+	Eyes_Init(&left_eye, &right_eye);
 }
 
 void System_Initialze_Update()
 {
-	if (HeadPan_State.HomeState != Homed)
-	{
-		return;
-	}
-
-	if (HeadTilt_State.HomeState != Homed)
-	{
-		return;
-	}
+//	if (HeadPan_State.HomeState != Homed)
+//	{
+//		return;
+//	}
+//
+//	if (HeadTilt_State.HomeState != Homed)
+//	{
+//		return;
+//	}
 
 	System_Ready = True;
 }
@@ -206,6 +209,11 @@ void Check_USB_Communication()
 			Generic_Head_Position_Setpoint(HeadTilt, Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
+		if (command == CMD_HEAD_EYES)
+		{
+			Eyes_Select(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
 		Protocol_0x55_MarkProcessed();
 	}
 }
@@ -228,122 +236,122 @@ int ReadHeadButton()
 	return (HAL_GPIO_ReadPin(HeadTopButton_GPIO_Port, HeadTopButton_Pin) == GPIO_PIN_RESET);
 }
 
-void RunDemoProgram1()
-{
-	if (System_Ready == True)
-	{
-		HeadButtonOld = HeadButton;
-		HeadButton = ReadHeadButton();
+//void RunDemoProgram1()
+//{
+//	if (System_Ready == True)
+//	{
+//		HeadButtonOld = HeadButton;
+//		HeadButton = ReadHeadButton();
+//
+//		if ((HeadButtonOld == 0) && (HeadButton == 1))
+//		{
+//			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
+//			RGBLeds_BlinkColor(RightHead, Blue, LED_Blink_Fast);
+//
+//			DemoEyesMode = 1;
+//			HeadLed(True);
+//		}
+//
+//		if ((HeadButtonOld == 1) && (HeadButton == 0))
+//		{
+//			RGBLeds_SetAllColors(LeftHead, Blue, LED_Blink_VeryFast);
+//			RGBLeds_SetAllColors(RightHead, Blue, LED_Blink_VeryFast);
+//
+//			DemoEyesMode = 0;
+//			HeadLed(False);
+//
+//			Head_Pan_Home();
+//			Head_Tilt_Home();
+//		}
+//
+//		if (TouchSensor_AnyPressed())
+//		{
+//			// Top right of head
+//			if (TouchSensorData.Sensor[4] == 1)
+//			{
+//				DemoEyesMode = 2;
+//
+//				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
+//				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+//
+//				RGBLeds_SetAllColors(LeftHead, Red, LED_Blink_Fast);
+//				RGBLeds_SetAllColors(RightHead, Red, LED_Blink_Fast);
+//
+//			}
+//
+//			// Top left of head
+//			if (TouchSensorData.Sensor[0] == 1)
+//			{
+//				DemoEyesMode = 0;
+//
+//				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
+//				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
+//
+//				RGBLeds_SetAllColors(LeftHead, White, LED_Blink_Slow);
+//				RGBLeds_SetAllColors(RightHead, White, LED_Blink_Slow);
+//			}
+//		}
+//
+//		// Update eyes on change
+//		if (DemoEyesMode != Demo_LedModeOld)
+//		{
+//			Update_Eyes(False);
+//		}
+//
+//		Demo_LedModeOld = DemoEyesMode;
+//	}
+//}
 
-		if ((HeadButtonOld == 0) && (HeadButton == 1))
-		{
-			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
-			RGBLeds_BlinkColor(RightHead, Blue, LED_Blink_Fast);
-
-			DemoEyesMode = 1;
-			HeadLed(True);
-		}
-
-		if ((HeadButtonOld == 1) && (HeadButton == 0))
-		{
-			RGBLeds_SetAllColors(LeftHead, Blue, LED_Blink_VeryFast);
-			RGBLeds_SetAllColors(RightHead, Blue, LED_Blink_VeryFast);
-
-			DemoEyesMode = 0;
-			HeadLed(False);
-
-			Head_Pan_Home();
-			Head_Tilt_Home();
-		}
-
-		if (TouchSensor_AnyPressed())
-		{
-			// Top right of head
-			if (TouchSensorData.Sensor[4] == 1)
-			{
-				DemoEyesMode = 2;
-
-				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
-				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
-
-				RGBLeds_SetAllColors(LeftHead, Red, LED_Blink_Fast);
-				RGBLeds_SetAllColors(RightHead, Red, LED_Blink_Fast);
-
-			}
-
-			// Top left of head
-			if (TouchSensorData.Sensor[0] == 1)
-			{
-				DemoEyesMode = 0;
-
-				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
-				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
-
-				RGBLeds_SetAllColors(LeftHead, White, LED_Blink_Slow);
-				RGBLeds_SetAllColors(RightHead, White, LED_Blink_Slow);
-			}
-		}
-
-		// Update eyes on change
-		if (DemoEyesMode != Demo_LedModeOld)
-		{
-			Update_Eyes(False);
-		}
-
-		Demo_LedModeOld = DemoEyesMode;
-	}
-}
-
-void Update_Eyes(int BlinkEye)
-{
-	if (DemoEyesMode == 0)
-	{
-		if (BlinkEye == True)
-		{
-			// Change eye to normal eyes
-			SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-			SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
-		}
-		else
-		{
-			// Change eye to normal eyes
-			SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-			SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
-		}
-	}
-
-	if (DemoEyesMode == 1)
-	{
-		if (BlinkEye == True)
-		{
-			SSD1305_writeDisplay(&left_eye, &nobleo_logo);
-			SSD1305_writeDisplay(&right_eye, &sara_logo);
-
-			HeadLed(False);
-		}
-		else
-		{
-			SSD1305_writeDisplay(&left_eye, &sara_logo);
-			SSD1305_writeDisplay(&right_eye, &nobleo_logo);
-
-			HeadLed(False);
-		}
-	}
-
-	if (DemoEyesMode == 2)
-	{
-		if (BlinkEye == True)
-		{
-			SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
-			SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
-		}
-		else
-		{
-			SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
-			SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
-		}
-	}
-}
+//void Update_Eyes(int BlinkEye)
+//{
+//	if (DemoEyesMode == 0)
+//	{
+//		if (BlinkEye == True)
+//		{
+//			// Change eye to normal eyes
+//			SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
+//			SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+//		}
+//		else
+//		{
+//			// Change eye to normal eyes
+//			SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
+//			SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
+//		}
+//	}
+//
+//	if (DemoEyesMode == 1)
+//	{
+//		if (BlinkEye == True)
+//		{
+//			SSD1305_writeDisplay(&left_eye, &nobleo_logo);
+//			SSD1305_writeDisplay(&right_eye, &sara_logo);
+//
+//			HeadLed(False);
+//		}
+//		else
+//		{
+//			SSD1305_writeDisplay(&left_eye, &sara_logo);
+//			SSD1305_writeDisplay(&right_eye, &nobleo_logo);
+//
+//			HeadLed(False);
+//		}
+//	}
+//
+//	if (DemoEyesMode == 2)
+//	{
+//		if (BlinkEye == True)
+//		{
+//			SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
+//			SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
+//		}
+//		else
+//		{
+//			SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
+//			SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
+//		}
+//	}
+//}
 
 void setPanMotor(int8_t setSpeed)
 {
@@ -395,30 +403,12 @@ int main(void)
 	TIM2->CCR2 = 0;
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
-
-
 	System_Initialize_Start();
 	System_Initialze_Update();
 
 	Protocol_0x55_Init();
 
-	//------------------------------------------------------------------------------------
-	//	HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-	//	__HAL_TIM_SET_COUNTER(&htim1, 0);
-	//	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-	//	__HAL_TIM_SET_COUNTER(&htim3, 0);
-	//	HAL_GPIO_WritePin(PanEnable_GPIO_Port, PanEnable_Pin, 1);
-	//	HAL_GPIO_WritePin(PanDirection_GPIO_Port, PanDirection_Pin, 1);
-	//------------------------------------------------------------------------------------
-
-//	HAL_Delay(1);
-//	Generic_Head_HAL_Brake(False, HeadPan);
-//	GenericHead_HAL_Direction(Move_Pos, HeadPan);
-//	Generic_Head_HAL_PWM(70, HeadPan);
-//	HAL_Delay(1000);
-//	Generic_Head_HAL_PWM(100, HeadPan);
-
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
