@@ -124,10 +124,10 @@ void System_Initialize_Start()
 	Encoders_Init(&htim1, &htim3);
 
 	Head_Pan_Init(&htim8);
-//	Head_Pan_Home();
+	Head_Pan_Home();
 
 	Head_Tilt_Init(&htim8);
-//	Head_Tilt_Home();
+	Head_Tilt_Home();
 
 	System_Ready = True;
 
@@ -155,15 +155,15 @@ void System_Initialize_Start()
 
 void System_Initialze_Update()
 {
-//	if (HeadPan_State.HomeState != Homed)
-//	{
-//		return;
-//	}
-//
-//	if (HeadTilt_State.HomeState != Homed)
-//	{
-//		return;
-//	}
+	if (HeadPan_State.HomeState != Homed)
+	{
+		return;
+	}
+
+	if (HeadTilt_State.HomeState != Homed)
+	{
+		return;
+	}
 
 	System_Ready = True;
 }

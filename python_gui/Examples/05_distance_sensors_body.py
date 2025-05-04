@@ -11,17 +11,17 @@ def main():
 
     try:
         while True:
-            distance_warning = robot.body.distancesensors.sensor_warning()
-            distance_collision = robot.body.distancesensors.sensor_collision()
-            cliff_warning = robot.body.distancesensors.sensor_cliffwarning()
+            distance_warning = robot.body.distance_sensors.sensor_warning()
+            distance_collision = robot.body.distance_sensors.sensor_collision()
+            cliff_warning = robot.body.distance_sensors.sensor_cliffwarning()
 
             if distance_collision:
                 print("Distance sensors: Collision ahead!")
-                robot.body.distancesensors.print_values()
+                robot.body.distance_sensors.print_values()
             else:
                 if distance_warning:
                     print("Distance sensors: Getting close!")
-                    robot.body.distancesensors.print_values()
+                    robot.body.distance_sensors.print_values()
 
             #------------------------------------------------------------------------
             # Safety measure. If cliff_warning == True, the programm will stop.

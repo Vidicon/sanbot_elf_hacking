@@ -15,7 +15,7 @@ class MotionSensors:
         self.abs_angle = 0.0
         self.valid_data = False
         self.error_counter = 0
-
+        self.callback = None
 
     def new_data(self, data):
         try:
@@ -33,6 +33,10 @@ class MotionSensors:
 
             self.valid_data = True
             self.error_counter = 0
+
+            if self.callback is not None:
+                self.callback()
+
         except Exception as e:
             print(f"Motion sensors data processing error: {e}")
 
@@ -40,5 +44,15 @@ class MotionSensors:
             if self.error_counter > 3:
                 self.valid_data = False
 
+
+
     def print_values(self):
         print("Motion     :", [int(value) for value in self.sensors])
+
+
+    def get_all_values(self):
+        return self.sensors
+
+    def set_callback(self, callback):
+        self.callback = callback
+        return

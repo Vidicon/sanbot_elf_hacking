@@ -32,6 +32,8 @@ class Battery:
         self.oldstate = Battery.ERROR
         self.Voltage = 0
         self.Current = 0
+        self.callback = None
+
 
     def print_state(self):
         txt = "Battery    : Voltage {} mV, Current {} mA, State = ".format(
@@ -91,5 +93,21 @@ class Battery:
             if not self.check_not_empty():
                 print("WARNING : Battery is almost empty, recharge first.")
 
+            if self.callback is not None:
+                self.callback()
+
         except:
             print("Battery data processing error")
+    
+    def get_batterystate(self):
+        return self.batterystate
+        
+    def get_voltage(self):
+        return self.Voltage
+
+    def get_current(self):
+        return self.Current
+
+    def set_callback(self, callback):
+        self.callback = callback
+        return

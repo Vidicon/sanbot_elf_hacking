@@ -115,9 +115,9 @@ class SaraRobot:
         if response == (
             SaraRobotCommands.CMD_GET_DISTANCESENSORS | SaraRobotCommands.RESP_BIT
         ):
-            self.body.distancesensors.new_data(data)
+            self.body.distance_sensors.new_data(data)
             if self.logging:
-                self.body.distancesensors.print_values()
+                self.body.distance_sensors.print_values()
             return
 
         if response == (SaraRobotCommands.CMD_GET_COMPASS | SaraRobotCommands.RESP_BIT):
@@ -141,9 +141,9 @@ class SaraRobot:
         if response == (
             SaraRobotCommands.CMD_GET_MOTIONSENSORS | SaraRobotCommands.RESP_BIT
         ):
-            self.body.motionsensors.new_data(data)
+            self.body.motion_sensors.new_data(data)
             if self.logging:
-                self.body.motionsensors.print_values()
+                self.body.motion_sensors.print_values()
             return
 
         # If not decoded, print the data
@@ -160,7 +160,7 @@ class Body:
 
         print("Adding " + self.instance_name)
 
-        self.distancesensors = DistanceSensors(self.bridge_manager, 
+        self.distance_sensors = DistanceSensors(self.bridge_manager, 
                                                 parent_name=self.instance_name, 
                                                 instance_ENUM=SaraRobotPartNames.BODYDISTANCESENSORS)
         
@@ -176,7 +176,7 @@ class Body:
                                                 parent_name=self.instance_name, 
                                                 instance_ENUM=SaraRobotPartNames.BATTERY)
 
-        self.motionsensors = MotionSensors(self.bridge_manager, 
+        self.motion_sensors = MotionSensors(self.bridge_manager, 
                                                 parent_name=self.instance_name, 
                                                 instance_ENUM=SaraRobotPartNames.MOTIONSENSORS)
     

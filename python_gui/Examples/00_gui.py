@@ -464,7 +464,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Arm Up",
-            command=lambda: robot.left_arm.motor.move(position=RobotArmPositions.UP),
+            command=lambda: self.robot.left_arm.motor.move(position=RobotArmPositions.UP),
         )
         self.button_LeftArm_Up.grid(row=row_count, column=col_count, sticky="w")
 
@@ -475,7 +475,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Arm Forward",
-            command=lambda: robot.left_arm.motor.move(
+            command=lambda: self.robot.left_arm.motor.move(
                 position=RobotArmPositions.FORWARD
             ),
         )
@@ -488,7 +488,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Left Arm Down",
-            command=lambda: robot.left_arm.motor.move(position=RobotArmPositions.DOWN),
+            command=lambda: self.robot.left_arm.motor.move(position=RobotArmPositions.DOWN),
         )
         self.button_LeftArm_Down.grid(row=row_count, column=col_count, sticky="w")
 
@@ -500,7 +500,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Arm Up",
-            command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.UP),
+            command=lambda: self.robot.right_arm.motor.move(position=RobotArmPositions.UP),
         )
         self.button_RightArm_Up.grid(row=row_count, column=col_count, sticky="w")
 
@@ -511,7 +511,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Arm Forward",
-            command=lambda: robot.right_arm.motor.move(
+            command=lambda: self.robot.right_arm.motor.move(
                 position=RobotArmPositions.FORWARD
             ),
         )
@@ -524,7 +524,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Right Arm Down",
-            command=lambda: robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
+            command=lambda: self.robot.right_arm.motor.move(position=RobotArmPositions.DOWN),
         )
         self.button_RightArm_Down.grid(row=row_count, column=col_count, sticky="w")
 
@@ -539,7 +539,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Up",
-            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_UP),
+            command=lambda: self.robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_UP),
         )
         self.button_Head_Up.grid(row=row_count, column=col_count, sticky="w")
 
@@ -550,7 +550,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Tilt Mid",
-            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_MID),
+            command=lambda: self.robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_MID),
         )
         self.button_Head_Mid.grid(row=row_count, column=col_count, sticky="w")
 
@@ -561,7 +561,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Tilt Down",
-            command=lambda: robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_DOWN),
+            command=lambda: self.robot.head.tilt_motor.move(position=RobotHeadPositions.TILT_DOWN),
         )
         self.button_Head_Down.grid(row=row_count, column=col_count, sticky="w")
 
@@ -572,7 +572,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Pan Left",
-            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_LEFT),
+            command=lambda: self.robot.head.pan_motor.move(position=RobotHeadPositions.PAN_LEFT),
         )
         self.button_Head_Left.grid(row=row_count, column=col_count, sticky="w")
 
@@ -583,7 +583,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Pan Mid",
-            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_MID),
+            command=lambda: self.robot.head.pan_motor.move(position=RobotHeadPositions.PAN_MID),
         )
         self.button_Head_Mid.grid(row=row_count, column=col_count, sticky="w")
 
@@ -594,7 +594,7 @@ class SaraGUI:
             height=1,
             width=button_width,
             text="Head Pan Right",
-            command=lambda: robot.head.pan_motor.move(position=RobotHeadPositions.PAN_RIGHT),
+            command=lambda: self.robot.head.pan_motor.move(position=RobotHeadPositions.PAN_RIGHT),
         )
         self.button_Head_Right.grid(row=row_count, column=col_count, sticky="w")
 
@@ -605,7 +605,7 @@ class SaraGUI:
         row_count = 0
 
         self.distance_sensor_labels = []
-        for i in range(12):
+        for i in range(13):
             label = tk.Button(
                 self.frame, height=1, width=button_width, text=f"Distance {i+1}"
             )
@@ -621,9 +621,11 @@ class SaraGUI:
         row_count = 0
 
         self.motion_sensor_labels = []
+        labels = ["Motion Front", "Motion Back"]
+
         for i in range(2):
             label = tk.Button(
-                self.frame, height=1, width=button_width, text=f"Motion {i+1}"
+                self.frame, height=1, width=button_width, text=labels[i]
             )
 
             label.grid(row=row_count, column=col_count, sticky="w")
@@ -674,10 +676,79 @@ class SaraGUI:
     def run(self):
         self.root.mainloop()
 
+    def distance_sensors_callback(self):
+        distances = self.robot.body.distance_sensors.get_all_values()
+        
+        for i in range(11):
+            self.SetDistanceButtonBGColor(self.distance_sensor_labels[i], distances[i])
+            self.distance_sensor_labels[i].config(text=f"{distances[i]:.0f}")
+
+        # cliff sensors
+        i = 11
+        self.distance_sensor_labels[i].config(text=f"{distances[i]:.0f}")
+        if distances[i] > 25000:
+           self.distance_sensor_labels[i].config(bg="red")
+        else:
+            self.distance_sensor_labels[i].config(bg="lime")            
+
+        i = 12
+        self.distance_sensor_labels[i].config(text=f"{distances[i]:.0f}")
+        if distances[i] > 25000:
+           self.distance_sensor_labels[i].config(bg="red")
+        else:
+            self.distance_sensor_labels[i].config(bg="lime")            
+
+    def SetDistanceButtonBGColor(self, button, distance):
+        button.config(text=str(distance))
+
+        if distance < 15000:
+            button.config(bg="red")
+        elif distance < 30000:
+            button.config(bg="yellow")
+        else:
+            button.config(bg="lime")            
+
+    def motion_sensors_callback(self):
+        motions = self.robot.body.motion_sensors.get_all_values()
+        for i in range(2):
+            if motions[i] > 0:
+                self.motion_sensor_labels[i].config(bg="lime")
+            else:
+                self.motion_sensor_labels[i].config(bg=self.frame.cget("bg"))
+
+    def battery_callback(self):
+        battery_state = self.robot.body.battery.get_batterystate()
+
+        if battery_state == Battery.EMPTY:
+            self.battery_labels[0].config(bg="red", text="Empty")
+
+        if battery_state == Battery.ERROR:
+            self.battery_labels[0].config(bg="red", text="Error")
+
+        if battery_state == Battery.DISCHARGE:
+            self.battery_labels[0].config(bg="yellow", text="Discharging")
+
+        if battery_state == Battery.CHARGE:
+            self.battery_labels[0].config(bg="lime", text="Charging")
+
+
+        battery_voltage = self.robot.body.battery.get_voltage()
+        self.battery_labels[1].config(text=f"{battery_voltage:.0f} mV")
+
+        battery_current = self.robot.body.battery.get_current()
+        self.battery_labels[2].config(text=f"{battery_current:.0f} mA")
+
+        return
+
 
 def main():
-    robot = SaraRobot(logging=True)
+    robot = SaraRobot(logging=False)
     gui = SaraGUI(robot)
+
+    robot.body.distance_sensors.set_callback(gui.distance_sensors_callback)
+    robot.body.motion_sensors.set_callback(gui.motion_sensors_callback)
+    robot.body.battery.set_callback(gui.battery_callback)
+
     gui.run()
 
 

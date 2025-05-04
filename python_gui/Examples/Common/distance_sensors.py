@@ -48,6 +48,7 @@ class DistanceSensors:
         self.valid_data = False
         self.error_counter = 0
         self.rx_counter = 0
+        self.callback = None
 
 
     def new_data(self, data):
@@ -84,6 +85,9 @@ class DistanceSensors:
 
         if self.sensors[12] >= 40000:
             print("Right cliff sensor too large value!")
+
+        if self.callback is not None:
+            self.callback()
 
     def sensor_warning(self, threshold=30000):
 
@@ -151,3 +155,7 @@ class DistanceSensors:
             return False
         else:
             return (self.sensors[6] < threshold) or (self.sensors[7] < threshold)
+
+    def set_callback(self, callback):
+        self.callback = callback
+        return
