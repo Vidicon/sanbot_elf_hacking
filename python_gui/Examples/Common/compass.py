@@ -27,6 +27,7 @@ class Compass:
         self.target_rotation = 0
         self.rotation_tmo_counter = 0
         self.rotation_tmo_threshold = 100
+        self.callback = None
 
 
     def new_data(self, data):
@@ -49,6 +50,9 @@ class Compass:
             self.abs_angle = float(compass_angle)
             self.valid_data = True
             self.error_counter = 0
+
+            if self.callback is not None:
+                self.callback()            
 
         except:
             print("Compass data processing error")
@@ -104,6 +108,10 @@ class Compass:
             rotation_tmo_threshold,
         )
 
+        if (wait_for_finish == False) or (rotation_tmo_threshold == 0):
+            print("\n")
+            return
+
         # Wait for the response message or a timeout of 20 seconds
         while self.rotate_ready == False:
             assert self.rotation_tmo_counter < (
@@ -139,4 +147,8 @@ class Compass:
         except:
             print(self.full_bodypart_name + " data processing error")
 
+        return
+    
+    def set_callback(self, callback):
+        self.callback = callback
         return

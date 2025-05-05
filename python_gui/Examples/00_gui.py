@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import font
 import time
+import math
 
 from Common.sara_library import *
 from Common.sara_common import *
@@ -647,27 +648,76 @@ class SaraGUI:
             self.battery_labels.append(label)
             row_count += 1
         # --------------------------------------------------------------------------------------
-        # Compass
+        # Compass rotations
         # --------------------------------------------------------------------------------------
         row_count += 1
 
-        self.compass_labels = []
-        for i in range(1):
-            label = tk.Button(
-                self.frame, height=1, width=button_width, text=f"Compass {i+1}"
-            )
-
-            label.grid(row=row_count, column=col_count, sticky="w")
-            self.compass_labels.append(label)
-            row_count += 1
-
-        # --------------------------------------------------------------------------------------
-        # streaming data area
-        # --------------------------------------------------------------------------------------
-        self.stream_area = scrolledtext.ScrolledText(
-            self.frame, width=150, height=10, wrap="word"
+        self.button_Rotate_North = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="North",
+            command=lambda: self.robot.body.compass.rotate_absolute(0, wait_for_finish=False),
         )
-        self.stream_area.grid(row=20, column=0, columnspan=10, sticky="w")
+        self.button_Rotate_North.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Rotate_East = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="East",
+            command=lambda: self.robot.body.compass.rotate_absolute(90, wait_for_finish=False),
+        )
+        self.button_Rotate_East.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Rotate_South = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="South",
+            command=lambda: self.robot.body.compass.rotate_absolute(180, wait_for_finish=False),
+        )
+        self.button_Rotate_South.grid(row=row_count, column=col_count, sticky="w")
+        
+        row_count += 1
+
+        self.button_Rotate_West = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="West",
+            command=lambda: self.robot.body.compass.rotate_absolute(270, wait_for_finish=False),
+        )
+        self.button_Rotate_West.grid(row=row_count, column=col_count, sticky="w")
+        
+        # --------------------------------------------------------------------------------------
+        # Canvas for the rotating arrow
+        # --------------------------------------------------------------------------------------
+        col_count += 1
+        row_count = 0
+
+        canvas_width = 100
+        canvas_height = 100
+        self.canvas = tk.Canvas(self.frame, width=canvas_width, height=canvas_height, bg="white")
+        self.canvas.grid(row=row_count, rowspan=4, column=col_count, sticky="nsew", padx=10, pady=10)  # Center the canvas in the column
+
+        self.arrow_center = (canvas_width // 2, canvas_height // 2)
+
+        row_count = 4
+        self.compass_button = tk.Button(self.frame, height=1, width=button_width, text="inf")
+        self.compass_button.grid(row=row_count, column=col_count, sticky="w")
+
+        # # --------------------------------------------------------------------------------------
+        # # streaming data area
+        # # --------------------------------------------------------------------------------------
+        # self.stream_area = scrolledtext.ScrolledText(
+        #     self.frame, width=150, height=10, wrap="word"
+        # )
+        # self.stream_area.grid(row=20, column=0, columnspan=10, sticky="w")
 
     def on_closing(self):
         time.sleep(1)
@@ -739,7 +789,35 @@ class SaraGUI:
         self.battery_labels[2].config(text=f"{battery_current:.0f} mA")
 
         return
+    
+    def compass_callback(self): 
+        angle_degrees = self.robot.body.compass.read_abs_angle()   
 
+        # print(f"Compass: {angle_degrees:.0f} Degree") 
+        self.compass_button.config(text=f"{angle_degrees:.0f} Deg")
+
+        self.draw_arrow(angle_degrees + 90)
+        return
+    
+    # Draw the rotating arrow
+    def draw_arrow(self, angle):
+        self.canvas.delete("arrow")
+
+        x, y = (63, 50)
+        radians = math.radians(angle)
+        x_end = x - 30 * math.cos(radians)
+        y_end = y - 30 * math.sin(radians)  # Negative because canvas y-coordinates increase downwards
+        self.canvas.create_line(
+            x,
+            y,
+            x_end,
+            y_end,
+            arrow=tk.LAST,
+            fill="blue",
+            width=2,
+            tags="arrow",
+        )
+        return
 
 def main():
     robot = SaraRobot(logging=False)
@@ -748,6 +826,7 @@ def main():
     robot.body.distance_sensors.set_callback(gui.distance_sensors_callback)
     robot.body.motion_sensors.set_callback(gui.motion_sensors_callback)
     robot.body.battery.set_callback(gui.battery_callback)
+    robot.body.compass.set_callback(gui.compass_callback)
 
     gui.run()
 
