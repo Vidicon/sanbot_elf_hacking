@@ -96,6 +96,12 @@ class SaraRobot:
     # def my_receive_callback_head(self, data):
     #     return
     
+    def noodstop(self):
+        self.bridge_manager.cmd_Generic(
+            SaraRobotCommands.CMD_BODY_STOP, 0, 0, SaraRobotPartNames.BODY)
+        self.bridge_manager.cmd_Generic(
+            SaraRobotCommands.CMD_HEAD_STOP, 0, 0, SaraRobotPartNames.HEAD)
+
     def process_callback(self, data):
         response = data[1]
 

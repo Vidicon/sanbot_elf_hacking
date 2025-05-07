@@ -223,6 +223,10 @@ void Check_USB_Communication()
 			HeadLed(Protocol_0x55_GetData(3));
 		}
 
+		if (command == CMD_HEAD_STOP)
+		{
+			HeadStop();
+		}
 
 		Protocol_0x55_MarkProcessed();
 	}
@@ -257,12 +261,7 @@ void HeadButton_Update()
 	// Pressed
 	if ((Button[0] == 1) && (Button[1] == 0))
 	{
-		RGBLeds_SetAllColors(LeftHead, Red, LED_On);
-		RGBLeds_SetAllColors(RightHead, Red, LED_On);
-
-		// Abort any motion
-		HeadPan_State.MotionState = Motion_Idle;
-		HeadTilt_State.MotionState = Motion_Idle;
+		HeadStop();
 
 		TxBuffer[0] = HEAD_BUTTON_PRESSED;
 		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
@@ -274,6 +273,16 @@ void HeadButton_Update()
 		TxBuffer[0] = HEAD_BUTTON_RELEASED;
 		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
 	}
+}
+
+void HeadStop()
+{
+	RGBLeds_SetAllColors(LeftHead, Red, LED_On);
+	RGBLeds_SetAllColors(RightHead, Red, LED_On);
+
+	// Abort any motion
+	HeadPan_State.MotionState = Motion_Idle;
+	HeadTilt_State.MotionState = Motion_Idle;
 }
 
 void setPanMotor(int8_t setSpeed)

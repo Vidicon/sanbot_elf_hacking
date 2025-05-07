@@ -22,6 +22,7 @@ class SaraRobotCommands:
     CMD_BASE_BRAKE = 0x34
     CMD_LA_HOME = 0x35
     CMD_RA_HOME = 0x36
+    CMD_BODY_STOP = 0x37
     CMD_BODY_LAST = 0x3F
 
     CMD_VERSION_HEAD = 0x40
@@ -35,6 +36,7 @@ class SaraRobotCommands:
     CMD_HEAD_PAN_HOME = 0x48
     CMD_HEAD_EYES = 0x49
     CMD_HEAD_LAMP = 0x4A
+    CMD_HEAD_STOP = 0x4B
     CMD_HEAD_LAST = 0x4F
 
 

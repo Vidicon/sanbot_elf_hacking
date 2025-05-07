@@ -56,7 +56,7 @@ class SaraGUI:
             height=4,  # Adjust the height to span multiple rows
             width=button_width,
             text="STOP",
-            # bg="lightcoral",  # Set background color to light red
+            command=lambda: self.robot.noodstop()
         )
         self.button_stop.grid(
             row=row_count, column=col_count, rowspan=4, sticky="w"
