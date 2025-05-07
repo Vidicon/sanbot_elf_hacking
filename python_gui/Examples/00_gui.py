@@ -285,10 +285,35 @@ class SaraGUI:
             width=button_width,
             text="Right Off",
             command=lambda: self.robot.right_arm.led.setcolor(
-                color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF
-            ),
+                color=ColorLed.NOCOLOR, blink=ColorLed.LED_OFF)
         )
         self.button_RA_Off.grid(row=row_count, column=col_count, sticky="w")
+
+        # --------------------------------------------------------------------------------------
+        # Head lamp
+        # --------------------------------------------------------------------------------------
+        row_count += 1
+        row_count += 1
+
+        self.button_Lamp_On = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Lamp On",
+            command=lambda: robot.head.lamp.set_lamp(lamp_on=True)
+        )
+        self.button_Lamp_On.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Lamp_Off = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Lamp Off",
+            command=lambda: robot.head.lamp.set_lamp(lamp_on=False)
+        )
+        self.button_Lamp_Off.grid(row=row_count, column=col_count, sticky="w")
 
         # --------------------------------------------------------------------------------------
         # Base

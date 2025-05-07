@@ -42,6 +42,7 @@
 #define CMD_HEAD_TILT_HOME 		0x47
 #define CMD_HEAD_PAN_HOME 		0x48
 #define CMD_HEAD_EYES 			0x49
+#define CMD_HEAD_LAMP 			0x4A
 
 #define CMD_HEAD_LAST 			0x4F
 

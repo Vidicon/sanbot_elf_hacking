@@ -34,6 +34,7 @@ class SaraRobotCommands:
     CMD_HEAD_TILT_HOME = 0x47
     CMD_HEAD_PAN_HOME = 0x48
     CMD_HEAD_EYES = 0x49
+    CMD_HEAD_LAMP = 0x4A
     CMD_HEAD_LAST = 0x4F
 
 
@@ -64,6 +65,7 @@ body_parts_names = [
     "compass",
     "battery",
     "eyes",
+    "lamp",
 ]   
 
 class SaraRobotPartNames:
@@ -93,6 +95,7 @@ class SaraRobotPartNames:
     COMPASS = 20
     BATTERY = 21
     HEAD_EYES = 22
+    HEAD_LAMP = 23
 
 class RobotArmPositions:
     UP = 450

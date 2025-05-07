@@ -214,6 +214,12 @@ void Check_USB_Communication()
 			Eyes_Select(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
 		}
 
+		if (command == CMD_HEAD_LAMP)
+		{
+			HeadLed(Protocol_0x55_GetData(3));
+		}
+
+
 		Protocol_0x55_MarkProcessed();
 	}
 }
