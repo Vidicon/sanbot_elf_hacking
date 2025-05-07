@@ -48,6 +48,10 @@
 
 #define RESP_BIT 				0x80
 
+// Commands to body MCU
+#define HEAD_BUTTON_PRESSED		0x01
+#define HEAD_BUTTON_RELEASED	0x02
+
 
 struct PROTOCOL_0X55_Data_Type {
 			uint8_t FIFO_Data[FIFO_SIZE+1];

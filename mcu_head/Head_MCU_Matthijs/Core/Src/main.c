@@ -64,6 +64,8 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim8;
 
+UART_HandleTypeDef huart4;
+
 /* USER CODE BEGIN PV */
 int SelfTestTimer = 0;
 
@@ -90,8 +92,9 @@ int SlowCounter = 0;
 
 int System_Ready = False;
 
-int Demo_LedModeOld = 0;
-int DemoEyesMode = 0;
+int Button[2];
+
+char TxBuffer[10];
 
 OLED_HandleTypeDef left_eye;
 OLED_HandleTypeDef right_eye;
@@ -108,6 +111,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -237,127 +241,40 @@ void HeadLed(int LedOn)
 }
 
 
-int ReadHeadButton()
+int HeadButton_Read()
 {
 	return (HAL_GPIO_ReadPin(HeadTopButton_GPIO_Port, HeadTopButton_Pin) == GPIO_PIN_RESET);
 }
 
-//void RunDemoProgram1()
-//{
-//	if (System_Ready == True)
-//	{
-//		HeadButtonOld = HeadButton;
-//		HeadButton = ReadHeadButton();
-//
-//		if ((HeadButtonOld == 0) && (HeadButton == 1))
-//		{
-//			RGBLeds_BlinkColor(LeftHead, Red, LED_Blink_Slow);
-//			RGBLeds_BlinkColor(RightHead, Blue, LED_Blink_Fast);
-//
-//			DemoEyesMode = 1;
-//			HeadLed(True);
-//		}
-//
-//		if ((HeadButtonOld == 1) && (HeadButton == 0))
-//		{
-//			RGBLeds_SetAllColors(LeftHead, Blue, LED_Blink_VeryFast);
-//			RGBLeds_SetAllColors(RightHead, Blue, LED_Blink_VeryFast);
-//
-//			DemoEyesMode = 0;
-//			HeadLed(False);
-//
-//			Head_Pan_Home();
-//			Head_Tilt_Home();
-//		}
-//
-//		if (TouchSensor_AnyPressed())
-//		{
-//			// Top right of head
-//			if (TouchSensorData.Sensor[4] == 1)
-//			{
-//				DemoEyesMode = 2;
-//
-//				Generic_Head_Position_Setpoint(HeadPan, 2, 128);
-//				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
-//
-//				RGBLeds_SetAllColors(LeftHead, Red, LED_Blink_Fast);
-//				RGBLeds_SetAllColors(RightHead, Red, LED_Blink_Fast);
-//
-//			}
-//
-//			// Top left of head
-//			if (TouchSensorData.Sensor[0] == 1)
-//			{
-//				DemoEyesMode = 0;
-//
-//				Generic_Head_Position_Setpoint(HeadPan, 1, 0);
-//				Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
-//
-//				RGBLeds_SetAllColors(LeftHead, White, LED_Blink_Slow);
-//				RGBLeds_SetAllColors(RightHead, White, LED_Blink_Slow);
-//			}
-//		}
-//
-//		// Update eyes on change
-//		if (DemoEyesMode != Demo_LedModeOld)
-//		{
-//			Update_Eyes(False);
-//		}
-//
-//		Demo_LedModeOld = DemoEyesMode;
-//	}
-//}
 
-//void Update_Eyes(int BlinkEye)
-//{
-//	if (DemoEyesMode == 0)
-//	{
-//		if (BlinkEye == True)
-//		{
-//			// Change eye to normal eyes
-//			SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-//			SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
-//		}
-//		else
-//		{
-//			// Change eye to normal eyes
-//			SSD1305_writeDisplay(&left_eye, &default_left_eye_open);
-//			SSD1305_writeDisplay(&right_eye, &default_right_eye_open);
-//		}
-//	}
-//
-//	if (DemoEyesMode == 1)
-//	{
-//		if (BlinkEye == True)
-//		{
-//			SSD1305_writeDisplay(&left_eye, &nobleo_logo);
-//			SSD1305_writeDisplay(&right_eye, &sara_logo);
-//
-//			HeadLed(False);
-//		}
-//		else
-//		{
-//			SSD1305_writeDisplay(&left_eye, &sara_logo);
-//			SSD1305_writeDisplay(&right_eye, &nobleo_logo);
-//
-//			HeadLed(False);
-//		}
-//	}
-//
-//	if (DemoEyesMode == 2)
-//	{
-//		if (BlinkEye == True)
-//		{
-//			SSD1305_writeDisplay(&left_eye, &fire_left_eye_low);
-//			SSD1305_writeDisplay(&right_eye, &fire_right_eye_low);
-//		}
-//		else
-//		{
-//			SSD1305_writeDisplay(&left_eye, &fire_left_eye_high);
-//			SSD1305_writeDisplay(&right_eye, &fire_right_eye_high);
-//		}
-//	}
-//}
+void HeadButton_Update()
+{
+	Button[1] = Button[0];
+	Button[0] = HeadButton_Read();
+
+	memset(TxBuffer, 0, 10);
+
+	// Pressed
+	if ((Button[0] == 1) && (Button[1] == 0))
+	{
+		RGBLeds_SetAllColors(LeftHead, Red, LED_On);
+		RGBLeds_SetAllColors(RightHead, Red, LED_On);
+
+		// Abort any motion
+		HeadPan_State.MotionState = Motion_Idle;
+		HeadTilt_State.MotionState = Motion_Idle;
+
+		TxBuffer[0] = HEAD_BUTTON_PRESSED;
+		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
+	}
+
+	// Released
+	if ((Button[0] == 0) && (Button[1] == 1))
+	{
+		TxBuffer[0] = HEAD_BUTTON_RELEASED;
+		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
+	}
+}
 
 void setPanMotor(int8_t setSpeed)
 {
@@ -404,6 +321,7 @@ int main(void)
   MX_TIM8_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
 	TIM2->CCR2 = 0;
@@ -414,42 +332,39 @@ int main(void)
 
 	Protocol_0x55_Init();
 
-	/* USER CODE END 2 */
+  /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  if (Update_25Hz)
-	  {
-		  Update_25Hz = 0;
+	while (1)
+	{
+		if (Update_25Hz)
+		{
+			Update_25Hz = 0;
+		}
+
+		if (Update_20Hz)
+		{
+			Update_20Hz = 0;
+			System_Initialze_Update();
+
+			Head_Update20Hz(Encoders_GetPointer());
+		}
+
+		if (Update_10Hz)
+		{
+			Update_10Hz = 0;
+
+			RGBLeds_Update10Hz();
+			Encoders_Update();
+			TouchSensors_Update();
+			HeadButton_Update();
 	  }
 
-	  if (Update_20Hz)
-	  {
-		  Update_20Hz = 0;
-		  System_Initialze_Update();
-
-		  Head_Update20Hz(Encoders_GetPointer());
-	  }
-
-	  if (Update_10Hz)
-	  {
-		  Update_10Hz = 0;
-
-		  RGBLeds_Update10Hz();
-		  Encoders_Update();
-		  TouchSensors_Update();
-
-#ifdef DEMO1
-		  RunDemoProgram1();
-#endif
-	  }
-
-	  if (Update_5Hz)
-	  {
-		  Update_5Hz = 0;
-	  }
+		if (Update_5Hz)
+		{
+			Update_5Hz = 0;
+		}
 
 	  if (Update_2Hz)
 	  {
@@ -473,47 +388,12 @@ int main(void)
 		Update_1Hz = 0;
 
 		SlowCounter += 1;
-
-#ifdef DEMO2
-		if (SlowCounter % 10 == 0)
-		{
-//			Generic_Head_Position_Setpoint(HeadPan, 2, 128);
-//			Generic_Head_Position_Setpoint(HeadTilt, 1, 128);
-
-			RGBLeds_SetAllColors(LeftHead, Red, LED_On);
-			RGBLeds_SetAllColors(RightHead, Red, LED_On);
-
-			DemoEyesMode = 0;
-		}
-
-		if (SlowCounter % 20 == 0)
-		{
-//			Generic_Head_Position_Setpoint(HeadPan, 1, 64);
-//			Generic_Head_Position_Setpoint(HeadTilt, 0, 128);
-
-			RGBLeds_SetAllColors(LeftHead, White, LED_On);
-			RGBLeds_SetAllColors(RightHead, White, LED_On);
-
-			DemoEyesMode = 1;
-		}
-
-		if (SlowCounter % 30 == 0)
-		{
-//			Generic_Head_Position_Setpoint(HeadPan, 0, 100);
-//			Generic_Head_Position_Setpoint(HeadTilt, 2, 0);
-
-			RGBLeds_SetAllColors(LeftHead, Green, LED_On);
-			RGBLeds_SetAllColors(RightHead, Green, LED_On);
-
-			DemoEyesMode = 2;
-		}
-#endif
 	  }
 
 	  //--------------------------------------------------------
 	  // Limit the check for new data frequency
 	  // When run at full speed (no delay), the USB interrupt and the check will lead
-	  // to lost bytes. Dont know why and dont know how to solve. But delay works fine.
+	  // to lost bytes. Don't know why and don't know how to solve. But delay works fine.
 	  //--------------------------------------------------------
 	  Check_USB_Communication();
 	  HAL_Delay(1);
@@ -899,6 +779,39 @@ static void MX_TIM8_Init(void)
 
   /* USER CODE END TIM8_Init 2 */
   HAL_TIM_MspPostInit(&htim8);
+
+}
+
+/**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
 
 }
 
