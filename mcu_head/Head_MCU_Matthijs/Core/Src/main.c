@@ -366,31 +366,34 @@ int main(void)
 
 			RGBLeds_Update10Hz();
 			Encoders_Update();
-			TouchSensors_Update();
 			HeadButton_Update();
 	  }
 
 		if (Update_5Hz)
 		{
 			Update_5Hz = 0;
+
+			TouchSensors_Update();
+			if (TouchSensor_AnyChanged()) { SendTouchSensors(TouchSensors_GetPointer());}
 		}
 
-	  if (Update_2Hz)
-	  {
-		  Update_2Hz = 0;
+		if (Update_2Hz)
+		{
+			Update_2Hz = 0;
 
-		  if (Counter_2Hz == 0)
-		  {
+
+			if (Counter_2Hz == 0)
+			{
 			  Update_Eyes(False);
-		  }
+			}
 
-		  if (Counter_2Hz == 5)
-		  {
+			if (Counter_2Hz == 5)
+			{
 			  Update_Eyes(True);
-		  }
+			}
 
-		  Counter_2Hz = (Counter_2Hz + 1) % 6;
-	  }
+			Counter_2Hz = (Counter_2Hz + 1) % 6;
+		}
 
 	if (Update_1Hz)
 	{

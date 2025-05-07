@@ -37,6 +37,7 @@ class SaraRobotCommands:
     CMD_HEAD_EYES = 0x49
     CMD_HEAD_LAMP = 0x4A
     CMD_HEAD_STOP = 0x4B
+    CMD_HEAD_TOUCHSENSORS = 0x4C
     CMD_HEAD_LAST = 0x4F
 
 
@@ -68,7 +69,8 @@ body_parts_names = [
     "battery",
     "eyes",
     "lamp",
-]   
+    "touch_sensors"
+]
 
 class SaraRobotPartNames:
     LEFT_ARM = 0
@@ -98,6 +100,7 @@ class SaraRobotPartNames:
     BATTERY = 21
     HEAD_EYES = 22
     HEAD_LAMP = 23
+    HEAD_TOUCHSENSORS = 24
 
 class RobotArmPositions:
     UP = 450

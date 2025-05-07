@@ -2,6 +2,7 @@
 #define _MYLIB_0x55_MESSAGES
 
 #include "stm32f1xx.h"
+#include "TouchSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -44,6 +45,7 @@
 #define CMD_HEAD_EYES 			0x49
 #define CMD_HEAD_LAMP 			0x4A
 #define CMD_HEAD_STOP 			0x4B
+#define CMD_HEAD_TOUCHSENSORS 	0x4C
 #define CMD_HEAD_LAST 			0x4F
 
 #define RESP_BIT 				0x80
@@ -91,5 +93,8 @@ signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
+
+void SendTouchSensors(struct TouchSensors_Data_Type *TouchData);
+void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData);
 
 #endif

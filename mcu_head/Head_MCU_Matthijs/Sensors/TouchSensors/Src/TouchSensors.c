@@ -13,14 +13,14 @@ struct TouchSensors_Data_Type TouchSensorData;
 //----------------------------------------------------------------
 // Return pointer instead of copy
 //----------------------------------------------------------------
-struct TouchSensors_Data_Type *TouchSensor_GetPointer()
+struct TouchSensors_Data_Type *TouchSensors_GetPointer()
 {
 	return &TouchSensorData;
 }
 
 void TouchSensors_Init()
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
 	{
 		TouchSensorData.Sensor[i] = False;
 		TouchSensorData.OldSensor[i] = False;
@@ -29,7 +29,7 @@ void TouchSensors_Init()
 
 void TouchSensors_Update()
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
 	{
 		TouchSensorData.OldSensor[i] = TouchSensorData.Sensor[i];
 	}
@@ -48,7 +48,7 @@ int TouchSensor_AnyPressed()
 {
 	int result = 0;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
 	{
 		if ((TouchSensorData.OldSensor[i] == 0) && (TouchSensorData.Sensor[i] == 1))
 		{
@@ -58,4 +58,20 @@ int TouchSensor_AnyPressed()
 
 	return result;
 }
+
+int TouchSensor_AnyChanged()
+{
+	int result = 0;
+
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
+	{
+		if (TouchSensorData.OldSensor[i] != TouchSensorData.Sensor[i])
+		{
+			result = 1;
+		}
+	}
+
+	return result;
+}
+
 

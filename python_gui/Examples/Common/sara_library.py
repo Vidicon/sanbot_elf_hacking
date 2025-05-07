@@ -11,6 +11,8 @@ from Common.motionsensors import MotionSensors
 from Common.robotarmmotor import RobotArmMotor
 from Common.eyes import HeadEyes
 from Common.head_lamp import HeadLamp
+from Common.touch_sensors import TouchSensors
+
 from Common.bridge_manager import BridgeManager
 from Common.sara_ports import SaraRobotPorts
 
@@ -153,6 +155,15 @@ class SaraRobot:
                 self.body.motion_sensors.print_values()
             return
 
+
+        if response == (
+            SaraRobotCommands.CMD_HEAD_TOUCHSENSORS | SaraRobotCommands.RESP_BIT
+        ):
+            self.head.touch_sensors.new_data(data)
+            if self.logging:
+                self.head.touch_sensors.print_values()
+            return
+
         # If not decoded, print the data
         hex_values = " ".join([format(x, "02X") for x in data])
         print("< NOT DECODED: " + hex_values)
@@ -246,6 +257,11 @@ class Head:
         self.lamp = HeadLamp(self.bridge_manager, 
                                         parent_name=self.instance_name, 
                                         instance_ENUM=SaraRobotPartNames.HEAD_LAMP
+                                        )
+
+        self.touch_sensors = TouchSensors(self.bridge_manager, 
+                                        parent_name=self.instance_name, 
+                                        instance_ENUM=SaraRobotPartNames.HEAD_TOUCHSENSORS
                                         )
 
     def getversion(self):
