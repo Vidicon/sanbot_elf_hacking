@@ -82,6 +82,8 @@ void Base_MotionStartWatchdog(int NewWatchdogTimeout);
 
 void Base_MotionUpdateWatchdog();
 
+void Base_Abort();
+
 #endif
 
 

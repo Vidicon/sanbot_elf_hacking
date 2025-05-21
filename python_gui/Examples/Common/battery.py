@@ -3,7 +3,6 @@ import platform
 import numpy as np
 from datetime import datetime
 
-from Common.mod_manager import ModManager
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
 from Common.sara_common import SaraRobotPartNames
@@ -21,18 +20,25 @@ class Battery:
     # Set SW limits to 3.25 * 4 = 13000 mV
     state_names = ["Empty", "Error", "Unknown", "Discharging", "Charging"]
 
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart)
-        print("Adding " + self.full_bodypart_name)
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
+        self.bridge_manager = bridge_manager
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.batterystate = Battery.ERROR
         self.oldstate = Battery.ERROR
         self.Voltage = 0
         self.Current = 0
+        self.callback = None
+
 
     def print_state(self):
-        txt = "Battery : Voltage {} mV, Current {} mA, State = ".format(self.Voltage, self.Current)
+        txt = "Battery    : Voltage {} mV, Current {} mA, State = ".format(
+            self.Voltage, self.Current
+        )
         txt += Battery.state_names[self.batterystate]
         print(txt)
 
@@ -87,5 +93,21 @@ class Battery:
             if not self.check_not_empty():
                 print("WARNING : Battery is almost empty, recharge first.")
 
+            if self.callback is not None:
+                self.callback()
+
         except:
             print("Battery data processing error")
+    
+    def get_batterystate(self):
+        return self.batterystate
+        
+    def get_voltage(self):
+        return self.Voltage
+
+    def get_current(self):
+        return self.Current
+
+    def set_callback(self, callback):
+        self.callback = callback
+        return

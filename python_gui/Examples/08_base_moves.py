@@ -3,9 +3,7 @@ from Common.sara_library import SaraRobot
 
 
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM0", "/dev/ttyACM1")
-
-    robot.getversion()
+    robot = SaraRobot(logging=False)
 
     # Wait for first valid data
     time.sleep(1.0)
@@ -23,7 +21,7 @@ def main():
     # In this case, send every 1 second.
     # ==================================================================================================
     # Do some XYR moves
-    robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
+    robot.base.motors.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
@@ -65,6 +63,7 @@ def main():
 
     # Turn back to an absolute angle
     robot.body.compass.rotate_absolute(abs_rotation_angle=160, wait_for_finish=True)
+    time.sleep(1.0)
 
     robot.base.brake(ApplyBrake=False)
     robot.stop()

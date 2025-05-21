@@ -235,3 +235,27 @@ signed char Protocol_0x55_GetData(int Index)
 	return PROTOCOL_0X55_RxData.FIFO_Data[Index];
 }
 
+//----------------------------------------------------------------
+// Touch sensors
+//----------------------------------------------------------------
+void SendTouchSensors(struct TouchSensors_Data_Type *TouchData)
+{
+	Protocol_0x55_SendTouchEvent((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], TouchData);
+}
+
+void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_HEAD_TOUCHSENSORS, RESPONSE_TRUE);
+
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
+	{
+		Buffer[3 + i] = (TouchData->Sensor[i]);
+	}
+
+	int payloadLen = NO_TOUCH_SENSORS;
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}
+

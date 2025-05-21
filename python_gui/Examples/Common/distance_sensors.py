@@ -2,7 +2,6 @@ import os
 import sys
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 
 from Common.sara_common import body_parts_names
 from Common.sara_common import bodypart_to_string
@@ -32,10 +31,13 @@ class DistanceSensors:
             [0.5 * hoek_mid, 1.5 * hoek_mid],
         ]
     )
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
+        self.bridge_manager = bridge_manager
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
 
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".distancesensors"
+        print("Adding " + self.instance_name)
 
         self.sensors = np.ones(13) * 65295
 
@@ -46,14 +48,16 @@ class DistanceSensors:
         self.valid_data = False
         self.error_counter = 0
         self.rx_counter = 0
+        self.callback = None
 
-        print("Adding " + self.full_bodypart_name)
 
     def new_data(self, data):
         try:
             datalength = data[2]
 
-            assert datalength == 26, self.full_bodypart_name + " data length not correct!"
+            assert datalength == 26, (
+                self.full_bodypart_name + " data length not correct!"
+            )
 
             for i in range(13):
                 new_byte_array = data[3 + i * 2 : -2]
@@ -73,14 +77,17 @@ class DistanceSensors:
             if self.error_counter > 3:
                 self.valid_data = False
 
-        #------------------------------------------------------------------------
+        # ------------------------------------------------------------------------
         # Cliff sensors
-        #------------------------------------------------------------------------
+        # ------------------------------------------------------------------------
         if self.sensors[11] >= 40000:
             print("Left cliff sensor too large value!")
 
         if self.sensors[12] >= 40000:
             print("Right cliff sensor too large value!")
+
+        if self.callback is not None:
+            self.callback()
 
     def sensor_warning(self, threshold=30000):
 
@@ -96,14 +103,13 @@ class DistanceSensors:
             return np.any(self.sensors[0:-2] < threshold)
 
     def sensor_cliffwarning(self):
-        print(self.sensors[-2:])
         if self.valid_data == False:
             return True
         else:
             return (self.sensors[11] >= 40000) or self.sensors[12] >= 40000
 
     def print_values(self):
-        print(self.sensors)
+        print("Distances  :", [int(value) for value in self.sensors])
 
     def get_all_values(self):
         return self.sensors
@@ -149,3 +155,7 @@ class DistanceSensors:
             return False
         else:
             return (self.sensors[6] < threshold) or (self.sensors[7] < threshold)
+
+    def set_callback(self, callback):
+        self.callback = callback
+        return

@@ -87,7 +87,7 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	// Head pan
 	//--------------------------------------------------------------------------------
 	int HeadPanLimitNeg = HAL_GPIO_ReadPin(PanNegSensor_GPIO_Port,PanNegSensor_Pin);
-	int HeadPanLimitPos = HAL_GPIO_ReadPin(PanPosSensor_GPIO_Port, PanPosSensor_Pin);
+//	int HeadPanLimitPos = HAL_GPIO_ReadPin(PanPosSensor_GPIO_Port, PanPosSensor_Pin);
 
 	int PanSpeed = 30;
 
@@ -169,7 +169,7 @@ void Head_Update20Hz(struct Encoders_Data_Type *EncoderData)
 	// Head Tilt
 	//--------------------------------------------------------------------------------
 	int HeadTiltLimitNeg = HAL_GPIO_ReadPin(TiltNegSensor_GPIO_Port, TiltNegSensor_Pin);
-	int HeadTiltLimitPos = HAL_GPIO_ReadPin(TiltPosSensor_GPIO_Port, TiltPosSensor_Pin);
+//	int HeadTiltLimitPos = HAL_GPIO_ReadPin(TiltPosSensor_GPIO_Port, TiltPosSensor_Pin);
 
 	int TiltSpeed = 20;
 

@@ -1,7 +1,6 @@
 import os
 import platform
 import numpy as np
-from Common.mod_manager import ModManager
 import math
 import time
 
@@ -12,9 +11,13 @@ from Common.sara_common import SaraRobotCommands
 
 
 class Compass:
-    def __init__(self, mod_manager, bodypart):
-        self.mod_manager = mod_manager
-        self.full_bodypart_name = bodypart_to_string(bodypart) + ".compass"
+    def __init__(self, bridge_manager, parent_name, instance_ENUM):
+        self.bridge_manager = bridge_manager
+        self.parent_name = parent_name
+        self.instance_ENUM = instance_ENUM
+        self.instance_name = self.parent_name + "." + bodypart_to_string(instance_ENUM)
+
+        print("Adding " + self.instance_name)
 
         self.sensors = np.zeros(1)
         self.abs_angle = 0
@@ -24,24 +27,32 @@ class Compass:
         self.target_rotation = 0
         self.rotation_tmo_counter = 0
         self.rotation_tmo_threshold = 100
+        self.callback = None
 
-        print("Adding " + self.full_bodypart_name)
 
     def new_data(self, data):
         try:
+            # print("--> compass: " + data.hex())
+
             datalength = data[2]
 
-            assert datalength == 6, self.full_bodypart_name + " data length not correct!"
+            assert datalength == 6, (
+                self.full_bodypart_name + " data length not correct!"
+            )
 
-            # for i in range(11):
-            new_byte_array = data[3:-2]
+            new_byte_array = data[3 : 3+6]
 
             int16_array_5 = np.frombuffer(new_byte_array, dtype=">i2")
-            compass_angle, angle_degrees = self.calculate_angle(int16_array_5[0], int16_array_5[1])
+            compass_angle, angle_degrees = self.calculate_angle(
+                int16_array_5[0], int16_array_5[1]
+            )
 
             self.abs_angle = float(compass_angle)
             self.valid_data = True
             self.error_counter = 0
+
+            if self.callback is not None:
+                self.callback()            
 
         except:
             print("Compass data processing error")
@@ -53,6 +64,9 @@ class Compass:
 
     def read_abs_angle(self):
         return self.abs_angle
+
+    def print_values(self):
+        print(f"Compass    : {self.abs_angle:.0f} Degree")
 
     # Function to calculate the angle
     def calculate_angle(self, x, y):
@@ -70,9 +84,15 @@ class Compass:
         return compass_degree, angle_degrees
 
     # Rotate to an absolute angle using the compass
-    def rotate_absolute(self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=10):
-        assert abs_rotation_angle < 360, "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
-        assert abs_rotation_angle >= 0, "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
+    def rotate_absolute(
+        self, abs_rotation_angle=0, wait_for_finish=True, rotation_tmo_threshold=10
+    ):
+        assert (
+            abs_rotation_angle < 360
+        ), "Invalid abs_rotation_angle (>360 Deg is not allowed)!"
+        assert (
+            abs_rotation_angle >= 0
+        ), "Invalid abs_rotation_angle (<0 Deg is not allowed)!"
 
         self.target_rotation = int(abs_rotation_angle)
         self.rotate_ready = False
@@ -82,13 +102,21 @@ class Compass:
         print(f"Compass rotation to {self.target_rotation :.0f} Deg ", end="")
 
         # Send command
-        self.mod_manager.cmd_createCompassMoveCommand(
-            SaraRobotCommands.CMD_COMP_MOVE, self.target_rotation, rotation_tmo_threshold
+        self.bridge_manager.cmd_createCompassMoveCommand(
+            SaraRobotCommands.CMD_COMP_MOVE,
+            self.target_rotation,
+            rotation_tmo_threshold,
         )
+
+        if (wait_for_finish == False) or (rotation_tmo_threshold == 0):
+            print("\n")
+            return
 
         # Wait for the response message or a timeout of 20 seconds
         while self.rotate_ready == False:
-            assert self.rotation_tmo_counter < (rotation_tmo_threshold * 10), "Rotate absolute timeout!"
+            assert self.rotation_tmo_counter < (
+                rotation_tmo_threshold * 10
+            ), "Rotate absolute timeout!"
 
             time.sleep(0.1)
             self.rotation_tmo_counter += 1
@@ -107,7 +135,9 @@ class Compass:
             datalength = data[2]
 
             try:
-                assert datalength == 1, self.full_bodypart_name + " data length not correct!"
+                assert datalength == 1, (
+                    self.full_bodypart_name + " data length not correct!"
+                )
 
                 self.rotate_result = data[3] == 1
             except AssertionError as e:
@@ -117,4 +147,8 @@ class Compass:
         except:
             print(self.full_bodypart_name + " data processing error")
 
+        return
+    
+    def set_callback(self, callback):
+        self.callback = callback
         return

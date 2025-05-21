@@ -283,17 +283,22 @@ void Base_MotionUpdateWatchdog()
 	if (Watchdog_Timer > 0)
 	{
 		Watchdog_Timer--;
-
-		// Watchdog changed to 0 --> stop any motion
-		if (Watchdog_Timer == 0)
-		{
-			// Stop base movements
-			RightBaseMotor_State.PWM_Output = 100;
-			LeftBaseMotor_State.PWM_Output = 100;
-			CenterBaseMotor_State.PWM_Output = 100;
-
-			// Stop compass rotations
-			Compass_MoveState = 0;
-		}
 	}
+	else
+	{
+		Base_Abort();
+	}
+}
+
+void Base_Abort()
+{
+	Watchdog_Timer = 0;
+
+	// Stop base movements
+	RightBaseMotor_State.PWM_Output = 100;
+	LeftBaseMotor_State.PWM_Output = 100;
+	CenterBaseMotor_State.PWM_Output = 100;
+
+	// Stop compass rotations
+	Compass_MoveState = 0;
 }

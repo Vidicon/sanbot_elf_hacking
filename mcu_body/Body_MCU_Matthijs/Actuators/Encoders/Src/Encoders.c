@@ -47,7 +47,7 @@ void Encoders_SelfTest()
 }
 
 /* DMA Transfer Complete Interrupt Callback */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_RxCpltCallback_Encoders(UART_HandleTypeDef *huart)
 {
     int TmpEncoder = 0;
 

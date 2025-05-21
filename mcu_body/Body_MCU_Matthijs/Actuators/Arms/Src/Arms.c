@@ -281,7 +281,6 @@ void Arms_Update20Hz(struct Encoders_Data_Type *EncoderData)
 		GenericArms_HAL_Brake(False, RightArm);
 	}
 
-
 	HAL_TIM_Base_Start(LeftArm_State.TIM );
 	HAL_TIM_PWM_Start(LeftArm_State.TIM , TIM_CHANNEL_1);
 
@@ -326,6 +325,13 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled)
 	// To do
 }
 
+void LeftArm_Abort()
+{
+	LeftArm_State.MotionState = Motion_Idle;
+	LeftArm_State.PWM_Output = (100 - abs(0));
+	GenericArms_HAL_Brake(True, LeftArm);
+}
+
 //----------------------------------------------------------------
 //
 //----------------------------------------------------------------
@@ -355,4 +361,11 @@ void RightArm_Home()
 void RightArm_SelfTest(enum ENUM_Booleans Enabled)
 {
 	// To do
+}
+
+void RightArm_Abort()
+{
+	RightArm_State.MotionState = Motion_Idle;
+	RightArm_State.PWM_Output = (100 - abs(0));
+	GenericArms_HAL_Brake(False, RightArm);
 }

@@ -2,6 +2,7 @@
 #define _MYLIB_0x55_MESSAGES
 
 #include "stm32f1xx.h"
+#include "TouchSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -31,7 +32,27 @@
 #define CMD_COMP_MOVE			0x33
 #define CMD_BASE_BRAKE	 		0x34
 
+
+#define CMD_VERSION_HEAD 		0x40
+#define CMD_HEAD_PAN_MOVE 		0x41
+#define CMD_HEAD_PAN_BRAKE 		0x42
+#define CMD_HEAD_TILT_MOVE 		0x43
+#define CMD_HEAD_TILT_BRAKE 	0x44
+#define CMD_HEAD_LEFT_COLOR 	0x45
+#define CMD_HEAD_RIGHT_COLOR 	0x46
+#define CMD_HEAD_TILT_HOME 		0x47
+#define CMD_HEAD_PAN_HOME 		0x48
+#define CMD_HEAD_EYES 			0x49
+#define CMD_HEAD_LAMP 			0x4A
+#define CMD_HEAD_STOP 			0x4B
+#define CMD_HEAD_TOUCHSENSORS 	0x4C
+#define CMD_HEAD_LAST 			0x4F
+
 #define RESP_BIT 				0x80
+
+// Commands to body MCU
+#define HEAD_BUTTON_PRESSED		0x01
+#define HEAD_BUTTON_RELEASED	0x02
 
 
 struct PROTOCOL_0X55_Data_Type {
@@ -72,5 +93,8 @@ signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
+
+void SendTouchSensors(struct TouchSensors_Data_Type *TouchData);
+void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData);
 
 #endif

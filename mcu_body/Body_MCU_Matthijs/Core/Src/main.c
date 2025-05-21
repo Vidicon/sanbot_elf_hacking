@@ -60,7 +60,11 @@ TIM_HandleTypeDef htim11;
 TIM_HandleTypeDef htim12;
 TIM_HandleTypeDef htim14;
 
+UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart6;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN PV */
@@ -84,6 +88,15 @@ int MotionFront = 0;
 int DemoState[2];
 
 int System_Ready = False;
+
+unsigned int  uart1RxCounter    		= 0;
+unsigned char uart1RxChar				= 0;
+unsigned char uart4RxChar				= 0;
+int datalen = 1;
+
+void BodyStop(void);
+void BodyRelease(void);
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,6 +110,8 @@ static void MX_TIM11_Init(void);
 static void MX_TIM12_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_USART1_UART_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -104,12 +119,76 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+//------------------------------------------------------------------------------------
+// Uart interrupt callback
+// Start 	= 0x55
+// Type  	= 0..127 (Command), high bit = response
+// Length	= 0..255
+// Data
+// CRC Low byte
+// CRC high byte
+// CRC modbus = 0x104B
+//------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == USART6)
+	{
+		HAL_UART_RxCpltCallback_Encoders(huart);
+	}
+
+	if (huart->Instance == USART1)
+	{
+		Protocol_0x55_NewData((uint8_t*) &uart1RxChar, (uint32_t*) &datalen);
+		HAL_UART_Receive_IT(&huart1, &uart1RxChar, 1);	// Enable next character reception
+	}
+
+	// To/From Head
+	if(huart->Instance == UART4)
+	{
+		// STOP button pressed
+		if (uart4RxChar == 0x01)
+		{
+			BodyStop();
+		}
+
+		// STOP button released
+		if (uart4RxChar == 0x02)
+		{
+			BodyRelease();
+		}
+
+		HAL_UART_Receive_IT(&huart4, &uart4RxChar, 1);
+	}
+}
+void BodyStop(void)
+{
+	RGBLeds_SetAllColors(LeftArm, Red, LED_On);
+	RGBLeds_SetAllColors(RightArm, Red, LED_On);
+	RGBLeds_SetAllColors(Base, Red, LED_On);
+
+	Base_Abort();
+	LeftArm_Abort();
+	RightArm_Abort();
+}
+
+void BodyRelease(void)
+{
+	RGBLeds_SetAllColors(LeftArm, Red, LED_Off);
+	RGBLeds_SetAllColors(RightArm, Red, LED_Off);
+	RGBLeds_SetAllColors(Base, Red, LED_Off);
+}
 
 void System_Initialize()
 {
 	HAL_TIM_Base_Start_IT(&htim14);
 
 	RGBLeds_Init();
+
+	Protocol_0x55_Init(&huart1);
+
+	HAL_UART_Receive_IT(&huart1, &uart1RxChar, 1);
+	HAL_UART_Receive_IT(&huart4, &uart4RxChar, 1);
 
 	Encoders_Init(&huart6);
 
@@ -179,6 +258,21 @@ void Check_USB_Communication()
 		{
 			Base_MotionStartWatchdog(Protocol_0x55_GetData(5));
 			Base_NewCompassRotation(Protocol_0x55_GetData(3), Protocol_0x55_GetData(4));
+		}
+
+		if (command == CMD_LA_HOME)
+		{
+			LeftArm_Home();
+		}
+
+		if (command == CMD_RA_HOME)
+		{
+			RightArm_Home();
+		}
+
+		if (command == CMD_BODY_STOP)
+		{
+			BodyStop();
 		}
 
 		Protocol_0x55_MarkProcessed();
@@ -361,11 +455,11 @@ int main(void)
   MX_I2C3_Init();
   MX_I2C1_Init();
   MX_USB_DEVICE_Init();
+  MX_USART1_UART_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
   System_Initialize();
-
-  Protocol_0x55_Init();
 
   GenericBase_HAL_Brake(False, LeftBaseMotor);
   GenericBase_HAL_Brake(False, CenterBaseMotor);
@@ -421,7 +515,9 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
+		  HAL_Delay(1);
 		  SendCompass(Compass_GetPointer());
+		  HAL_Delay(1);
 	  }
 
 	  if (Update_1Hz)
@@ -726,6 +822,72 @@ static void MX_TIM14_Init(void)
 }
 
 /**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief USART6 Initialization Function
   * @param None
   * @retval None
@@ -771,6 +933,12 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+  /* DMA2_Stream7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 
 }
 

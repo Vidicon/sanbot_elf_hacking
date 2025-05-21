@@ -4,14 +4,15 @@ import time
 
 from Common.sara_library import *
 
-
 def main():
-    robot = SaraRobot("COM2", "COM3", "/dev/ttyACM1", "/dev/ttyACM2")
+    robot = SaraRobot(logging=False)
 
-    robot.getversion()
+    time.sleep(1)
 
-    time.sleep(3)
+    robot.body.getversion()
+    robot.head.getversion()
 
+    time.sleep(10)
     robot.stop()
 
     return
