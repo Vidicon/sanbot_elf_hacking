@@ -45,6 +45,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 void HeadLed(int LedOn);
+void HeadStop(void);
+void HeadRelease(void);
 //void Update_Eyes(int BlinkEye);
 
 /* USER CODE END PD */
@@ -64,7 +66,7 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim8;
 
-UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart5;
 
 /* USER CODE BEGIN PV */
 int SelfTestTimer = 0;
@@ -111,7 +113,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI3_Init(void);
-static void MX_UART4_Init(void);
+static void MX_UART5_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -151,8 +153,8 @@ void System_Initialize_Start()
 
 	SSD1305_init(&left_eye, &right_eye);
 
-	SSD1305_writeDisplay(&left_eye, &default_left_eye_closed);
-	SSD1305_writeDisplay(&right_eye, &default_right_eye_closed);
+	SSD1305_writeDisplay(&left_eye, (uint8_t*) &default_left_eye_closed);
+	SSD1305_writeDisplay(&right_eye, (uint8_t*) &default_right_eye_closed);
 
 	Eyes_Init(&left_eye, &right_eye);
 }
@@ -264,18 +266,20 @@ void HeadButton_Update()
 		HeadStop();
 
 		TxBuffer[0] = HEAD_BUTTON_PRESSED;
-		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
+		HAL_UART_Transmit(&huart5, (uint8_t*) &TxBuffer[0], 1, 10);
 	}
 
 	// Released
 	if ((Button[0] == 0) && (Button[1] == 1))
 	{
+		HeadRelease();
+
 		TxBuffer[0] = HEAD_BUTTON_RELEASED;
-		HAL_UART_Transmit(&huart4, &TxBuffer[0], 1, 10);
+		HAL_UART_Transmit(&huart5, (uint8_t*) &TxBuffer[0], 1, 10);
 	}
 }
 
-void HeadStop()
+void HeadStop(void)
 {
 	RGBLeds_SetAllColors(LeftHead, Red, LED_On);
 	RGBLeds_SetAllColors(RightHead, Red, LED_On);
@@ -283,6 +287,12 @@ void HeadStop()
 	// Abort any motion
 	HeadPan_State.MotionState = Motion_Idle;
 	HeadTilt_State.MotionState = Motion_Idle;
+}
+
+void HeadRelease(void)
+{
+	RGBLeds_SetAllColors(LeftHead, Red, LED_Off);
+	RGBLeds_SetAllColors(RightHead, Red, LED_Off);
 }
 
 void setPanMotor(int8_t setSpeed)
@@ -330,7 +340,7 @@ int main(void)
   MX_TIM8_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
-  MX_UART4_Init();
+  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
 
 	TIM2->CCR2 = 0;
@@ -795,35 +805,35 @@ static void MX_TIM8_Init(void)
 }
 
 /**
-  * @brief UART4 Initialization Function
+  * @brief UART5 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_UART4_Init(void)
+static void MX_UART5_Init(void)
 {
 
-  /* USER CODE BEGIN UART4_Init 0 */
+  /* USER CODE BEGIN UART5_Init 0 */
 
-  /* USER CODE END UART4_Init 0 */
+  /* USER CODE END UART5_Init 0 */
 
-  /* USER CODE BEGIN UART4_Init 1 */
+  /* USER CODE BEGIN UART5_Init 1 */
 
-  /* USER CODE END UART4_Init 1 */
-  huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
-  huart4.Init.WordLength = UART_WORDLENGTH_8B;
-  huart4.Init.StopBits = UART_STOPBITS_1;
-  huart4.Init.Parity = UART_PARITY_NONE;
-  huart4.Init.Mode = UART_MODE_TX_RX;
-  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart4) != HAL_OK)
+  /* USER CODE END UART5_Init 1 */
+  huart5.Instance = UART5;
+  huart5.Init.BaudRate = 115200;
+  huart5.Init.WordLength = UART_WORDLENGTH_8B;
+  huart5.Init.StopBits = UART_STOPBITS_1;
+  huart5.Init.Parity = UART_PARITY_NONE;
+  huart5.Init.Mode = UART_MODE_TX_RX;
+  huart5.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart5.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart5) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN UART4_Init 2 */
+  /* USER CODE BEGIN UART5_Init 2 */
 
-  /* USER CODE END UART4_Init 2 */
+  /* USER CODE END UART5_Init 2 */
 
 }
 

@@ -59,8 +59,6 @@ void GenericArms_HAL_Direction(enum ENUM_ArmDirection Direction, enum ENUM_BodyP
 
 void GenericArms_Init(struct Arm_State_Type LeftArm_State);
 
-
-
 //------------------------------------------------
 void LeftArm_Init(TIM_HandleTypeDef *htim);
 
@@ -68,28 +66,17 @@ void LeftArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void LeftArm_Home();
 
-//void LeftArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
-//
-//void LeftArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
-//
-//void LeftArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
-//
-//void LeftArm_NewSetpoint(int NewSetpoint);
+void LeftArm_Abort();
 
 //------------------------------------------------
+
 void RightArm_Init(TIM_HandleTypeDef *htim);
 
 void RightArm_SelfTest(enum ENUM_Booleans Enabled);
 
 void RightArm_Home();
 
-//void RightArm_Update20Hz(struct Encoders_Data_Type *EncoderData);
-//
-//void RightArm_HAL_Brake(enum ENUM_Booleans BrakeEnable);
-//
-//void RightArm_EnableBrake(enum ENUM_Booleans BrakeEnable);
-//
-//void RightArm_NewSetpoint(int NewSetpoint);
+void RightArm_Abort();
 
 //------------------------------------------------
 #endif /* ARMS_INC_ARMS_H_ */

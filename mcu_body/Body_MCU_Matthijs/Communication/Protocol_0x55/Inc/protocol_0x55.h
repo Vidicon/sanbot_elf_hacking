@@ -34,10 +34,10 @@
 #define CMD_BASE_BRAKE	 		0x34
 #define CMD_LA_HOME 			0x35
 #define CMD_RA_HOME 			0x36
-
+#define CMD_BODY_STOP 			0x37
+#define CMD_BODY_LAST 			0x3F
 
 #define RESP_BIT 				0x80
-
 
 struct PROTOCOL_0X55_Data_Type {
 			uint8_t FIFO_Data[FIFO_SIZE+1];

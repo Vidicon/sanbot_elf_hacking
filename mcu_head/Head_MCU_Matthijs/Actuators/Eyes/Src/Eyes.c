@@ -39,11 +39,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(left_eye, &nobleo_logo);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &nobleo_logo);
 		}
 		else
 		{
-			SSD1305_writeDisplay(left_eye, &nobleo_logo);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &nobleo_logo);
 		}
 	}
 
@@ -51,11 +51,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(left_eye, &default_left_eye_closed);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &default_left_eye_closed);
 		}
 		else
 		{
-			SSD1305_writeDisplay(left_eye, &default_left_eye_open);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &default_left_eye_open);
 		}
 	}
 
@@ -63,11 +63,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(left_eye, &fire_left_eye_low);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &fire_left_eye_low);
 		}
 		else
 		{
-			SSD1305_writeDisplay(left_eye, &fire_left_eye_high);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &fire_left_eye_high);
 		}
 	}
 
@@ -75,11 +75,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(left_eye, &tears_left_high);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &tears_left_high);
 		}
 		else
 		{
-			SSD1305_writeDisplay(left_eye, &tears_left_low);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &tears_left_low);
 		}
 	}
 
@@ -87,11 +87,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(left_eye, &heart_left_high);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &heart_left_high);
 		}
 		else
 		{
-			SSD1305_writeDisplay(left_eye, &heart_left_low);
+			SSD1305_writeDisplay(left_eye, (uint8_t*) &heart_left_low);
 		}
 	}
 
@@ -101,11 +101,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(right_eye, &sara_logo);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &sara_logo);
 		}
 		else
 		{
-			SSD1305_writeDisplay(right_eye, &sara_logo);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &sara_logo);
 		}
 	}
 
@@ -113,11 +113,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(right_eye, &default_right_eye_closed);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &default_right_eye_closed);
 		}
 		else
 		{
-			SSD1305_writeDisplay(right_eye, &default_right_eye_open);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &default_right_eye_open);
 		}
 	}
 
@@ -125,11 +125,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(right_eye, &fire_right_eye_low);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &fire_right_eye_low);
 		}
 		else
 		{
-			SSD1305_writeDisplay(right_eye, &fire_right_eye_high);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &fire_right_eye_high);
 		}
 	}
 
@@ -137,11 +137,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(right_eye, &tears_right_high);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &tears_right_high);
 		}
 		else
 		{
-			SSD1305_writeDisplay(right_eye, &tears_right_low);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &tears_right_low);
 		}
 	}
 
@@ -149,11 +149,11 @@ void Update_Eyes(int BlinkEye)
 	{
 		if (BlinkEye == True)
 		{
-			SSD1305_writeDisplay(right_eye, &heart_right_high);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &heart_right_high);
 		}
 		else
 		{
-			SSD1305_writeDisplay(right_eye, &heart_right_low);
+			SSD1305_writeDisplay(right_eye, (uint8_t*) &heart_right_low);
 		}
 	}
 }
