@@ -21,12 +21,11 @@ def main():
     # In this case, send every 1 second.
     # ==================================================================================================
     # Do some XYR moves
-    robot.base.motors.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
+    robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move_stop()
-    # robot.base.brake(ApplyBrake=True)
     time.sleep(2.0)
 
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=50, Rotation_Velocity=0)
@@ -34,7 +33,6 @@ def main():
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=50, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move_stop()
-    # robot.base.brake(ApplyBrake=True)
     time.sleep(1.0)
 
     robot.base.move(Sideways_Velocity=-50, Forward_Velocity=0, Rotation_Velocity=0)
@@ -42,7 +40,6 @@ def main():
     robot.base.move(Sideways_Velocity=-50, Forward_Velocity=0, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move_stop()
-    # robot.base.brake(ApplyBrake=True)
     time.sleep(2.0)
 
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=-50, Rotation_Velocity=0)
@@ -50,7 +47,6 @@ def main():
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=-50, Rotation_Velocity=0)
     time.sleep(1.0)
     robot.base.move_stop()
-    # robot.base.brake(ApplyBrake=True)
     time.sleep(1.0)
 
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=60)
@@ -58,7 +54,6 @@ def main():
     robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=60)
     time.sleep(1.0)
     robot.base.move_stop()
-    # robot.base.brake(ApplyBrake=True)
     time.sleep(1.0)
 
     # Turn back to an absolute angle

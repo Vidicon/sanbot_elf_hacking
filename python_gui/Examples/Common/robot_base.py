@@ -25,18 +25,11 @@ class RobotBase:
 
         print("Adding " + self.instance_name)
 
-        # self.bridge_manager = bridge_manager
-        # self.bodypart = bodypart
-        # self.full_bodypart_name = bodypart_to_string(bodypart)
-        # print("Adding " + "robot." + self.full_bodypart_name)
-        # self.led = ColorLed(self.bridge_manager, self.bodypart)
-
         self.led = ColorLed(self.bridge_manager,
                     parent_name = self.instance_name, 
                     instance_ENUM= SaraRobotPartNames.BASE_LED
                     )
 
-        # self.motors = BaseMotors(self.bridge_manager, self.bodypart)
         self.motors = BaseMotors(self.bridge_manager,
                                  parent_name = self.instance_name, 
                                 instance_ENUM= SaraRobotPartNames.BASE_MOTORS
