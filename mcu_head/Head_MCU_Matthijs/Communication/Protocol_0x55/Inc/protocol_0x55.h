@@ -93,8 +93,8 @@ signed char Protocol_0x55_GetData(int Index);
 
 void Protocol_0x55_ClearRxBuffer();
 
-
 void SendTouchSensors(struct TouchSensors_Data_Type *TouchData);
+
 void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData);
 
 #endif
