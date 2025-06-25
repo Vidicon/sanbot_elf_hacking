@@ -7,6 +7,7 @@
 #include "DistanceSensors.h"
 #include "Compass.h"
 #include "Battery.h"
+#include "TouchSensors.h"
 
 #define RESPONSE_TRUE 		1
 #define RESPONSE_FALSE 		0
@@ -26,7 +27,6 @@
 #define CMD_GET_COMPASS 	    0x23
 #define CMD_GET_BATTERY 	    0x24
 
-
 #define CMD_LA_MOVE		 		0x30
 #define CMD_RA_MOVE		 		0x31
 #define CMD_BASE_MOVE	 		0x32
@@ -35,6 +35,7 @@
 #define CMD_LA_HOME 			0x35
 #define CMD_RA_HOME 			0x36
 #define CMD_BODY_STOP 			0x37
+#define CMD_BODY_TOUCHSENSORS	0x38
 #define CMD_BODY_LAST 			0x3F
 
 #define RESP_BIT 				0x80
@@ -103,10 +104,14 @@ void SendBattery(struct Battery_Sensor_Type *BatteryData);
 
 void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *BatteryData);
 
-//------------------------------------------------------------------------------------------
+
 void SendCompassMoveDone(uint8_t Succes);
 
 void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes);
 
+
+void SendTouchSensors(struct TouchSensors_Data_Type *TouchData);
+
+void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData);
 
 #endif

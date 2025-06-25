@@ -110,12 +110,10 @@ void Error_Handler(void);
 #define RightLimitBack_GPIO_Port GPIOG
 #define RightLimitUp_Pin GPIO_PIN_1
 #define RightLimitUp_GPIO_Port GPIOG
-#define PE7_Pin GPIO_PIN_7
-#define PE7_GPIO_Port GPIOE
-#define PE8_Pin GPIO_PIN_8
-#define PE8_GPIO_Port GPIOE
-#define PE9_Pin GPIO_PIN_9
-#define PE9_GPIO_Port GPIOE
+#define TouchL_Pin GPIO_PIN_12
+#define TouchL_GPIO_Port GPIOE
+#define TouchR_Pin GPIO_PIN_13
+#define TouchR_GPIO_Port GPIOE
 #define RightArmRed_Pin GPIO_PIN_10
 #define RightArmRed_GPIO_Port GPIOD
 #define RightArmGreen_Pin GPIO_PIN_14
