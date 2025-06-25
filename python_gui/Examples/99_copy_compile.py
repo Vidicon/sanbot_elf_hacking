@@ -41,3 +41,5 @@ for item in os.listdir(destination_common_folder):
         os.remove(file_path)
 
 
+destination_teacher_folder = os.path.join(current_folder, "../Teacher")
+shutil.copytree(examples_source_folder, destination_teacher_folder, dirs_exist_ok=True)
