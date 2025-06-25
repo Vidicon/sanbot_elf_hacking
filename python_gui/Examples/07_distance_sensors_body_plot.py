@@ -13,9 +13,9 @@ ani = []
 
 # Update function for the animation
 def update_sensor_plot(frame, ax1, ax2, robot):
-    raw_values = robot.body.distancesensors.get_all_values() / 65536
-    sensor_angles_bottom = robot.body.distancesensors.sensor_angles_bottom
-    sensor_angles_mid = robot.body.distancesensors.sensor_angles_mid
+    raw_values = robot.body.distance_sensors.get_all_values() / 65536
+    sensor_angles_bottom = robot.body.distance_sensors.sensor_angles_bottom
+    sensor_angles_mid = robot.body.distance_sensors.sensor_angles_mid
 
     # Clear the axis and re-plot
     ax1.clear()
@@ -103,7 +103,7 @@ def main():
     #     interval=250,
     # )
 
-    old_counter = robot.body.distancesensors.get_rx_counter()
+    old_counter = robot.body.distance_sensors.get_rx_counter()
 
     try:
         while True:
@@ -114,10 +114,10 @@ def main():
 
             # Wait for new distance sensor data
             try:
-                while old_counter == robot.body.distancesensors.get_rx_counter():
+                while old_counter == robot.body.distance_sensors.get_rx_counter():
                     time.sleep(0.1)
 
-                old_counter = robot.body.distancesensors.get_rx_counter()
+                old_counter = robot.body.distance_sensors.get_rx_counter()
             except KeyboardInterrupt:
                 return
 

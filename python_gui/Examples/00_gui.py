@@ -788,6 +788,75 @@ class SaraGUI:
         # )
         # self.stream_area.grid(row=20, column=0, columnspan=10, sticky="w")
 
+        # --------------------------------------------------------------------------------------
+        # Moves
+        # --------------------------------------------------------------------------------------
+        row_count += 3
+
+        self.button_Move_BACK = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Move Forward",
+            command=lambda: robot.base.move(Sideways_Velocity=0, Forward_Velocity=50, Rotation_Velocity=0),
+        )
+        self.button_Move_BACK.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Move_BACK = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Move Backward",
+            command=lambda: robot.base.move(Sideways_Velocity=0, Forward_Velocity=-50, Rotation_Velocity=0),
+        )
+        self.button_Move_BACK.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Move_LEFT = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Move Left",
+            command=lambda: robot.base.move(Sideways_Velocity=-50, Forward_Velocity=0, Rotation_Velocity=0),
+        )
+        self.button_Move_LEFT.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Move_RIGHT = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Move Right",
+            command=lambda: robot.base.move(Sideways_Velocity=50, Forward_Velocity=0, Rotation_Velocity=0),
+        )
+        self.button_Move_RIGHT.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Rotate_LEFT = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Rotate Left",
+            command=lambda: robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=50),
+        )
+        self.button_Rotate_LEFT.grid(row=row_count, column=col_count, sticky="w")
+
+        row_count += 1
+
+        self.button_Rotate_RIGHT = tk.Button(
+            self.frame,
+            height=1,
+            width=button_width,
+            text="Rotate Right",
+            command=lambda: robot.base.move(Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=-50),
+        )
+        self.button_Rotate_RIGHT.grid(row=row_count, column=col_count, sticky="w")
+
     def on_closing(self):
         time.sleep(1)
         self.root.destroy()  # This will close the window

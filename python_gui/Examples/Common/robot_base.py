@@ -25,18 +25,11 @@ class RobotBase:
 
         print("Adding " + self.instance_name)
 
-        # self.bridge_manager = bridge_manager
-        # self.bodypart = bodypart
-        # self.full_bodypart_name = bodypart_to_string(bodypart)
-        # print("Adding " + "robot." + self.full_bodypart_name)
-        # self.led = ColorLed(self.bridge_manager, self.bodypart)
-
         self.led = ColorLed(self.bridge_manager,
                     parent_name = self.instance_name, 
                     instance_ENUM= SaraRobotPartNames.BASE_LED
                     )
 
-        # self.motors = BaseMotors(self.bridge_manager, self.bodypart)
         self.motors = BaseMotors(self.bridge_manager,
                                  parent_name = self.instance_name, 
                                 instance_ENUM= SaraRobotPartNames.BASE_MOTORS
@@ -57,20 +50,6 @@ class RobotBase:
             SaraRobotCommands.CMD_BASE_MOVE,
             4,
             np.array([Sideways_Velocity, Forward_Velocity, Rotation_Velocity, 0]),
-        )
-
-    def move_debug(
-        self, Sideways_Velocity=0, Forward_Velocity=0, Rotation_Velocity=0, tmo=999
-    ):
-
-        assert abs(Sideways_Velocity <= 100), "Abs(Sideways) velocity too high"
-        assert abs(Forward_Velocity <= 100), "Abs(Forward) velocity too high"
-        assert abs(Rotation_Velocity <= 100), "Abs(Rotation) velocity too high"
-
-        self.mod_manbridge_managerger.cmd_Generic(
-            SaraRobotCommands.CMD_BASE_MOVE,
-            4,
-            np.array([Sideways_Velocity, Forward_Velocity, Rotation_Velocity, tmo]),
         )
 
     # Not sure if robot has brakes on base motors!!!

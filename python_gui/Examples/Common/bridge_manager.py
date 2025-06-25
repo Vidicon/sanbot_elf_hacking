@@ -174,12 +174,9 @@ class COMConnection:
             
             if number_of_bytes > 0:
                 data = self.serial_port.read(number_of_bytes)
-                # if self.receive_callback:
-                #     self.receive_callback(data)
                 self.process_data_callback(data, number_of_bytes)
 
     def connect(self):
-        # print(f"Connecting to port {self.port} at baudrate {self.baudrate}")
         try:
             self.serial_port = serial.Serial(
                 port=self.port, baudrate=self.baudrate, timeout=self.timeout
@@ -258,7 +255,7 @@ class COMConnection:
         
         # total message not long enough yet
         if (len(self.buffer) < (datalength + 5)):
-            print("--> >= 5 bytes but not a complete message yet.")
+            # print("--> >= 5 bytes but not a complete message yet.")
             return
 
         # print("--> Complete message ready to process.")

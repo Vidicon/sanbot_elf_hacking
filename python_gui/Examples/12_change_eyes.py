@@ -6,7 +6,7 @@ from Common.sara_library import *
 
 
 def main():
-    robot = SaraRobot(logging=True)
+    robot = SaraRobot(logging=False)
 
     robot.head.getversion()
     robot.body.getversion()

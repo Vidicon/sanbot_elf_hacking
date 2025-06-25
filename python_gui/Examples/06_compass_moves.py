@@ -27,12 +27,10 @@ def main():
     angle = robot.body.compass.read_abs_angle()
     robot.body.compass.print_values()
 
-    robot.body.compass.rotate_absolute(200, wait_for_finish=True)
+    robot.body.compass.rotate_absolute(200, wait_for_finish=True, rotation_tmo_threshold=20)
 
     angle = robot.body.compass.read_abs_angle()
     robot.body.compass.print_values()
-
-    # time.sleep(10)
 
     robot.stop()
     return

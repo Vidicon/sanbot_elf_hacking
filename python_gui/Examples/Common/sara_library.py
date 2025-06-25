@@ -92,12 +92,6 @@ class SaraRobot:
         self.base.brake(ApplyBrake=False)
         self.bridge_manager.disconnect()
 
-    # def my_receive_callback_body(self, data):
-    #     return
-
-    # def my_receive_callback_head(self, data):
-    #     return
-    
     def noodstop(self):
         self.bridge_manager.cmd_Generic(
             SaraRobotCommands.CMD_BODY_STOP, 0, 0, SaraRobotPartNames.BODY)
