@@ -6,9 +6,13 @@
 
 static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData_DMA_Copy;
+
+static int DMA_Tx_Len;
 
 // volatile to indicate this variable can be changed at any time.
 static volatile uint8_t RxMutex;
+static UART_HandleTypeDef *Uart_0x55;
 
 // Allow other modules to retreive the Rx pointer
 struct PROTOCOL_0X55_Data_Type* Protocol_0x55_GetRxPointer()
@@ -163,7 +167,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-HEAD by MatthijsFH - TAG V2.0 - ");
+	sprintf(&Buffer[3], "SANBOT-HEAD by MatthijsFH - TAG V3.0 - ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -227,9 +231,20 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 
 void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
-}
+	// Transmission is NOT complete
+	while (__HAL_UART_GET_FLAG(Uart_0x55, UART_FLAG_TC) != 1)
+	{
+		HAL_Delay(1);
+	}
 
+	// Copy Tx data to new memory location, so the next packet can already be constructed during
+	// DMA transmission.
+	DMA_Tx_Len = 3 + payloadLen + 2;
+
+	memcpy((uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy, (uint8_t *)&PROTOCOL_0X55_TxData, sizeof(PROTOCOL_0X55_TxData));
+
+	HAL_UART_Transmit_DMA(Uart_0x55, (uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy.FIFO_Data[0], DMA_Tx_Len);
+}
 signed char Protocol_0x55_GetData(int Index)
 {
 	return PROTOCOL_0X55_RxData.FIFO_Data[Index];
