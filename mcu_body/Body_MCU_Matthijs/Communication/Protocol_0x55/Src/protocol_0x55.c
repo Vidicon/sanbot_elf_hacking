@@ -174,7 +174,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH - TAG V2.0 - ");
+	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH - TAG V3.0 - ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -247,8 +247,6 @@ void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 	// Copy Tx data to new memory location, so the next packet can already be constructed during
 	// DMA transmission.
 	DMA_Tx_Len = 3 + payloadLen + 2;
-
-//	memcpy((uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy.FIFO_Data[0], (uint8_t *)&PROTOCOL_0X55_TxData.FIFO_Data[0], DMA_Tx_Len);
 
 	memcpy((uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy, (uint8_t *)&PROTOCOL_0X55_TxData, sizeof(PROTOCOL_0X55_TxData));
 
