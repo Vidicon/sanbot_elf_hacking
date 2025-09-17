@@ -67,11 +67,13 @@ class DistanceSensors:
                 combined_int = int.from_bytes(new_byte_array[0:2], byteorder="big")
                 self.sensors[i] = float(combined_int)
 
-            if (self.sensors[8] == 0) or (self.sensors[9] == 0) or (self.sensors[10] == 0):
+            # if (self.sensors[8] == 0) or (self.sensors[9] == 0) or (self.sensors[10] == 0):
                 # print("Invalid value for sensors 8, 9 or 10 detected!")
-                self.sensors[8] = self.sensors_prev[8]
-                self.sensors[9] = self.sensors_prev[9]
-                self.sensors[10] = self.sensors_prev[10]
+                # print("Raw data received : ", [f"0x{byte:02X}" for byte in data])
+
+            #     self.sensors[8] = self.sensors_prev[8]
+            #     self.sensors[9] = self.sensors_prev[9]
+            #     self.sensors[10] = self.sensors_prev[10]
 
             self.valid_data = True
             self.error_counter = 0

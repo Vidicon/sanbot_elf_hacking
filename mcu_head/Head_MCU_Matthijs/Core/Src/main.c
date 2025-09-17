@@ -127,6 +127,8 @@ void System_Initialize_Start()
 
 	RGBLeds_Init();
 
+	Protocol_0x55_Init(&huart5);
+
 	Encoders_Init(&htim1, &htim3);
 
 	Head_Pan_Init(&htim8);
@@ -348,8 +350,6 @@ int main(void)
 
 	System_Initialize_Start();
 	System_Initialze_Update();
-
-	Protocol_0x55_Init();
 
   /* USER CODE END 2 */
 

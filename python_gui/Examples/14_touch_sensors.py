@@ -13,18 +13,26 @@ def main():
 
 
     while True:
-        touchsensors = robot.head.touch_sensors.get_all_values()
-        print("Touch sensors:", [int(value) for value in touchsensors])
+        touchsensors_head = robot.head.touch_sensors.get_all_values()
+        # print("Touch sensors head:", [int(value) for value in touchsensors_head])
 
-        if (touchsensors[4]):
+        touchsensors_body = robot.body.touch_sensors.get_all_values()
+        # print("Touch sensors body:", [int(value) for value in touchsensors_body])   
+
+        if (touchsensors_head[4]):
             print("Touch front right detected!")
-        if (touchsensors[0]):
+        if (touchsensors_head[0]):
             print("Touch front left detected!")
-        if (touchsensors[1]):   
+        if (touchsensors_head[1]):   
             print("Touch rear left detected!")
-        if (touchsensors[5]):   
+        if (touchsensors_head[5]):   
             print("Touch rear right detected!")      
           
+        if (touchsensors_body[0]):   
+            print("Touch arm left detected!")      
+        if (touchsensors_body[1]):   
+            print("Touch arm right detected!")      
+
         time.sleep(0.5)
     
     time.sleep(1)

@@ -7,8 +7,13 @@
 #include "Compass.h"
 #include "Battery.h"
 
+int payloadLen;
+
 static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_RxData;
 static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData;
+static struct PROTOCOL_0X55_Data_Type PROTOCOL_0X55_TxData_DMA_Copy;
+
+static int DMA_Tx_Len;
 
 // volatile to indicate this variable can be changed at any time.
 static volatile uint8_t RxMutex;
@@ -169,7 +174,7 @@ void Protocol_0x55_SendVersion(char *Buffer)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_VERSION, RESPONSE_TRUE);
 
-	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH - TAG V2.0 - ");
+	sprintf(&Buffer[3], "SANBOT-BODY by MatthijsFH - TAG V3.1 - ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __TIME__);
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], " ");
 	sprintf(&Buffer[3 + strlen(&Buffer[3])], __DATE__);
@@ -233,10 +238,19 @@ uint16_t Protocol_0x55_CalculateCRC16(char *data, uint8_t msgSize)
 
 void Protocol_0x55_Send(char *data, uint8_t payloadLen)
 {
-	// USB DMA tx
-	//	CDC_Transmit_FS((uint8_t*)data, 3 + payloadLen + 2);
+	// Transmission is NOT complete
+	while (__HAL_UART_GET_FLAG(Uart_0x55, UART_FLAG_TC) != 1)
+	{
+		HAL_Delay(1);
+	}
 
-	HAL_UART_Transmit_DMA(Uart_0x55, (uint8_t *)data, 3 + payloadLen + 2);
+	// Copy Tx data to new memory location, so the next packet can already be constructed during
+	// DMA transmission.
+	DMA_Tx_Len = 3 + payloadLen + 2;
+
+	memcpy((uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy, (uint8_t *)&PROTOCOL_0X55_TxData, sizeof(PROTOCOL_0X55_TxData));
+
+	HAL_UART_Transmit_DMA(Uart_0x55, (uint8_t *)&PROTOCOL_0X55_TxData_DMA_Copy.FIFO_Data[0], DMA_Tx_Len);
 }
 
 signed char Protocol_0x55_GetData(int Index)
@@ -365,7 +379,7 @@ void Protocol_0x55_SendBattery(char *Buffer, struct Battery_Sensor_Type *Battery
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_GET_BATTERY, RESPONSE_TRUE);
 
-	int payloadLen = 14;
+	payloadLen = 14;
 
 	// 	uint16_t DeviceType;
 	//	uint16_t FW_Version;
@@ -414,7 +428,7 @@ void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes)
 {
 	Protocol_0x55_PrepareNewMessage(Buffer, CMD_COMP_MOVE, RESPONSE_TRUE);
 
-	int payloadLen = 1;
+	payloadLen = 1;
 
 	Buffer[3 + 0] = Succes;
 
@@ -422,3 +436,28 @@ void Protocol_0x55_SendCompassMoveDone(char *Buffer, uint8_t Succes)
 	Protocol_0x55_AddCRC(Buffer, payloadLen);
 	Protocol_0x55_Send(Buffer, payloadLen);
 }
+
+//----------------------------------------------------------------
+// Touch sensors
+//----------------------------------------------------------------
+void SendTouchSensors(struct TouchSensors_Data_Type *TouchData)
+{
+	Protocol_0x55_SendTouchEvent((char *) &PROTOCOL_0X55_TxData.FIFO_Data[0], TouchData);
+}
+
+void Protocol_0x55_SendTouchEvent(char *Buffer, struct TouchSensors_Data_Type *TouchData)
+{
+	Protocol_0x55_PrepareNewMessage(Buffer, CMD_BODY_TOUCHSENSORS, RESPONSE_TRUE);
+
+	for (int i = 0; i < NO_TOUCH_SENSORS; i++)
+	{
+		Buffer[3 + i] = (TouchData->Sensor[i]);
+	}
+
+	payloadLen = NO_TOUCH_SENSORS;
+
+	Protocol_0x55_SetLength(Buffer, payloadLen);
+	Protocol_0x55_AddCRC(Buffer, payloadLen);
+	Protocol_0x55_Send(Buffer, payloadLen);
+}
+

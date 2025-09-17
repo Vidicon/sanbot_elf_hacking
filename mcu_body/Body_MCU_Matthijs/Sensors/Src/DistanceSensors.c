@@ -37,7 +37,6 @@ void DistanceSensors_Update()
 	// Left: 4 sensors 0, 1, 2, 3
 	if (DistanceData.SelectedSensor <= 3)
 	{
-
 		Left_Soft_I2C_Write(0x40, 0x5E);
 		DistanceData.Distance[DistanceData.SelectedSensor] = Left_Soft_I2C_Read(0x40);
 	}

@@ -33,6 +33,7 @@
 #include "DistanceSensors.h"
 #include "Compass.h"
 #include "Battery.h"
+#include "TouchSensors.h"
 #include "stm32f2xx.h"
 
 /* USER CODE END Includes */
@@ -202,6 +203,7 @@ void System_Initialize()
 
 	MotionSensors_Init();
 	DistanceSensors_Init();
+	TouchSensors_Init();
 
 	Compass_Init(&hi2c3);
 
@@ -508,6 +510,9 @@ int main(void)
 	  if (Update_5Hz)
 	  {
 		  Update_5Hz = 0;
+
+			TouchSensors_Update();
+			if (TouchSensor_AnyChanged()) { SendTouchSensors(TouchSensors_GetPointer());}
 	  }
 
 	  if (Update_2Hz)
@@ -515,9 +520,7 @@ int main(void)
 		  Update_2Hz = 0;
 
 		  SendEncoders(Encoders_GetPointer());
-		  HAL_Delay(1);
 		  SendCompass(Compass_GetPointer());
-		  HAL_Delay(1);
 	  }
 
 	  if (Update_1Hz)
@@ -1057,10 +1060,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PE7_Pin PE8_Pin PE9_Pin */
-  GPIO_InitStruct.Pin = PE7_Pin|PE8_Pin|PE9_Pin;
+  /*Configure GPIO pins : TouchL_Pin TouchR_Pin */
+  GPIO_InitStruct.Pin = TouchL_Pin|TouchR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RightArmRed_Pin RightArmGreen_Pin RightArmBlue_Pin */
